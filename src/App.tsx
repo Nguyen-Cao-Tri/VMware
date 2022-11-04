@@ -1,26 +1,20 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useCallback } from 'react';
+import './styles/App.css';
+import Router from './config/routes/routes';
+import LogProvider, { Handler } from './hooks/logProvider/LogProvider';
+// import useRequest from './hooks/useRequest/useRequest';
 
-function App() {
+const App: React.FC = () => {
+  // const request = useRequest();
+  const customHandler: Handler = useCallback((error: Error) => {
+    console.error('FROM Custom:', error);
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <LogProvider handler={customHandler}>
+      <div className="wrapper">
+        <Router />
+      </div>
+    </LogProvider>
   );
-}
-
+};
 export default App;

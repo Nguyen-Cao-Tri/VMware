@@ -1,0 +1,14 @@
+.list__item{
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.list__item__item ul{
+    list-style: none;
+    text-align: center;
+}
+
+.list__item__item ul li{
+    font-size: 20px;
+} 
