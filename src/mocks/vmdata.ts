@@ -15,49 +15,19 @@ export const listDatacenter = [
 
 export const listFolder = [
   {
-    datacenter: '01',
-    folder_item: [
-      {
-        folder: '01',
-        name: 'New Folder ',
-        type: 'DATACENTER',
-      },
-      {
-        folder: '02',
-        name: 'New Folder',
-        type: 'DATACENTER',
-      },
-    ],
+    folder: '01',
+    name: 'New Folder ',
+    type: 'DATACENTER',
   },
   {
-    datacenter: '02',
-    folder_item: [
-      {
-        folder: '01',
-        name: 'New Folder ',
-        type: 'DATACENTER',
-      },
-      {
-        folder: '02',
-        name: 'New Folder',
-        type: 'DATACENTER',
-      },
-    ],
+    folder: '02',
+    name: 'New Folder',
+    type: 'DATACENTER',
   },
   {
-    datacenter: '03',
-    folder_item: [
-      {
-        folder: '01',
-        name: 'New Folder ',
-        type: 'DATACENTER',
-      },
-      {
-        folder: '02',
-        name: 'New Folder',
-        type: 'DATACENTER',
-      },
-    ],
+    folder: '03',
+    name: 'New Folder ',
+    type: 'DATACENTER',
   },
 ];
 

@@ -2,17 +2,13 @@ import React from 'react';
 import { useRoutes } from 'react-router-dom';
 import NotFound from '../../pages/NotFound/NotFound';
 import DefaultLayout from '../../layouts/DefaultLayout';
-import VMware from '../../pages/VMware/VMware';
-import ListTree from '../../components/ListTree/ListTree';
+import LoginForm from '../../components/LoginForm/LoginForm';
 
 const routes = [
   {
     path: '/',
     element: <DefaultLayout />,
-    children: [
-      { index: true, element: <VMware /> },
-      { path: 'vcenter/datacenter', element: <ListTree /> },
-    ],
+    children: [{ path: 'auth/login', element: <LoginForm /> }],
   },
   {
     element: <NotFound />,
