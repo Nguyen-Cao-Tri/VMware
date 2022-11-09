@@ -1,21 +1,32 @@
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import { Button, Form, Input } from 'antd';
 import React from 'react';
 import 'antd/dist/antd.min.css';
 import useRequest from '../../hooks/useRequest/useRequest';
-import { AxiosResponse } from 'axios';
+import { useNavigate } from 'react-router-dom';
+import './styles.scss';
 
 const LoginForm: React.FC = () => {
+  const navigate = useNavigate();
   const { request } = useRequest();
+
   const onFinish = (values: any) => {
     const { username, password } = values;
     console.log('username password', username, password);
-    request('/auth/login', 'POST', { username, password })
-      .then((response: AxiosResponse) => {
+
+    request('/login', 'POST', { username, password })
+      .then((response: any) => {
         console.log('res', response);
-        // localStorage.setItem('apiKey', apiKey);
+        const apiKey = response.apiKey;
+        localStorage.setItem('apiKey', apiKey);
+        navigate('/');
       })
       .catch((error: any) => {
         console.log(error);
+        // const errorMessage =
+        // error.response.data.message || 'Unknown error';
+        // alert(errorMessage);
+        alert('Login Fail');
       });
   };
 
@@ -26,7 +37,7 @@ const LoginForm: React.FC = () => {
   return (
     <div className="login">
       <div className="item_login">
-        <h1>LOGIN</h1>
+        {/* <p>{isLoading ? 'Loading...' : ''} </p> */}
         <Form
           name="basic"
           onFinish={onFinish}
@@ -41,6 +52,7 @@ const LoginForm: React.FC = () => {
           >
             <Input />
           </Form.Item>
+
           <Form.Item
             className="input"
             label="Password"
@@ -49,6 +61,7 @@ const LoginForm: React.FC = () => {
           >
             <Input.Password />
           </Form.Item>
+
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit">
               Submit

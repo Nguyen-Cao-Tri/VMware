@@ -1,0 +1,45 @@
+.login {
+  background: linear-gradient(269.88deg, #e4f4ff 6.75%, #fcf8ed 95.85%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  .item_login {
+    background-color: #ffff;
+    border-radius: 10px;
+
+    h1 {
+      text-align: center;
+      color: rgb(41, 211, 241);
+    }
+    Form {
+      // border: 1px solid #333;
+      border-radius: 5px;
+      box-sizing: border-box;
+      box-shadow: 14px 14px 20px #cbced1;
+      width: 500px;
+      height: 250px;
+      padding: 50px;
+      position: relative;
+
+      .input {
+        margin-left: 20px;
+        width: 350px;
+        height: 35px;
+        border-radius: 4px;
+      }
+      button {
+        width: 50px;
+        position: absolute;
+        // bottom: 10px;
+        right: 55%;
+        height: 30px;
+        width: 80px;
+        border-radius: 2px;
+        border: 1px solid #59d7e7;
+        background: #59d7e7 ;
+        cursor: pointer;
+      }
+    }
+  }
+}

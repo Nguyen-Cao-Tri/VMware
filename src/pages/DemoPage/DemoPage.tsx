@@ -1,40 +1,91 @@
-import React, { useMemo } from 'react';
-// import { useLog } from '../hooks/logProvider/LogProvider';
+import { Tree } from 'antd';
+import type { DataNode } from 'antd/es/tree';
+import React, { useState } from 'react';
 
-/* eslint-disable @typescript-eslint/promise-function-async */
+const treeData: DataNode[] = [
+  {
+    title: '0-0',
+    key: '0-0',
+    children: [
+      {
+        title: '0-0-0',
+        key: '0-0-0',
+        children: [
+          { title: '0-0-0-0', key: '0-0-0-0' },
+          { title: '0-0-0-1', key: '0-0-0-1' },
+          { title: '0-0-0-2', key: '0-0-0-2' },
+        ],
+      },
+      {
+        title: '0-0-1',
+        key: '0-0-1',
+        children: [
+          { title: '0-0-1-0', key: '0-0-1-0' },
+          { title: '0-0-1-1', key: '0-0-1-1' },
+          { title: '0-0-1-2', key: '0-0-1-2' },
+        ],
+      },
+      {
+        title: '0-0-2',
+        key: '0-0-2',
+      },
+    ],
+  },
+  {
+    title: '0-1',
+    key: '0-1',
+    children: [
+      { title: '0-1-0-0', key: '0-1-0-0' },
+      { title: '0-1-0-1', key: '0-1-0-1' },
+      { title: '0-1-0-2', key: '0-1-0-2' },
+    ],
+  },
+  {
+    title: '0-2',
+    key: '0-2',
+  },
+];
 
-export default function DemoPage() {
-  const a = 3;
-  const b = 4;
-  const test = useMemo(() => {
-    const testMemo = () => {
-      console.log('hi', a + b);
-    };
-    console.log(typeof testMemo);
-    return testMemo;
-  }, [a, b]);
-  test();
+const App: React.FC = () => {
+  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([
+    '0-0-0',
+    '0-0-1',
+  ]);
+  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>(['0-0-0']);
+  const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
+  const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
 
-  // const { log } = useLog();
-  // // const log = (x: number) => {
-  // //   return new Promise<void>((resolve) => {
-  // //     setTimeout(() => {
-  // //       console.log('hi', x);
-  // //       resolve();
-  // //     }, 1000);
-  // //   });
-  // // };
+  const onExpand = (expandedKeysValue: React.Key[]) => {
+    console.log('onExpand', expandedKeysValue);
+    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
+    // or, you can remove all expanded children keys.
+    setExpandedKeys(expandedKeysValue);
+    setAutoExpandParent(false);
+  };
 
-  // useEffect(() => {
-  //   // const interval = setInterval(() => {
-  //   if (typeof log === 'function') {
-  //     log('This is log');
-  //   }
-  //   // }, 3000);
-  //   // return () => {
-  //   //   clearInterval(interval);
-  //   // };
-  // }, []);
+  const onCheck = (checkedKeysValue: any) => {
+    console.log('onCheck', checkedKeysValue);
+    setCheckedKeys(checkedKeysValue);
+  };
 
-  return <div>Demo Page</div>;
-}
+  const onSelect = (selectedKeysValue: React.Key[], info: any) => {
+    console.log('onSelect', info);
+    setSelectedKeys(selectedKeysValue);
+  };
+
+  return (
+    <Tree
+      checkable
+      onExpand={onExpand}
+      expandedKeys={expandedKeys}
+      autoExpandParent={autoExpandParent}
+      onCheck={onCheck}
+      checkedKeys={checkedKeys}
+      onSelect={onSelect}
+      selectedKeys={selectedKeys}
+      treeData={treeData}
+    />
+  );
+};
+
+export default App;

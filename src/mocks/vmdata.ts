@@ -1,31 +1,31 @@
 export const listDatacenter = [
   {
-    datacenter: '01',
+    id: '01',
     name: 'Datacenter 1',
   },
   {
-    datacenter: '02',
+    id: '02',
     name: 'Datacenter 2',
   },
   {
-    datacenter: '03',
+    id: '03',
     name: 'Datacenter 3',
   },
 ];
 
 export const listFolder = [
   {
-    folder: '01',
+    id: '011',
     name: 'New Folder ',
     type: 'DATACENTER',
   },
   {
-    folder: '02',
+    id: '021',
     name: 'New Folder',
     type: 'DATACENTER',
   },
   {
-    folder: '03',
+    id: '031',
     name: 'New Folder ',
     type: 'DATACENTER',
   },
@@ -37,20 +37,20 @@ export const listVM = [
     memory_size_MiB: 4096,
     name: 'VM',
     power_state: 'POWERED_OFF',
-    vm: '01',
+    id: '0111',
   },
   {
     cpu_count: 4,
     memory_size_MiB: 4096,
     name: 'VM',
     power_state: 'POWERED_OFF',
-    vm: '02',
+    id: '0211',
   },
   {
     cpu_count: 4,
     memory_size_MiB: 4096,
     name: 'VM',
     power_state: 'POWERED_OFF',
-    vm: '03',
+    id: '0311',
   },
 ];

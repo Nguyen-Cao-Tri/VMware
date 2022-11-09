@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 
 export default function useRequest(): any {
-  const [loading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const request = async (url: string, method?: string, data?: object) => {
     setIsLoading(true);
@@ -21,5 +21,5 @@ export default function useRequest(): any {
       .finally(() => setIsLoading(false));
     return await createRequest;
   };
-  return { request, loading, error };
+  return { request, isLoading, error };
 }
