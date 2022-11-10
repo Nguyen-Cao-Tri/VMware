@@ -1,0 +1,6 @@
+.top__content{
+    display: flex;
+    width: 200px;
+    height: 500px;
+    border-bottom-style: outset;
+}

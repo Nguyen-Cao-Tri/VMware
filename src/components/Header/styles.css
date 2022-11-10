@@ -1,0 +1,10 @@
+.wrapper{
+    height: 55px;
+    width: auto;
+    background-color: #59d7e7;
+    text-align:start;
+}
+h1{
+    margin-left: 30px ;
+    color: whitesmoke !important;
+}

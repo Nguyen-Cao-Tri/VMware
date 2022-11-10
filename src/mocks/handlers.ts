@@ -42,4 +42,22 @@ export const handlers = [
   rest.get('/api/vcenter/vm', (req, res, ctx) => {
     return res(ctx.status(200), ctx.json(listVM));
   }),
+  rest.post('/api/vcenter/vm/:vm/power', (req, res, ctx) => {
+    const { vm } = req.params;
+    console.log('param', req.params);
+
+    const action = req.url.searchParams.get('action');
+    switch (action) {
+      case 'on':
+        break;
+      case 'off':
+        break;
+      case 'reset':
+        break;
+      case 'suspend':
+        break;
+    }
+    // return res(ctx.text(vm));
+    return res(ctx.status(200), ctx.json({ vm, action }));
+  }),
 ];
