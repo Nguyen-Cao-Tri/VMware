@@ -2,21 +2,21 @@ import React from 'react';
 import { useRoutes } from 'react-router-dom';
 import NotFound from '../../pages/NotFound/NotFound';
 import DefaultLayout from '../../layouts/DefaultLayout/DefaultLayout';
-import DemoPage from '../../pages/DemoPage/DemoPage';
+// import DemoPage from '../../pages/DemoPage/DemoPage';
 import LoginForm from '../../pages/LoginForm/LoginForm';
-import Datacenter from '../../pages/Datacenter/Datacenter';
-
+import Parent from '../../pages/DemoPage/Parent';
 const routes = [
   {
     path: '/',
     element: <DefaultLayout />,
-    children: [
-      { path: 'api/vcenter/datacenter', element: <Datacenter /> },
-      { path: 'api/vcenter/folder', element: <DemoPage /> },
-      { path: 'api/vcenter/vm', element: <DemoPage /> },
-      { path: 'demo', element: <DemoPage /> },
-    ],
+    // children: [
+    //   { path: 'api/vcenter/datacenter', element: <DemoPage /> },
+    //   { path: 'api/vcenter/folder', element: <DemoPage /> },
+    //   { path: 'api/vcenter/vm', element: <DemoPage /> },
+    //   { path: 'demo', element: <DemoPage /> },
+    // ],
   },
+  { path: 'test', element: <Parent /> },
   {
     path: '/login',
     element: <LoginForm />,

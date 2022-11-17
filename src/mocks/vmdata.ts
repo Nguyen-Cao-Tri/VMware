@@ -19,6 +19,11 @@ export const listFolder = [
     name: 'New Folder ',
     type: 'DATACENTER',
   },
+  // {
+  //   id: '012',
+  //   name: 'New Folder ',
+  //   type: 'DATACENTER',
+  // },
   {
     id: '021',
     name: 'New Folder',

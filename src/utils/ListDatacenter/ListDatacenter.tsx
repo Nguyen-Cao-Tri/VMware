@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import React, { useEffect, useState } from 'react';
+import React, {
+  createContext,
+  PropsWithChildren,
+  useEffect,
+  useState,
+} from 'react';
 import 'antd/dist/antd.min.css';
 import { Tree, Dropdown, Menu, Modal } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
 import { useNavigate } from 'react-router-dom';
 import { DirectoryTreeProps } from 'antd/es/tree';
-import { PoweroffOutlined } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
-import { info } from 'console';
+import { PoweroffOutlined, ReloadOutlined } from '@ant-design/icons';
 
 const { DirectoryTree } = Tree;
 
@@ -17,13 +20,22 @@ interface DataNode {
   title: string;
   key: string;
   children?: DataNode[];
+  isLeaf?: boolean;
+}
+interface IContext {
+  onRightClick: DirectoryTreeProps['onRightClick'];
+  onSelect?: DirectoryTreeProps['onSelect'];
+  treeData?: DataNode[];
 }
 const initTreeData: DataNode[] = [
   { title: 'Datacenter 1', key: '01' },
   { title: 'Datacenter 2', key: '02' },
   { title: 'Datacenter 3', key: '03' },
 ];
-const ListDatacenter: React.FC = () => {
+const ListDatacenterContext = createContext<IContext>({
+  onRightClick: () => {},
+});
+const ListDatacenter: React.FC = (props: PropsWithChildren<any>) => {
   const items = (
     <Menu
       onClick={(key) => {
@@ -50,6 +62,10 @@ const ListDatacenter: React.FC = () => {
             break;
           case 'snapshot':
             handleSnapshot();
+            break;
+          case 'login':
+            handleLogin();
+            break;
         }
       }}
       items={[
@@ -60,6 +76,7 @@ const ListDatacenter: React.FC = () => {
         {
           label: 'Refresh',
           key: 'refresh',
+          icon: <ReloadOutlined />,
         },
         {
           label: 'Power',
@@ -85,6 +102,10 @@ const ListDatacenter: React.FC = () => {
           ],
         },
         {
+          label: 'Set user login',
+          key: 'login',
+        },
+        {
           label: 'Take Snapshot',
           key: 'snapshot',
         },
@@ -97,14 +118,16 @@ const ListDatacenter: React.FC = () => {
   const [action, setAction] = useState<string>('off');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rename, setRename] = useState<string>('');
+  const [renameInput, setRenameInput] = useState<string>('');
+  const [expand, setExpand] = useState<string[]>([]);
   const { request } = useRequest();
   const navigate = useNavigate();
   const updateTreeData = (
     list: DataNode[],
     key: React.Key,
-    children?: DataNode[],
+    children: DataNode[],
   ): DataNode[] =>
-    list.map((node) => {
+    list.map((node: any) => {
       if (node.key === key) {
         return {
           ...node,
@@ -120,10 +143,12 @@ const ListDatacenter: React.FC = () => {
       return node;
     });
   const onRightClick: DirectoryTreeProps['onRightClick'] = (info) => {
+    console.log('info', info);
     setInfor(info);
   };
   const onChange = (e: any) => {
     setRename(e.target.value);
+    setRenameInput(e.target.value);
   };
   const handleOk = () => {
     const findRename = (list: DataNode[]) => {
@@ -137,38 +162,42 @@ const ListDatacenter: React.FC = () => {
         }
       });
       console.log('list', list);
-      setTreeData(list);
-      setIsModalOpen(false);
+      return list;
     };
-    findRename(treeData);
-    console.log('treedata', treeData);
-    console.log('infor', infor.node.key);
+    setTreeData([...findRename(treeData)]);
+    setRename('');
+    setIsModalOpen(false);
   };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
   const handleRename = () => {
     setIsModalOpen(true);
+    setRenameInput(infor.node.title);
   };
   const handleRefresh = () => {
-    console.log('refresh');
+    setTreeData(initTreeData);
+    setExpand([]);
+    navigate('/');
   };
   const handlePowerOn = () => {
-    console.log('power on');
+    setAction('On');
   };
   const handlePowerOff = () => {
-    console.log('power off');
+    setAction('Off');
   };
   const handlePowerSuspend = () => {
-    console.log('power suspend');
+    setAction('Suspend');
   };
   const handlePowerReset = () => {
-    console.log('power reset');
+    setAction('Reset');
+  };
+  const handleLogin = () => {
+    console.log('login');
   };
   const handleSnapshot = () => {
     console.log('snapshot');
   };
-
   useEffect(() => {
     const getApiKey = localStorage.getItem('apiKey');
     if (getApiKey === undefined || getApiKey === null) {
@@ -182,10 +211,10 @@ const ListDatacenter: React.FC = () => {
     console.log('key select', keys);
     const getMock = (item: any) => {
       request(`/api/vcenter/${item}`, 'GET').then((res: any) => {
-        const obj = [...res];
-        obj.forEach((item: any) => {
+        console.log('res', res);
+        res.forEach((item: any) => {
           if (item.id.includes(keys[0])) {
-            setTreeData((treeData) =>
+            setTreeData(
               updateTreeData(treeData, keys[0], [
                 {
                   title: item.name,
@@ -220,47 +249,67 @@ const ListDatacenter: React.FC = () => {
         }`,
       );
     }
-    console.log('Key Select', keys);
-    console.log('Info Select', info);
+    // console.log('Key Select', keys);
+    // console.log('Info Select', info);
+  };
+  const value: IContext = {
+    onRightClick,
+    onSelect,
+    treeData,
   };
   return (
     <>
-      <Dropdown overlay={items} trigger={['contextMenu']}>
-        <div
-          className="site-dropdown-context-menu"
-          style={{
-            textAlign: 'center',
-            height: 200,
-            lineHeight: '200px',
-            width: 200,
-          }}
-        >
-          <DirectoryTree
-            multiple
-            onRightClick={onRightClick}
-            onSelect={onSelect}
-            treeData={treeData}
+      <ListDatacenterContext.Provider value={value}>
+        {props.children}
+        <Dropdown autoFocus overlay={items} trigger={['contextMenu']}>
+          <div
+            className="site-dropdown-context-menu"
             style={{
-              width: '200px',
-              height: '500px',
-              borderRightStyle: 'outset',
-              paddingTop: '20px',
-              borderBottomStyle: 'outset',
+              textAlign: 'center',
+              height: 200,
+              lineHeight: '200px',
+              width: 200,
             }}
-          />
-        </div>
-      </Dropdown>
-      <Modal
-        title="Rename"
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <div className="input__name">
-          <span>Enter the new name</span>
-          <input type="text" onChange={onChange} />
-        </div>
-      </Modal>
+          >
+            <DirectoryTree
+              defaultExpandedKeys={expand}
+              multiple
+              onRightClick={onRightClick}
+              onSelect={onSelect}
+              treeData={treeData}
+              style={{
+                width: '200px',
+                height: '500px',
+                borderRightStyle: 'outset',
+                paddingTop: '20px',
+                borderBottomStyle: 'outset',
+              }}
+            />
+            <Modal
+              title="Rename"
+              open={isModalOpen}
+              onOk={handleOk}
+              onCancel={handleCancel}
+            >
+              <div className="input__name">
+                <span>Enter the new name</span>
+                <input
+                  value={renameInput}
+                  style={{
+                    marginLeft: '10px',
+                    borderRadius: '10px',
+                    width: '200px',
+                    borderStyle: 'ridge',
+                    paddingLeft: '8px',
+                  }}
+                  type="text"
+                  onChange={onChange}
+                />
+              </div>
+            </Modal>
+          </div>
+        </Dropdown>
+      </ListDatacenterContext.Provider>
     </>
   );
 };
