@@ -10,7 +10,7 @@ import React, {
   useState,
 } from 'react';
 import 'antd/dist/antd.min.css';
-import { Tree, Dropdown, Menu, Modal, TreeDataNode } from 'antd';
+import { Tree, Dropdown, Menu, Modal, TreeDataNode, Input } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
 import { useNavigate } from 'react-router-dom';
 import { DirectoryTreeProps, EventDataNode } from 'antd/es/tree';
@@ -24,28 +24,34 @@ interface DataNode {
   children?: DataNode[];
   isLeaf?: boolean;
 }
-const initTreeData: DataNode[] = [
-  { title: 'Datacenter 1', key: '01' },
-  { title: 'Datacenter 2', key: '02' },
-  { title: 'Datacenter 3', key: '03' },
-];
 const Sidebar = (props: {
-  funSelect: (
-    arg0: {
-      event: 'select';
-      selected: boolean;
-      node: EventDataNode<TreeDataNode>;
-      selectedNodes: TreeDataNode[];
-      nativeEvent: MouseEvent;
-    },
-    arg1: object[],
-  ) => void;
+  funSelect: (arg0: {
+    event: 'select';
+    selected: boolean;
+    node: EventDataNode<TreeDataNode>;
+    selectedNodes: TreeDataNode[];
+    nativeEvent: MouseEvent;
+  }) => void;
+  funGetVM: (arg0: any) => void;
 }) => {
+  // const [listDatacenter, setListDatacenter] = useState<object[]>([]);
+  const [treeData, setTreeData] = useState<DataNode[]>([]);
+  const [infor, setInfor] = useState<any>();
+  const [isModalOpenRename, setIsModalOpenRename] = useState(false);
+  const [rename, setRename] = useState<string>('');
+  const [renameInput, setRenameInput] = useState<string>('');
+  const [vm, setVm] = useState<any>();
+  const [keySelect, setKeySelect] = useState<string>('');
+  const [initData, setInitData] = useState<DataNode[]>([]);
+  const [isModalOpenLogin, setIsModalOpenLogin] = useState<boolean>(false);
+  const [userName, setUserName] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const { request } = useRequest();
+  const navigate = useNavigate();
   const items = (
     <Menu
       onClick={(key) => {
         console.log('key', key);
-
         switch (key.key) {
           case 'rename':
             handleRename();
@@ -71,6 +77,8 @@ const Sidebar = (props: {
           case 'login':
             handleLogin();
             break;
+          case 'clone':
+            handleClone();
         }
       }}
       items={[
@@ -111,24 +119,16 @@ const Sidebar = (props: {
           key: 'login',
         },
         {
+          label: 'Clone',
+          key: 'clone',
+        },
+        {
           label: 'Take Snapshot',
           key: 'snapshot',
         },
       ]}
     />
   );
-  const [listDatacenter, setListDatacenter] = useState<object[]>([]);
-  const [treeData, setTreeData] = useState<DataNode[]>(initTreeData);
-  const [infor, setInfor] = useState<any>();
-  const [action, setAction] = useState<string>('off');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [rename, setRename] = useState<string>('');
-  const [renameInput, setRenameInput] = useState<string>('');
-  const [expand, setExpand] = useState<string[]>([]);
-  const [vm, setVm] = useState<any>();
-  const [keySelect, setKeySelect] = useState<string>('');
-  const { request } = useRequest();
-  const navigate = useNavigate();
   const updateTreeData = (
     list: DataNode[],
     key: React.Key,
@@ -138,7 +138,7 @@ const Sidebar = (props: {
       if (node.key === key) {
         return {
           ...node,
-          children,
+          children: [...children],
         };
       }
       if (node.children != null) {
@@ -149,15 +149,48 @@ const Sidebar = (props: {
       }
       return node;
     });
+  const initTreeData = (data: DataNode[]) => {
+    const newData: DataNode[] = [];
+    data?.forEach((item: any) => {
+      const obj = {
+        title: item.name,
+        key: item.id,
+      };
+      newData.push(obj);
+    });
+    setTreeData(newData);
+  };
+  const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
+    const keysLength = keys[0].toString().length;
+    setKeySelect(keys[0].toString());
+    if (keysLength === 2) {
+      getMock('folder', keys, info);
+    }
+    if (keysLength === 3) {
+      getMock('vm', keys, info);
+    }
+    if (keysLength === 4) {
+      console.log('vm sidebar', vm);
+
+      props.funSelect(info);
+    }
+  };
   const onRightClick: DirectoryTreeProps['onRightClick'] = (info) => {
     console.log('info', info);
     setInfor(info);
+    props.funGetVM(vm);
   };
   const onChange = (e: any) => {
     setRename(e.target.value);
     setRenameInput(e.target.value);
   };
-  const handleOk = () => {
+  const onChangeUsername = (e: any) => {
+    setUserName(e.target.value);
+  };
+  const onChangePassword = (e: any) => {
+    setPassword(e.target.value);
+  };
+  const handleOkRename = () => {
     const findRename = (list: DataNode[]) => {
       list.forEach((item: any) => {
         if (item.key === infor.node.key) {
@@ -173,41 +206,61 @@ const Sidebar = (props: {
     };
     setTreeData([...findRename(treeData)]);
     setRename('');
-    setIsModalOpen(false);
+    setIsModalOpenRename(false);
   };
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const handleOkLogin = () => {
+    setIsModalOpenLogin(false);
+    alert('Set user login success');
+    console.log('password', password);
+  };
+  const handleCancelRename = () => {
+    setIsModalOpenRename(false);
+  };
+  const handleCancelLogin = () => {
+    setIsModalOpenLogin(false);
   };
   const handleRename = () => {
-    setIsModalOpen(true);
+    setIsModalOpenRename(true);
     setRenameInput(infor.node.title);
   };
   const handleRefresh = () => {
-    setTreeData(initTreeData);
-    setExpand([]);
-    navigate('/');
-  };
-  const handlePowerOn = () => {
-    setVm(() => {
-      vm.forEach((item: { id: string; power_state: string }) => {
-        if (item.id === keySelect) {
-          item.power_state = 'POWER_ON';
-        }
-      });
-      return vm;
+    const data: DataNode[] = [];
+    initData.forEach((item: any) => {
+      const obj = {
+        title: item.name,
+        key: item.id,
+      };
+      data.push(obj);
+      setTreeData(data);
     });
   };
+  const setPowerVm = (item: string) => {
+    const filterVm = vm.map((vmItem: { id: string; power_state: string }) => {
+      if (vmItem.id === keySelect) {
+        vmItem.power_state = item;
+      }
+      return vmItem;
+    });
+    setVm(filterVm);
+    props.funGetVM(filterVm);
+  };
+  const handlePowerOn = () => {
+    setPowerVm('POWER_ON');
+  };
   const handlePowerOff = () => {
-    setAction('Off');
+    setPowerVm('POWER_OFF');
   };
   const handlePowerSuspend = () => {
-    setAction('Suspend');
+    setPowerVm('POWER_SUSPEND');
   };
   const handlePowerReset = () => {
-    setAction('Reset');
+    setPowerVm('POWER_RESET');
   };
   const handleLogin = () => {
-    console.log('login');
+    setIsModalOpenLogin(true);
+  };
+  const handleClone = () => {
+    console.log('clone');
   };
   const handleSnapshot = () => {
     console.log('snapshot');
@@ -218,50 +271,29 @@ const Sidebar = (props: {
       navigate('/login');
     }
     request('/api/vcenter/datacenter', 'GET').then((res: any) => {
-      setListDatacenter(res);
+      initTreeData(res);
+      setInitData(res);
     });
   }, []);
   const getMock = async (item: any, keys: any, info: any) => {
     try {
       const response = await request(`/api/vcenter/${item}`, 'GET');
+      props.funSelect(info);
+      props.funGetVM(response);
       setVm(response);
+      const data: DataNode[] = [];
       response.forEach((item: any) => {
         if (item.id.includes(keys[0])) {
-          props.funSelect(info, item);
-          setTreeData(
-            updateTreeData(treeData, keys[0], [
-              {
-                title: item.name,
-                key: item.id,
-              },
-            ]),
-          );
+          const obj = {
+            title: item.name,
+            key: item.id,
+          };
+          data.push(obj);
         }
+        setTreeData(updateTreeData(treeData, keys[0], data));
       });
     } catch (error) {
       console.log(error);
-    }
-  };
-  const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
-    const keysLength = keys[0].toString().length;
-    console.log('key select', keys);
-    console.log('info select', info);
-    setKeySelect(keys[0].toString());
-    if (keysLength === 2) {
-      getMock('folder', keys, info);
-      // navigate(`/api/vcenter/datacenter?datacenter_id=${keys[0]}`);
-    }
-    if (keysLength === 3) {
-      getMock('vm', keys, info);
-      // navigate(
-      //   `/api/vcenter/folder?datacenter_id=${keys[0]
-      //     .toString()
-      //     .slice(0, 2)}&folder_id=${keys[0]}`,
-      // );
-    }
-    if (keysLength === 4) {
-      props.funSelect(info, vm);
-      // navigate(`/api/vcenter/datacenter?datacenter_id=${keys[0]}`);
     }
   };
   return (
@@ -277,7 +309,6 @@ const Sidebar = (props: {
           }}
         >
           <DirectoryTree
-            defaultExpandedKeys={expand}
             multiple
             onRightClick={onRightClick}
             onSelect={onSelect}
@@ -292,13 +323,13 @@ const Sidebar = (props: {
           />
           <Modal
             title="Rename"
-            open={isModalOpen}
-            onOk={handleOk}
-            onCancel={handleCancel}
+            open={isModalOpenRename}
+            onOk={handleOkRename}
+            onCancel={handleCancelRename}
           >
             <div className="input__name">
               <span>Enter the new name</span>
-              <input
+              <Input
                 value={renameInput}
                 style={{
                   marginLeft: '10px',
@@ -310,6 +341,23 @@ const Sidebar = (props: {
                 type="text"
                 onChange={onChange}
               />
+            </div>
+          </Modal>
+          <Modal
+            title="User login"
+            open={isModalOpenLogin}
+            onOk={handleOkLogin}
+            onCancel={handleCancelLogin}
+          >
+            <div className="input__name">
+              <div>
+                Username
+                <Input onChange={onChangeUsername}></Input>
+              </div>
+              <div>
+                Password
+                <Input.Password onChange={onChangePassword} />
+              </div>
             </div>
           </Modal>
         </div>

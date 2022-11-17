@@ -17,26 +17,23 @@ interface DataNode {
 }
 export default function DefaultLayout() {
   const [infor, setInfor] = useState();
-  const [datas, setDatas] = useState<object[]>([]);
+  const [vm, setVm] = useState();
   return (
     <div className="wrapper">
       <div className="header">
-        {/* <Allotment> */}
-        {/* <Allotment.Pane minSize={200}> */}
         <Header />
-        {/* </Allotment.Pane>
-        </Allotment> */}
       </div>
       <div className="top__content">
-        {/* <Allotment.Pane snap> */}
         <Sidebar
-          funSelect={(info: any, dataSelect: object[]) => {
+          funSelect={(info: any) => {
             setInfor(info);
-            setDatas(dataSelect);
+          }}
+          funGetVM={(vm: any) => {
+            setVm(vm);
           }}
         />
         <div className="top__content__content">
-          <Content infors={infor} data={datas} />
+          <Content infors={infor} vm={vm} />
         </div>
       </div>
       <div className="bottom__content">

@@ -1,29 +1,76 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import React from 'react';
+import {
+  PlayCircleOutlined,
+  PauseOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
+const styles = {
+  height: '100px',
+  width: '200px',
+  border: '2px solid',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  margin: '20px',
+};
 
 const Content = (props: any) => {
-  const render = props.infors?.node.title;
-  console.log('render', render);
-  console.log('key content', props.infors?.node.key);
+  const title = props.infors?.node.title;
+  const key = props.infors?.node.key;
+  const vm = props.vm;
+  console.log('title', title);
+  console.log('key content', key);
+  console.log('vm content', vm);
 
-  const data = props.data;
-  console.log('data content', data);
-  // const sumChildren = data?.filter((item: any) =>
-  //   item.id.includes(props.infors?.node.key),
-  // );
+  const sumChildren = vm?.filter((item: any) =>
+    item.id.includes(props.infors?.node.key),
+  );
   const RenderUI = () => {
-    if (render?.includes('Datacenter')) {
+    if (title?.includes('Datacenter')) {
       return (
         <>
-          <h3 style={{ padding: '20px' }}>{render}</h3>
+          <h3 style={{ padding: '20px' }}>{title}</h3>
         </>
       );
     }
-    if (render?.includes('Folder')) {
+    if (title?.includes('Folder')) {
       return (
         <div style={{ padding: '20px' }}>
-          <h3>{render}</h3>
-          {/* <div> Virtual Machines: {sumChildren.length}</div> */}
+          <h3>{title}</h3>
+          <div> Virtual Machines: {sumChildren.length}</div>
+        </div>
+      );
+    }
+    if (title?.includes('VM')) {
+      const powerState = vm?.filter((item: any) => item.id === key);
+      const state = powerState[0].power_state;
+      console.log('power state', powerState[0].power_state);
+      if (state === 'POWER_ON')
+        return (
+          <div style={styles}>
+            <PlayCircleOutlined style={{ marginRight: '10px' }} />
+            <div>Power On</div>
+          </div>
+        );
+      if (state === 'POWER_SUSPEND')
+        return (
+          <div style={styles}>
+            <PauseOutlined style={{ marginRight: '10px' }} />
+            <div>Power Suspend</div>
+          </div>
+        );
+      if (state === 'POWER_RESET')
+        return (
+          <div style={styles}>
+            <SyncOutlined style={{ marginRight: '10px' }} />
+            <div>Power Reset</div>
+          </div>
+        );
+      return (
+        <div style={styles}>
+          <div>Power off</div>
         </div>
       );
     }
