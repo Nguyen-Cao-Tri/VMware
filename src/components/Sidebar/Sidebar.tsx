@@ -34,7 +34,6 @@ const Sidebar = (props: {
   }) => void;
   funGetVM: (arg0: any) => void;
 }) => {
-  // const [listDatacenter, setListDatacenter] = useState<object[]>([]);
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [infor, setInfor] = useState<any>();
   const [isModalOpenRename, setIsModalOpenRename] = useState(false);
@@ -44,8 +43,17 @@ const Sidebar = (props: {
   const [keySelect, setKeySelect] = useState<string>('');
   const [initData, setInitData] = useState<DataNode[]>([]);
   const [isModalOpenLogin, setIsModalOpenLogin] = useState<boolean>(false);
+  const [isModalOpenGetfile, setIsModalOpenGetfile] = useState<boolean>(false);
+  const [isModalOpenCopyfile, setIsModalOpenCopyfile] =
+    useState<boolean>(false);
+  const [isModalOpenClone, setIsModalOpenClone] = useState<boolean>(false);
+  const [valueGetFile, setValueGetFile] = useState<string>('');
+  const [copyFileInput, setCopyFileInput] = useState<string>('');
+  const [selectFileInput, setSelectFileInput] = useState<string>('');
+  const [cloneValue, setCloneValue] = useState<string>('');
   const [userName, setUserName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [userLogin, setUserLogin] = useState<object[]>([]);
   const { request } = useRequest();
   const navigate = useNavigate();
   const items = (
@@ -79,6 +87,12 @@ const Sidebar = (props: {
             break;
           case 'clone':
             handleClone();
+            break;
+          case 'getfile':
+            handleGetFile();
+            break;
+          case 'copyfile':
+            handleCopyFile();
         }
       }}
       items={[
@@ -117,6 +131,14 @@ const Sidebar = (props: {
         {
           label: 'Set user login',
           key: 'login',
+        },
+        {
+          label: 'Get file from guest',
+          key: 'getfile',
+        },
+        {
+          label: 'Copy file to guest',
+          key: 'copyfile',
         },
         {
           label: 'Clone',
@@ -210,14 +232,22 @@ const Sidebar = (props: {
   };
   const handleOkLogin = () => {
     setIsModalOpenLogin(false);
-    alert('Set user login success');
-    console.log('password', password);
+    // const obj = {
+    //   id: infor?.node.key,
+    //   username: userName,
+    //   password: password,
+    // };
+    // localStorage.setItem(`username ${infor.node.key}`, `${obj.username}`);
+    // localStorage.setItem(`password ${infor.node.key}`, `${obj.password}`);
   };
   const handleCancelRename = () => {
     setIsModalOpenRename(false);
   };
   const handleCancelLogin = () => {
     setIsModalOpenLogin(false);
+  };
+  const handleCancelGetFile = () => {
+    setIsModalOpenGetfile(false);
   };
   const handleRename = () => {
     setIsModalOpenRename(true);
@@ -258,9 +288,134 @@ const Sidebar = (props: {
   };
   const handleLogin = () => {
     setIsModalOpenLogin(true);
+    setUserName('');
+    setPassword('');
+  };
+  const handleGetFile = () => {
+    setIsModalOpenGetfile(true);
+  };
+  const handleCopyFile = () => {
+    setIsModalOpenCopyfile(true);
+  };
+  const handleOkCopyfile = () => {
+    setIsModalOpenCopyfile(false);
+    const vm = 'vm-17';
+    request(`/api/vcenter/vm/${vm}/guest/filesystem?action=create`, 'POST', {
+      spec: {
+        path: copyFileInput,
+      },
+    })
+      .then((response: any) => {
+        console.log(response);
+        const formData = new FormData();
+        formData.append('file', selectFileInput);
+        request(
+          response.link,
+          'PUT',
+          {
+            body: formData,
+          },
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        )
+          .then((res: any) => {
+            console.log(res);
+          })
+          .catch((error: any) => {
+            console.log(error);
+          });
+      })
+      .catch((error: any) => {
+        console.log('Oops errors!', error);
+      });
+  };
+  const handleCancelCopyfile = () => {
+    setIsModalOpenCopyfile(false);
+  };
+  const onChangeClone = (e: any) => {
+    setCloneValue(e.target.value);
+  };
+  const onChangeGetFile = (e: any) => {
+    setValueGetFile(e.target.value);
+  };
+  const handleOkGetfile = () => {
+    setIsModalOpenGetfile(false);
+    const vm: any = userLogin.filter((item: any) => item.id === infor.node.key);
+    const vmId = vm[0].id;
+    const vmUsername = vm[0].username;
+    const vmPassword = vm[0].password;
+    request(`/api/vcenter/vm/${vmId}/guest/filesystem?action=create`, 'POST', {
+      credentials: {
+        interactive_session: false,
+        user_name: vmUsername,
+        password: vmPassword,
+        type: 'USERNAME_PASSWORD',
+      },
+      spec: {
+        path: valueGetFile,
+      },
+    })
+      .then((response: any) => {
+        console.log(response.link);
+        if (response.link) {
+          request(response.link, 'GET')
+            .then((res: any) => {
+              const url = window.URL.createObjectURL(new Blob([res.data]));
+              const link = document.createElement('a');
+              link.href = url;
+              link.setAttribute('download', ' file.zip');
+              document.body.appendChild(link);
+              link.click();
+            })
+            .catch((error: any) => {
+              console.log(error);
+            });
+        }
+        setIsModalOpenGetfile(false);
+      })
+      .catch((error: any) => {
+        console.log('Oops errors!', error);
+        setIsModalOpenGetfile(false);
+      });
+  };
+  const onChangeCopyfile = (e: any) => {
+    // console.log(e.target.value);
+    setCopyFileInput(e.target.value);
+  };
+  const handleChangeFile = (e: any) => {
+    // console.log(e.target.file[0]);
+    setSelectFileInput(e.target.files[0]);
   };
   const handleClone = () => {
-    console.log('clone');
+    setIsModalOpenClone(true);
+  };
+  const handleOkClone = () => {
+    setIsModalOpenClone(false);
+    // const idRandom = new Date().getMilliseconds();
+    // const idVmCLone = `${infor.node.key.slice(0, 3)}${idRandom}`;
+    // request('/api/vcenter/vm?action=clone', 'POST', {
+    //   name: cloneValue,
+    //   source: idVmCLone,
+    // })
+    //   .then((res: any) => console.log('res clone', res))
+    //   .catch((e: any) => console.log('error clone', e));
+    // console.log('tree data', treeData);
+    // const vmItem = vm.filter((item: any) =>
+    //   item.id.includes(infor.node.key.slice(0, 3)),
+    // );
+    // const cloneVm = () => {};
+    // console.log('vm item clone 1', vmItem);
+    // const vmItemClone = [
+    //   ...vmItem,
+    //   (vmItem[0].id = idVmCLone),
+    //   (vmItem[0].name = cloneValue),
+    // ];
+  };
+  const handleCancelClone = () => {
+    setIsModalOpenClone(false);
   };
   const handleSnapshot = () => {
     console.log('snapshot');
@@ -352,13 +507,53 @@ const Sidebar = (props: {
             <div className="input__name">
               <div>
                 Username
-                <Input onChange={onChangeUsername}></Input>
+                <Input value={userName} onChange={onChangeUsername}></Input>
               </div>
               <div>
                 Password
-                <Input.Password onChange={onChangePassword} />
+                <Input.Password value={password} onChange={onChangePassword} />
               </div>
             </div>
+          </Modal>
+          <Modal
+            title="GetFile"
+            open={isModalOpenGetfile}
+            onOk={handleOkGetfile}
+            onCancel={handleCancelGetFile}
+          >
+            <div className="inputGetfile">
+              <span>Path:</span>
+              <Input placeholder="Enter ..." onChange={onChangeGetFile} />
+            </div>
+          </Modal>
+          <Modal
+            title="CopyFile"
+            open={isModalOpenCopyfile}
+            onOk={handleOkCopyfile}
+            onCancel={handleCancelCopyfile}
+          >
+            <div className="inputCopyfile">
+              <div className="path">
+                <span>Path:</span>
+                <Input placeholder="Enter ..." onChange={onChangeCopyfile} />
+              </div>
+              <div>
+                <span>File:</span>
+                <Input
+                  type="file"
+                  placeholder="Enter ..."
+                  onChange={handleChangeFile}
+                />
+              </div>
+            </div>
+          </Modal>
+          <Modal
+            title="Clone"
+            open={isModalOpenClone}
+            onOk={handleOkClone}
+            onCancel={handleCancelClone}
+          >
+            <Input placeholder="Input VM name" onChange={onChangeClone}></Input>
           </Modal>
         </div>
       </Dropdown>

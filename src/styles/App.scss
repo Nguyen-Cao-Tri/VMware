@@ -1,0 +1,25 @@
+.inputGetfile{
+  span{
+    margin-right: 20px;
+  }
+  input{
+    width: 80%;
+  border-radius: 4px;
+
+  }
+}
+.inputCopyfile{
+  span{
+    margin-right: 20px;
+  }
+ .path{
+  margin-bottom: 20px;
+ }
+ input{
+  width: 80%;
+  border-radius: 4px;
+ }
+  input[type="file"] {
+  border: none;
+}
+}

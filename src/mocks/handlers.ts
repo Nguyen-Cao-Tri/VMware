@@ -42,4 +42,43 @@ export const handlers = [
   rest.get('/api/vcenter/vm', (req, res, ctx) => {
     return res(ctx.status(200), ctx.json(listVM));
   }),
+  rest.post('/api/vcenter/vm/:vm/guest/filesystem', async (req, res, ctx) => {
+    const { vm } = req.params;
+    console.log('param', req.params);
+    const action = req.url.searchParams.get('action');
+    if (action !== 'create') {
+      return await res(
+        ctx.status(401),
+        ctx.json({ message: 'Invalid action' }),
+      );
+    }
+    return await res(
+      ctx.status(200),
+      ctx.json({
+        vm,
+        action,
+        link: '/guestFile?id=3&token=52b2f156-a58f-d73c-0ed1-b185b8842b353',
+      }),
+    );
+  }),
+  rest.get('/guestFile', async (req, res, ctx) => {
+    const fileBuffer = await fetch(
+      'https://www.dundeecity.gov.uk/sites/default/files/publications/civic_renewal_forms.zip',
+      { mode: 'no-cors' },
+    ).then(async (res) => await res.arrayBuffer());
+
+    return await res(
+      ctx.set('Content-Length', fileBuffer.byteLength.toString()),
+      ctx.set('Content-Type', 'application/zip'),
+      ctx.body(fileBuffer),
+    );
+  }),
+  // rest.post('/api/vcenter/vm?action=clone', async (req, res, ctx) => {
+  //   const body = await req.json();
+  //   console.log('body clone', body);
+  //   return await res(ctx.status(200));
+  // }),
+  rest.put('/guestFile', (req, res, ctx) => {
+    return res(ctx.status(200), ctx.json({ message: 'Successfully!' }));
+  }),
 ];
