@@ -1,36 +1,36 @@
 export const listDatacenter = [
   {
-    id: '01',
+    datacenter: '01',
     name: 'Datacenter 1',
   },
   {
-    id: '02',
+    datacenter: '02',
     name: 'Datacenter 2',
   },
   {
-    id: '03',
+    datacenter: '03',
     name: 'Datacenter 3',
   },
 ];
 
 export const listFolder = [
   {
-    id: '011',
+    folder: '011',
     name: 'New Folder ',
     type: 'DATACENTER',
   },
   {
-    id: '012',
+    folder: '012',
     name: 'New Folder ',
     type: 'DATACENTER',
   },
   {
-    id: '021',
+    folder: '021',
     name: 'New Folder',
     type: 'DATACENTER',
   },
   {
-    id: '031',
+    folder: '031',
     name: 'New Folder ',
     type: 'DATACENTER',
   },
@@ -42,27 +42,34 @@ export const listVM = [
     memory_size_MiB: 4096,
     name: 'VM',
     power_state: 'POWERED_OFF',
-    id: '0111',
+    vm: '0111',
   },
   {
     cpu_count: 4,
     memory_size_MiB: 4096,
     name: 'VM',
     power_state: 'POWERED_OFF',
-    id: '0121',
+    vm: '0112',
   },
   {
     cpu_count: 4,
     memory_size_MiB: 4096,
     name: 'VM',
     power_state: 'POWERED_OFF',
-    id: '0211',
+    vm: '0121',
   },
   {
     cpu_count: 4,
     memory_size_MiB: 4096,
     name: 'VM',
     power_state: 'POWERED_OFF',
-    id: '0311',
+    vm: '0211',
+  },
+  {
+    cpu_count: 4,
+    memory_size_MiB: 4096,
+    name: 'VM',
+    power_state: 'POWERED_OFF',
+    vm: '0311',
   },
 ];

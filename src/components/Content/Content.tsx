@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
+
 import React from 'react';
 import {
   PlayCircleOutlined,
@@ -19,13 +20,13 @@ const styles = {
 const Content = (props: any) => {
   const title = props.infors?.node.title;
   const key = props.infors?.node.key;
-  const vm = props.vm;
+  const vms = props.vm;
   console.log('title', title);
   console.log('key content', key);
-  console.log('vm content', vm);
+  console.log('vm content', vms);
 
-  const sumChildren = vm?.filter((item: any) =>
-    item.id.includes(props.infors?.node.key),
+  const sumChildren = vms?.filter((item: any) =>
+    item.vm?.includes(props.infors?.node.key)
   );
   const RenderUI = () => {
     if (title?.includes('Datacenter')) {
@@ -44,7 +45,7 @@ const Content = (props: any) => {
       );
     }
     if (title?.includes('VM')) {
-      const powerState = vm?.filter((item: any) => item.id === key);
+      const powerState = vms.filter((item: any) => item.vm === key);
       const state = powerState[0].power_state;
       console.log('power state', powerState[0].power_state);
       if (state === 'POWER_ON')

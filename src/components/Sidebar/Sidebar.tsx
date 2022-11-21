@@ -39,7 +39,7 @@ const Sidebar = (props: {
   const [isModalOpenRename, setIsModalOpenRename] = useState(false);
   const [rename, setRename] = useState<string>('');
   const [renameInput, setRenameInput] = useState<string>('');
-  const [vm, setVm] = useState<any>();
+  const [vmData, setVmData] = useState<any>();
   const [keySelect, setKeySelect] = useState<string>('');
   const [initData, setInitData] = useState<DataNode[]>([]);
   const [isModalOpenLogin, setIsModalOpenLogin] = useState<boolean>(false);
@@ -68,16 +68,16 @@ const Sidebar = (props: {
             handleRefresh();
             break;
           case 'powerOn':
-            handlePowerOn();
+            handlePowerState('POWER_ON');
             break;
           case 'powerOff':
-            handlePowerOff();
+            handlePowerState('POWER_OFF');
             break;
           case 'powerSuspend':
-            handlePowerSuspend();
+            handlePowerState('POWER_SUSPEND');
             break;
           case 'powerReset':
-            handlePowerReset();
+            handlePowerState('POWER_RESET');
             break;
           case 'snapshot':
             handleSnapshot();
@@ -176,13 +176,16 @@ const Sidebar = (props: {
     data?.forEach((item: any) => {
       const obj = {
         title: item.name,
-        key: item.id,
+        key: item.datacenter,
       };
       newData.push(obj);
     });
     setTreeData(newData);
   };
   const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
+    console.log('keys',keys);
+    console.log('info',info);
+    
     const keysLength = keys[0].toString().length;
     setKeySelect(keys[0].toString());
     if (keysLength === 2) {
@@ -192,15 +195,13 @@ const Sidebar = (props: {
       getMock('vm', keys, info);
     }
     if (keysLength === 4) {
-      console.log('vm sidebar', vm);
-
       props.funSelect(info);
     }
   };
   const onRightClick: DirectoryTreeProps['onRightClick'] = (info) => {
     console.log('info', info);
     setInfor(info);
-    props.funGetVM(vm);
+    props.funGetVM(vmData);
   };
   const onChange = (e: any) => {
     setRename(e.target.value);
@@ -232,13 +233,13 @@ const Sidebar = (props: {
   };
   const handleOkLogin = () => {
     setIsModalOpenLogin(false);
-    // const obj = {
-    //   id: infor?.node.key,
-    //   username: userName,
-    //   password: password,
-    // };
-    // localStorage.setItem(`username ${infor.node.key}`, `${obj.username}`);
-    // localStorage.setItem(`password ${infor.node.key}`, `${obj.password}`);
+    const obj = {
+      id: infor?.node.key,
+      username: userName,
+      password: password,
+    };
+    localStorage.setItem(`username ${infor.node.key}`, `${obj.username}`);
+    localStorage.setItem(`password ${infor.node.key}`, `${obj.password}`);
   };
   const handleCancelRename = () => {
     setIsModalOpenRename(false);
@@ -258,36 +259,35 @@ const Sidebar = (props: {
     initData.forEach((item: any) => {
       const obj = {
         title: item.name,
-        key: item.id,
+        key: item.datacenter,
       };
       data.push(obj);
-      setTreeData(data);
     });
+    setTreeData(data);
   };
   const setPowerVm = (item: string) => {
-    const filterVm = vm.map((vmItem: { id: string; power_state: string }) => {
-      if (vmItem.id === keySelect) {
+    console.log('vm sidebar',vmData);
+    
+    const filterVm = vmData.map((vmItem: { vm: string; power_state: string }) => {
+      if (vmItem.vm === infor.node.key) {
         vmItem.power_state = item;
       }
       return vmItem;
     });
-    setVm(filterVm);
+    setVmData(filterVm);
     props.funGetVM(filterVm);
   };
-  const handlePowerOn = () => {
-    setPowerVm('POWER_ON');
-  };
-  const handlePowerOff = () => {
-    setPowerVm('POWER_OFF');
-  };
-  const handlePowerSuspend = () => {
-    setPowerVm('POWER_SUSPEND');
-  };
-  const handlePowerReset = () => {
-    setPowerVm('POWER_RESET');
+  const handlePowerState=(state:string)=>{
+    setPowerVm(state);
   };
   const handleLogin = () => {
     setIsModalOpenLogin(true);
+    const getUsername = localStorage.getItem(`username ${infor.node.key}`);
+    if(getUsername === undefined || getUsername === null){
+
+      setIsModalOpenLogin(true);
+    } else {setIsModalOpenLogin(false);
+      alert('User logged in!');}
     setUserName('');
     setPassword('');
   };
@@ -394,25 +394,25 @@ const Sidebar = (props: {
   };
   const handleOkClone = () => {
     setIsModalOpenClone(false);
-    // const idRandom = new Date().getMilliseconds();
-    // const idVmCLone = `${infor.node.key.slice(0, 3)}${idRandom}`;
-    // request('/api/vcenter/vm?action=clone', 'POST', {
-    //   name: cloneValue,
-    //   source: idVmCLone,
-    // })
-    //   .then((res: any) => console.log('res clone', res))
-    //   .catch((e: any) => console.log('error clone', e));
-    // console.log('tree data', treeData);
-    // const vmItem = vm.filter((item: any) =>
-    //   item.id.includes(infor.node.key.slice(0, 3)),
-    // );
-    // const cloneVm = () => {};
-    // console.log('vm item clone 1', vmItem);
-    // const vmItemClone = [
-    //   ...vmItem,
-    //   (vmItem[0].id = idVmCLone),
-    //   (vmItem[0].name = cloneValue),
-    // ];
+    const idRandom = new Date().getMilliseconds();
+    const idVmCLone = `${infor.node.key.slice(0, 3)}${idRandom}`;
+    request('/api/vcenter/vm?action=clone', 'POST', {
+      name: cloneValue,
+      source: idVmCLone,
+    })
+      .then((res: any) => console.log('res clone', res))
+      .catch((e: any) => console.log('error clone', e));
+    console.log('tree data', treeData);
+    const vmItem = vmData.filter((item: any) =>
+      item.id.includes(infor.node.key.slice(0, 3)),
+    );
+    const cloneVm = () => {};
+    console.log('vm item clone 1', vmItem);
+    const vmItemClone = [
+      ...vmItem,
+      (vmItem[0].id = idVmCLone),
+      (vmItem[0].name = cloneValue),
+    ];
   };
   const handleCancelClone = () => {
     setIsModalOpenClone(false);
@@ -423,25 +423,32 @@ const Sidebar = (props: {
   useEffect(() => {
     const getApiKey = localStorage.getItem('apiKey');
     if (getApiKey === undefined || getApiKey === null) {
-      navigate('/login');
+    navigate('/login');
     }
-    request('/api/vcenter/datacenter', 'GET').then((res: any) => {
-      initTreeData(res);
-      setInitData(res);
+    request(
+    '/api/vcenter/datacenter','GET',
+    {},
+    {
+    'vmware-api-session-id': 'd9042f69a49726a6ffbd980e90dcc548',
+    },
+    ).then((res: any) => {
+    initTreeData(res);
+    setInitData(res);
     });
-  }, []);
-  const getMock = async (item: any, keys: any, info: any) => {
+    }, []);
+  const getMock = async (param: string, keys: any, info: any) => {
     try {
-      const response = await request(`/api/vcenter/${item}`, 'GET');
+      const response = await request(`/api/vcenter/${param}`, 'GET');
       props.funSelect(info);
-      props.funGetVM(response);
-      setVm(response);
+      if(param==='vm'){props.funGetVM(response);}
+      
+      setVmData(response);
       const data: DataNode[] = [];
       response.forEach((item: any) => {
-        if (item.id.includes(keys[0])) {
+        if (item[param].includes(keys[0])) {
           const obj = {
             title: item.name,
-            key: item.id,
+            key: item[param],
           };
           data.push(obj);
         }
@@ -466,6 +473,7 @@ const Sidebar = (props: {
           <DirectoryTree
             multiple
             onRightClick={onRightClick}
+            selectable={true}
             onSelect={onSelect}
             treeData={treeData}
             style={{

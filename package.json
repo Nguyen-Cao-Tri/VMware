@@ -10,6 +10,7 @@
     "@types/node": "^16.18.2",
     "@types/react": "^18.0.23",
     "@types/react-dom": "^18.0.7",
+    "@typescript-eslint/parser": "^5.43.0",
     "allotment": "^1.17.0",
     "antd": "^4.23.6",
     "axios": "^1.1.3",
