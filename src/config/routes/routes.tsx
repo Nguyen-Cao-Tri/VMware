@@ -4,7 +4,7 @@ import NotFound from '../../pages/NotFound/NotFound';
 import DefaultLayout from '../../layouts/DefaultLayout/DefaultLayout';
 // import DemoPage from '../../pages/DemoPage/DemoPage';
 import LoginForm from '../../pages/LoginForm/LoginForm';
-import Parent from '../../pages/DemoPage/Parent';
+import Demo from '../../pages/DemoPage/DemoPage';
 const routes = [
   {
     path: '/',
@@ -16,7 +16,7 @@ const routes = [
     //   { path: 'demo', element: <DemoPage /> },
     // ],
   },
-  { path: 'test', element: <Parent /> },
+  { path: 'demo', element: <Demo /> },
   {
     path: '/login',
     element: <LoginForm />,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable react/prop-types */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -46,6 +47,10 @@ const Sidebar = (props: {
   const [isModalOpenGetfile, setIsModalOpenGetfile] = useState<boolean>(false);
   const [isModalOpenCopyfile, setIsModalOpenCopyfile] =
     useState<boolean>(false);
+  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
+  const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
+  const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [isModalOpenClone, setIsModalOpenClone] = useState<boolean>(false);
   const [valueGetFile, setValueGetFile] = useState<string>('');
   const [copyFileInput, setCopyFileInput] = useState<string>('');
@@ -177,26 +182,60 @@ const Sidebar = (props: {
       const obj = {
         title: item.name,
         key: item.datacenter,
+        children: [],
       };
       newData.push(obj);
     });
     setTreeData(newData);
   };
-  const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
-    console.log('keys',keys);
-    console.log('info',info);
-    
-    const keysLength = keys[0].toString().length;
-    setKeySelect(keys[0].toString());
+  const onExpand = (expandedKeysValue: React.Key[], info: any) => {
+    console.log('onExpand', expandedKeysValue);
+    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
+    // or, you can remove all expanded children keys.
+    setExpandedKeys(expandedKeysValue);
+    const keys = expandedKeysValue[expandedKeysValue.length - 1];
+    const keySelectedLength = `${
+      expandedKeysValue[expandedKeysValue.length - 1]
+    }`.length;
+    if (keySelectedLength === 2) {
+      getData('folder', keys, info);
+    }
+    if (keySelectedLength === 3) {
+      getData('vm', keys, info);
+    }
+    if (keySelectedLength === 4) {
+      props.funSelect(info);
+    }
+    setAutoExpandParent(false);
+  };
+  const onCheck = (checkedKeysValue: any) => {
+    console.log('onCheck', checkedKeysValue);
+    setCheckedKeys(checkedKeysValue);
+  };
+  console.log('treedata', treeData);
+
+  // const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
+  //   console.log('keys', keys);
+  //   console.log('info', info);
+
+  //   const keysLength = keys[0].toString().length;
+  //   setKeySelect(keys[0].toString());
+
+  // };
+  const onSelect = (selectedKeysValue: React.Key[], info: any) => {
+    console.log('onSelect', info);
+    console.log('onSelect key', selectedKeysValue);
+    const keysLength = selectedKeysValue[0]?.toString().length;
     if (keysLength === 2) {
-      getMock('folder', keys, info);
+      getData('folder', selectedKeysValue, info);
     }
     if (keysLength === 3) {
-      getMock('vm', keys, info);
+      getData('vm', selectedKeysValue, info);
     }
     if (keysLength === 4) {
       props.funSelect(info);
     }
+    setSelectedKeys(selectedKeysValue);
   };
   const onRightClick: DirectoryTreeProps['onRightClick'] = (info) => {
     console.log('info', info);
@@ -236,7 +275,7 @@ const Sidebar = (props: {
     const obj = {
       id: infor?.node.key,
       username: userName,
-      password: password,
+      password,
     };
     localStorage.setItem(`username ${infor.node.key}`, `${obj.username}`);
     localStorage.setItem(`password ${infor.node.key}`, `${obj.password}`);
@@ -266,28 +305,31 @@ const Sidebar = (props: {
     setTreeData(data);
   };
   const setPowerVm = (item: string) => {
-    console.log('vm sidebar',vmData);
-    
-    const filterVm = vmData.map((vmItem: { vm: string; power_state: string }) => {
-      if (vmItem.vm === infor.node.key) {
-        vmItem.power_state = item;
-      }
-      return vmItem;
-    });
+    console.log('vm sidebar', vmData);
+
+    const filterVm = vmData.map(
+      (vmItem: { vm: string; power_state: string }) => {
+        if (vmItem.vm === infor.node.key) {
+          vmItem.power_state = item;
+        }
+        return vmItem;
+      },
+    );
     setVmData(filterVm);
     props.funGetVM(filterVm);
   };
-  const handlePowerState=(state:string)=>{
+  const handlePowerState = (state: string) => {
     setPowerVm(state);
   };
   const handleLogin = () => {
     setIsModalOpenLogin(true);
     const getUsername = localStorage.getItem(`username ${infor.node.key}`);
-    if(getUsername === undefined || getUsername === null){
-
+    if (getUsername === undefined || getUsername === null) {
       setIsModalOpenLogin(true);
-    } else {setIsModalOpenLogin(false);
-      alert('User logged in!');}
+    } else {
+      setIsModalOpenLogin(false);
+      alert('User logged in!');
+    }
     setUserName('');
     setPassword('');
   };
@@ -421,27 +463,38 @@ const Sidebar = (props: {
     console.log('snapshot');
   };
   useEffect(() => {
-    const getApiKey = localStorage.getItem('apiKey');
-    if (getApiKey === undefined || getApiKey === null) {
-    navigate('/login');
-    }
-    request(
-    '/api/vcenter/datacenter','GET',
-    {},
-    {
-    'vmware-api-session-id': 'd9042f69a49726a6ffbd980e90dcc548',
-    },
-    ).then((res: any) => {
-    initTreeData(res);
-    setInitData(res);
+    // const getApiKey = localStorage.getItem('apiKey');
+    // if (getApiKey === undefined || getApiKey === null) {
+    // navigate('/login');
+    // }
+    request('/api/vcenter/datacenter', 'GET').then((res: any) => {
+      initTreeData(res);
+      setInitData(res);
     });
-    }, []);
-  const getMock = async (param: string, keys: any, info: any) => {
+  }, []);
+  const onLoadData = ({ key, children }: any) =>
+    new Promise<void>((resolve) => {
+      if (children) {
+        resolve();
+        return;
+      }
+      setTimeout(() => {
+        setTreeData((origin) =>
+          updateTreeData(origin, key, [
+            { title: 'Child Node', key: `${key}-0` },
+            { title: 'Child Node', key: `${key}-1` },
+          ]),
+        );
+      }, 1000);
+    });
+
+  const getData = async (param: string, keys: any, info: any) => {
     try {
       const response = await request(`/api/vcenter/${param}`, 'GET');
       props.funSelect(info);
-      if(param==='vm'){props.funGetVM(response);}
-      
+      if (param === 'vm') {
+        props.funGetVM(response);
+      }
       setVmData(response);
       const data: DataNode[] = [];
       response.forEach((item: any) => {
@@ -470,18 +523,23 @@ const Sidebar = (props: {
             width: 200,
           }}
         >
-          <DirectoryTree
-            multiple
-            onRightClick={onRightClick}
-            selectable={true}
+          <Tree
+            checkable
+            onExpand={onExpand}
+            // expandedKeys={['01']}
+            autoExpandParent={autoExpandParent}
+            onCheck={onCheck}
+            checkedKeys={checkedKeys}
             onSelect={onSelect}
+            selectedKeys={selectedKeys}
+            onRightClick={onRightClick}
+            defaultExpandParent={true}
+            onLoad={onLoadData}
             treeData={treeData}
             style={{
               width: '200px',
               height: '500px',
-              borderRightStyle: 'outset',
               paddingTop: '20px',
-              borderBottomStyle: 'outset',
             }}
           />
           <Modal

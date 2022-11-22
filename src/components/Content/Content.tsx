@@ -21,9 +21,9 @@ const Content = (props: any) => {
   const title = props.infors?.node.title;
   const key = props.infors?.node.key;
   const vms = props.vm;
-  console.log('title', title);
-  console.log('key content', key);
-  console.log('vm content', vms);
+  // console.log('title', title);
+  // console.log('key content', key);
+  // console.log('vm content', vms);
 
   const sumChildren = vms?.filter((item: any) =>
     item.vm?.includes(props.infors?.node.key)

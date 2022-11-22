@@ -23,7 +23,7 @@ export const handlers = [
     return await res(ctx.status(200), ctx.json({ apiKey: 'fake_api_key' }));
   }),
   rest.get('/api/vcenter/datacenter', (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(listDatacenter));
+    return res(ctx.status(200), ctx.json(listDatacenter));  
   }),
   rest.get('/api/vcenter/folder', (req, res, ctx) => {
     return res(ctx.status(200), ctx.json(listFolder));

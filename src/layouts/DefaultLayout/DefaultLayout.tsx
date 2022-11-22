@@ -7,7 +7,7 @@ import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import './styles.css';
-// import { Allotment } from 'allotment';
+import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 interface DataNode {
   title: string;
@@ -23,23 +23,32 @@ export default function DefaultLayout() {
       <div className="header">
         <Header />
       </div>
-      <div className="top__content">
-        <Sidebar
-          funSelect={(info: any) => {
-            setInfor(info);
-          }}
-          funGetVM={(vm: any) => {
-            setVm(vm);
-          }}
-        />
-        <div className="top__content__content">
-          <Content infors={infor} vm={vm} />
-        </div>
+      <div
+        style={{
+          minHeight: 200,
+          minWidth: 200,
+          height: '100vh',
+          width: '100vw',
+          border: '1px solid #ccc',
+        }}
+      >
+        <Allotment minSize={100}>
+          <Allotment.Pane maxSize={250}>
+            <Sidebar
+              funSelect={(info: any) => {
+                setInfor(info);
+              }}
+              funGetVM={(vm: any) => {
+                setVm(vm);
+              }}
+            />
+          </Allotment.Pane>
+          <Allotment vertical>
+            <Content infors={infor} vm={vm} />
+            <Footer />
+          </Allotment>
+        </Allotment>
       </div>
-      <div className="bottom__content">
-        <Footer />
-      </div>
-      <Outlet />
     </div>
   );
 }
