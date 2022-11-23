@@ -41,7 +41,6 @@ const Sidebar = (props: {
   const [rename, setRename] = useState<string>('');
   const [renameInput, setRenameInput] = useState<string>('');
   const [vmData, setVmData] = useState<any>();
-  const [keySelect, setKeySelect] = useState<string>('');
   const [initData, setInitData] = useState<DataNode[]>([]);
   const [isModalOpenLogin, setIsModalOpenLogin] = useState<boolean>(false);
   const [isModalOpenGetfile, setIsModalOpenGetfile] = useState<boolean>(false);
@@ -50,7 +49,6 @@ const Sidebar = (props: {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
-  const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [isModalOpenClone, setIsModalOpenClone] = useState<boolean>(false);
   const [valueGetFile, setValueGetFile] = useState<string>('');
   const [copyFileInput, setCopyFileInput] = useState<string>('');
@@ -59,6 +57,9 @@ const Sidebar = (props: {
   const [userName, setUserName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [userLogin, setUserLogin] = useState<object[]>([]);
+  const [datacenter, setDatacenter] = useState<object[]>([]);
+  const [folder, setFolder] = useState<object[]>([]);
+  const [vm, setVm] = useState<object[]>([]);
   const { request } = useRequest();
   const navigate = useNavigate();
   const items = (
@@ -183,17 +184,52 @@ const Sidebar = (props: {
         title: item.name,
         key: item.datacenter,
         children: [],
+        isLeaf: false,
       };
       newData.push(obj);
     });
+    setDatacenter(newData);
     setTreeData(newData);
   };
+  const onLoadData = ({ key, children }: any) =>
+    new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 1000);
+    });
+  const getData = async (param: string, keys: any, info: any) => {
+    try {
+      const response = await request(`/api/vcenter/${param}`, 'GET');
+      if (param === 'folder') {
+        setFolder(response);
+      }
+      if (param === 'vm') {
+        props.funGetVM(response);
+        setVm(response);
+      }
+      setTimeout(() => {
+        setVmData(response);
+        const data: DataNode[] = [];
+        response.forEach((item: any) => {
+          if (item[param].includes(keys)) {
+            const obj = {
+              title: item.name,
+              key: item[param],
+              isLeaf: param === 'vm',
+            };
+            data.push(obj);
+          }
+          setTreeData(updateTreeData(treeData, keys, data));
+        });
+      }, 1000);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const onExpand = (expandedKeysValue: React.Key[], info: any) => {
-    console.log('onExpand', expandedKeysValue);
-    // if not set autoExpandParent to false, if children expanded, parent can not collapse.
-    // or, you can remove all expanded children keys.
     setExpandedKeys(expandedKeysValue);
     const keys = expandedKeysValue[expandedKeysValue.length - 1];
+    console.log('key', keys);
     const keySelectedLength = `${
       expandedKeysValue[expandedKeysValue.length - 1]
     }`.length;
@@ -206,36 +242,16 @@ const Sidebar = (props: {
     if (keySelectedLength === 4) {
       props.funSelect(info);
     }
-    setAutoExpandParent(false);
   };
   const onCheck = (checkedKeysValue: any) => {
     console.log('onCheck', checkedKeysValue);
     setCheckedKeys(checkedKeysValue);
   };
-  console.log('treedata', treeData);
-
-  // const onSelect: DirectoryTreeProps['onSelect'] = (keys, info) => {
-  //   console.log('keys', keys);
-  //   console.log('info', info);
-
-  //   const keysLength = keys[0].toString().length;
-  //   setKeySelect(keys[0].toString());
-
-  // };
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
     console.log('onSelect', info);
     console.log('onSelect key', selectedKeysValue);
-    const keysLength = selectedKeysValue[0]?.toString().length;
-    if (keysLength === 2) {
-      getData('folder', selectedKeysValue, info);
-    }
-    if (keysLength === 3) {
-      getData('vm', selectedKeysValue, info);
-    }
-    if (keysLength === 4) {
-      props.funSelect(info);
-    }
     setSelectedKeys(selectedKeysValue);
+    props.funSelect(info);
   };
   const onRightClick: DirectoryTreeProps['onRightClick'] = (info) => {
     console.log('info', info);
@@ -299,10 +315,12 @@ const Sidebar = (props: {
       const obj = {
         title: item.name,
         key: item.datacenter,
+        isLeaf: false,
       };
       data.push(obj);
     });
     setTreeData(data);
+    setExpandedKeys([]);
   };
   const setPowerVm = (item: string) => {
     console.log('vm sidebar', vmData);
@@ -385,10 +403,12 @@ const Sidebar = (props: {
   };
   const handleOkGetfile = () => {
     setIsModalOpenGetfile(false);
-    const vm: any = userLogin.filter((item: any) => item.id === infor.node.key);
-    const vmId = vm[0].id;
-    const vmUsername = vm[0].username;
-    const vmPassword = vm[0].password;
+    const vms: any = userLogin.filter(
+      (item: any) => item.vm === infor.node.key,
+    );
+    const vmId = vms[0].id;
+    const vmUsername = vms[0].username;
+    const vmPassword = vms[0].password;
     request(`/api/vcenter/vm/${vmId}/guest/filesystem?action=create`, 'POST', {
       credentials: {
         interactive_session: false,
@@ -432,30 +452,37 @@ const Sidebar = (props: {
     setSelectFileInput(e.target.files[0]);
   };
   const handleClone = () => {
+    setCloneValue('');
     setIsModalOpenClone(true);
   };
   const handleOkClone = () => {
     setIsModalOpenClone(false);
     const idRandom = new Date().getMilliseconds();
-    const idVmCLone = `${infor.node.key.slice(0, 3)}${idRandom}`;
+    const idVmClone = `${infor.node.key.slice(0, 3)}${idRandom}`;
     request('/api/vcenter/vm?action=clone', 'POST', {
       name: cloneValue,
-      source: idVmCLone,
+      source: idVmClone,
     })
       .then((res: any) => console.log('res clone', res))
       .catch((e: any) => console.log('error clone', e));
     console.log('tree data', treeData);
-    const vmItem = vmData.filter((item: any) =>
-      item.id.includes(infor.node.key.slice(0, 3)),
+    console.log('datacenter', datacenter);
+    console.log('folder', folder);
+    console.log('vm', vm);
+    console.log('name clone', cloneValue);
+    console.log('id clone', idVmClone);
+    const cloneItemVm = vm.filter(
+      (itemVm: any) => itemVm.vm === infor.node.key,
     );
-    const cloneVm = () => {};
-    console.log('vm item clone 1', vmItem);
-    const vmItemClone = [
-      ...vmItem,
-      (vmItem[0].id = idVmCLone),
-      (vmItem[0].name = cloneValue),
-    ];
+    const cloneVmValue: { vm: string; name: string } = {
+      ...cloneItemVm[0],
+      vm: idVmClone,
+      name: cloneValue,
+    };
+    setVm([...vm, cloneVmValue]);
+    console.log('cloneVmValue', cloneVmValue);
   };
+
   const handleCancelClone = () => {
     setIsModalOpenClone(false);
   };
@@ -472,45 +499,6 @@ const Sidebar = (props: {
       setInitData(res);
     });
   }, []);
-  const onLoadData = ({ key, children }: any) =>
-    new Promise<void>((resolve) => {
-      if (children) {
-        resolve();
-        return;
-      }
-      setTimeout(() => {
-        setTreeData((origin) =>
-          updateTreeData(origin, key, [
-            { title: 'Child Node', key: `${key}-0` },
-            { title: 'Child Node', key: `${key}-1` },
-          ]),
-        );
-      }, 1000);
-    });
-
-  const getData = async (param: string, keys: any, info: any) => {
-    try {
-      const response = await request(`/api/vcenter/${param}`, 'GET');
-      props.funSelect(info);
-      if (param === 'vm') {
-        props.funGetVM(response);
-      }
-      setVmData(response);
-      const data: DataNode[] = [];
-      response.forEach((item: any) => {
-        if (item[param].includes(keys[0])) {
-          const obj = {
-            title: item.name,
-            key: item[param],
-          };
-          data.push(obj);
-        }
-        setTreeData(updateTreeData(treeData, keys[0], data));
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
   return (
     <>
       <Dropdown autoFocus overlay={items} trigger={['contextMenu']}>
@@ -526,16 +514,16 @@ const Sidebar = (props: {
           <Tree
             checkable
             onExpand={onExpand}
-            // expandedKeys={['01']}
-            autoExpandParent={autoExpandParent}
+            expandedKeys={expandedKeys}
             onCheck={onCheck}
             checkedKeys={checkedKeys}
             onSelect={onSelect}
             selectedKeys={selectedKeys}
             onRightClick={onRightClick}
             defaultExpandParent={true}
-            onLoad={onLoadData}
+            loadData={onLoadData}
             treeData={treeData}
+            showLine={true}
             style={{
               width: '200px',
               height: '500px',
@@ -619,7 +607,11 @@ const Sidebar = (props: {
             onOk={handleOkClone}
             onCancel={handleCancelClone}
           >
-            <Input placeholder="Input VM name" onChange={onChangeClone}></Input>
+            <Input
+              placeholder="Input VM name"
+              onChange={onChangeClone}
+              value={cloneValue}
+            ></Input>
           </Modal>
         </div>
       </Dropdown>

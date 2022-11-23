@@ -14,7 +14,10 @@ export const handlers = [
       password: 'admin',
     };
     const { username, password } = await req.json();
-    if (username !== validAccounts.username && password!==validAccounts.password) {
+    if (
+      username !== validAccounts.username &&
+      password !== validAccounts.password
+    ) {
       return await res(
         ctx.status(401),
         ctx.json({ message: 'Invalid username or password' }),
@@ -23,7 +26,7 @@ export const handlers = [
     return await res(ctx.status(200), ctx.json({ apiKey: 'fake_api_key' }));
   }),
   rest.get('/api/vcenter/datacenter', (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(listDatacenter));  
+    return res(ctx.status(200), ctx.json(listDatacenter));
   }),
   rest.get('/api/vcenter/folder', (req, res, ctx) => {
     return res(ctx.status(200), ctx.json(listFolder));
@@ -62,11 +65,13 @@ export const handlers = [
       ctx.body(fileBuffer),
     );
   }),
-  // rest.post('/api/vcenter/vm?action=clone', async (req, res, ctx) => {
-  //   const body = await req.json();
-  //   console.log('body clone', body);
-  //   return await res(ctx.status(200));
-  // }),
+  rest.post('/api/vcenter/vm?action=clone', async (req, res, ctx) => {
+    const body = await req.json();
+    return await res(
+      ctx.status(200),
+      ctx.json({ name: body.name, id: body.source }),
+    );
+  }),
   rest.put('/guestFile', (req, res, ctx) => {
     return res(ctx.status(200), ctx.json({ message: 'Successfully!' }));
   }),

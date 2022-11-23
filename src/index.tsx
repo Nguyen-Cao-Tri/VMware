@@ -6,7 +6,6 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom';
 // import { LogProvider } from './hooks/logProvider/logProvider';
 import { worker } from './mocks/browser';
-console.log(process.env.REACT_APP_ENVIRONMENT);
 
 if (process.env.REACT_APP_ENVIRONMENT === 'development') {
   worker
