@@ -1,75 +1,59 @@
 export const listDatacenter = [
   {
-    datacenter: '01',
+    datacenter: 'datacenter-1',
     name: 'Datacenter 1',
   },
   {
-    datacenter: '02',
+    datacenter: 'datacenter-2',
     name: 'Datacenter 2',
   },
   {
-    datacenter: '03',
-    name: 'Datacenter 3',
+    datacenter: 'datacenter-3',
+    name: 'ABC',
   },
 ];
 
 export const listFolder = [
   {
-    folder: '011',
-    name: 'New Folder ',
-    type: 'DATACENTER',
+    folder: 'group-v22',
+    name: 'Demo Virtual Machine',
+    type: 'VIRTUAL_MACHINE',
+    parentId: 'datacenter-3',
   },
   {
-    folder: '012',
-    name: 'New Folder ',
-    type: 'DATACENTER',
+    folder: 'group-v23',
+    name: 'Windows VM',
+    type: 'VIRTUAL_MACHINE',
+    parentFolder: 'group-v22',
   },
   {
-    folder: '021',
-    name: 'New Folder',
-    type: 'DATACENTER',
+    folder: 'group-v24',
+    name: 'Linux VM',
+    type: 'VIRTUAL_MACHINE',
+    parentFolder: 'group-v22',
   },
   {
-    folder: '031',
-    name: 'New Folder ',
-    type: 'DATACENTER',
+    folder: 'group-v4',
+    name: 'vm',
+    type: 'VIRTUAL_MACHINE',
   },
 ];
 
 export const listVM = [
   {
-    cpu_count: 4,
-    memory_size_MiB: 4096,
-    name: 'VM',
+    memory_size_MiB: 8192,
+    vm: 'vm-17',
+    name: 'Windows 11',
     power_state: 'POWERED_OFF',
-    vm: '0111',
+    cpu_count: 4,
+    parentId: 'group-v23',
   },
   {
-    cpu_count: 4,
     memory_size_MiB: 4096,
-    name: 'VM',
-    power_state: 'POWERED_OFF',
-    vm: '0112',
-  },
-  {
-    cpu_count: 4,
-    memory_size_MiB: 4096,
-    name: 'VM',
-    power_state: 'POWERED_OFF',
-    vm: '0121',
-  },
-  {
-    cpu_count: 4,
-    memory_size_MiB: 4096,
-    name: 'VM',
-    power_state: 'POWERED_OFF',
-    vm: '0211',
-  },
-  {
-    cpu_count: 4,
-    memory_size_MiB: 4096,
-    name: 'VM',
-    power_state: 'POWERED_OFF',
-    vm: '0311',
+    vm: 'vm-35',
+    name: 'Ubuntu',
+    power_state: 'POWERED_ON',
+    cpu_count: 2,
+    parentId: 'group-v24',
   },
 ];

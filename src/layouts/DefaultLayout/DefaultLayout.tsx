@@ -33,15 +33,8 @@ export default function DefaultLayout() {
         }}
       >
         <Allotment minSize={100}>
-          <Allotment.Pane maxSize={250}>
-            <Sidebar
-              funSelect={(info: any) => {
-                setInfor(info);
-              }}
-              funGetVM={(vm: any) => {
-                setVm(vm);
-              }}
-            />
+          <Allotment.Pane minSize={200} maxSize={700}>
+            <Sidebar />
           </Allotment.Pane>
           <Allotment vertical>
             <Content infors={infor} vm={vm} />

@@ -28,9 +28,9 @@ export const handlers = [
   rest.get('/api/vcenter/datacenter', (req, res, ctx) => {
     return res(ctx.status(200), ctx.json(listDatacenter));
   }),
-  rest.get('/api/vcenter/folder', (req, res, ctx) => {
-    return res(ctx.status(200), ctx.json(listFolder));
-  }),
+  // rest.get('/api/vcenter/folder', (req, res, ctx) => {
+  //   return res(ctx.status(200), ctx.json(listFolder));
+  // }),
   rest.get('/api/vcenter/vm', (req, res, ctx) => {
     return res(ctx.status(200), ctx.json(listVM));
   }),
@@ -74,5 +74,9 @@ export const handlers = [
   }),
   rest.put('/guestFile', (req, res, ctx) => {
     return res(ctx.status(200), ctx.json({ message: 'Successfully!' }));
+  }),
+  rest.get('/api/vcenter/folder', async (req, res, ctx) => {
+    console.log('req folder', req);
+    return await res(ctx.status(200), ctx.json(listFolder));
   }),
 ];

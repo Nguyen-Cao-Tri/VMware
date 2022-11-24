@@ -21,22 +21,22 @@ const Content = (props: any) => {
   const title = props.infors?.node.title;
   const key = props.infors?.node.key;
   const vms = props.vm;
-  console.log('title', title);
-  console.log('key content', key);
-  console.log('vm content', vms);
+  // console.log('title', title);
+  // console.log('key content', key);
+  // console.log('vm content', vms);
 
   const sumChildren = vms?.filter((item: any) =>
     item.vm?.includes(props.infors?.node.key),
   );
   const RenderUI = () => {
-    if (title?.includes('Datacenter')) {
+    if (key?.length === 2) {
       return (
         <>
           <h3 style={{ padding: '20px' }}>{title}</h3>
         </>
       );
     }
-    if (title?.includes('Folder')) {
+    if (key?.length === 3) {
       return (
         <div style={{ padding: '20px' }}>
           <h3>{title}</h3>
@@ -51,10 +51,10 @@ const Content = (props: any) => {
         </div>
       );
     }
-    if (title?.includes('VM')) {
+    if (key?.length >= 4) {
       const powerState = vms.filter((item: any) => item.vm === key);
-      const state = powerState[0].power_state;
-      console.log('power state', powerState[0].power_state);
+      const state = powerState[0]?.power_state;
+      console.log('power state', powerState[0]?.power_state);
       if (state === 'POWER_ON')
         return (
           <div style={styles}>
