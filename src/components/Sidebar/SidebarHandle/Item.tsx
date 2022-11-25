@@ -7,7 +7,7 @@ const Item = (
     onClick={(key) => {
       switch (key.key) {
         case 'rename':
-          <HandleRename />;
+          HandleRename();
           break;
         case 'refresh':
           break;

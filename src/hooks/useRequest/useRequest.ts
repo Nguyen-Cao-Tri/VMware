@@ -17,7 +17,7 @@ export default function useRequest(): any {
       url: `${baseURL}${url}`,
       data,
       headers: {
-        'vmware-api-session-id': '84ff7c2adc475f48826c63750988c3a1',
+        'vmware-api-session-id': '325e3e2d5b83e5fbe64cb87a866321ca',
         ...config,
       },
       withCredentials: false,

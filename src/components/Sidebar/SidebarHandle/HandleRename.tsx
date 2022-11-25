@@ -1,16 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal } from 'antd';
 
 const Children = () => {
-  console.log('children');
+  return <div>bjkhg</div>;
 };
 
 const HandleRename = () => {
-  // const [showModal, setShowModal] = useState('asd');
-  // console.log(showModal);
-  console.log('children');
-  return <div>asdasd</div>;
+  // const [showModal, setShowModal] = useState<boolean>(true);
+  console.log('rename');
+  return (
+    <Modal title="Rename" open={true}>
+      <Children />
+    </Modal>
+  );
 };
 
 export default HandleRename;

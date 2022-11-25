@@ -81,13 +81,6 @@ const Sidebar = () => {
         >
           <Tree
             checkable
-            // onExpand={onExpand}
-            // expandedKeys={expandedKeys}
-            // onCheck={onCheck}
-            // checkedKeys={checkedKeys}
-            // onSelect={onSelect}
-            // selectedKeys={selectedKeys}
-            // onRightClick={onRightClick}
             showIcon={true}
             defaultExpandParent={true}
             loadData={onLoadData}
