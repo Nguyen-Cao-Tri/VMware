@@ -16,8 +16,9 @@ interface DataNode {
   isLeaf?: boolean;
 }
 export default function DefaultLayout() {
-  const [infor, setInfor] = useState();
-  const [vm, setVm] = useState();
+  const [infoSelect, setInfoSelect] = useState();
+  const [infoExpand, setInfoExpand] = useState();
+  const [vmPowerState, setVmPowerState] = useState<object[]>();
   return (
     <div className="wrapper">
       <div className="header">
@@ -34,10 +35,14 @@ export default function DefaultLayout() {
       >
         <Allotment minSize={100}>
           <Allotment.Pane minSize={200} maxSize={700}>
-            <Sidebar />
+            <Sidebar
+              propOnSelect={(value) => setInfoSelect(value)}
+              propOnExpand={(value) => setInfoExpand(value)}
+              propVmPowerState={(value) => setVmPowerState(value)}
+            />
           </Allotment.Pane>
           <Allotment vertical>
-            <Content infors={infor} vm={vm} />
+            <Content inforSelect={infoSelect} vmData={vmPowerState} />
             <Footer />
           </Allotment>
         </Allotment>

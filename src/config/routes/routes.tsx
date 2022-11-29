@@ -5,6 +5,7 @@ import DefaultLayout from '../../layouts/DefaultLayout/DefaultLayout';
 // import DemoPage from '../../pages/DemoPage/DemoPage';
 import LoginForm from '../../pages/LoginForm/LoginForm';
 import Demo from '../../pages/DemoPage/DemoPage';
+import Test from '../../pages/TestLogic/Test';
 const routes = [
   {
     path: '/',
@@ -20,6 +21,10 @@ const routes = [
   {
     path: '/login',
     element: <LoginForm />,
+  },
+  {
+    path: '/test',
+    element: <Test />,
   },
   {
     element: <NotFound />,

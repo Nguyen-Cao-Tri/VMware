@@ -25,16 +25,17 @@ interface DataNode {
   children?: DataNode[];
   isLeaf?: boolean;
 }
-const Sidebar = (props: {
-  funSelect: (arg0: {
-    event: 'select';
-    selected: boolean;
-    node: EventDataNode<TreeDataNode>;
-    selectedNodes: TreeDataNode[];
-    nativeEvent: MouseEvent;
-  }) => void;
-  funGetVM: (arg0: any) => void;
-}) => {
+// }props: {
+//   funSelect: (arg0: {
+//     event: 'select';
+//     selected: boolean;
+//     node: EventDataNode<TreeDataNode>;
+//     selectedNodes: TreeDataNode[];
+//     nativeEvent: MouseEvent;
+//   }) => void;
+//   funGetVM: (arg0: any) => void;
+// }
+const Sidebar = () => {
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [infor, setInfor] = useState<any>();
   const [isModalOpenRename, setIsModalOpenRename] = useState(false);
@@ -202,7 +203,7 @@ const Sidebar = (props: {
         setFolder(response);
       }
       if (param === 'vm') {
-        props.funGetVM(response);
+        // props.funGetVM(response);
         setVm(response);
       }
       setTimeout(() => {
@@ -268,8 +269,8 @@ const Sidebar = (props: {
     console.log('onSelect', info);
     console.log('onSelect key', selectedKeysValue);
     setSelectedKeys(selectedKeysValue);
-    props.funSelect(info);
-    props.funGetVM(vm);
+    // props.funSelect(info);
+    // props.funGetVM(vm);
   };
   const onRightClick: DirectoryTreeProps['onRightClick'] = (info) => {
     console.log('info', info);
@@ -347,7 +348,7 @@ const Sidebar = (props: {
       return vmItem;
     });
     setVm(filterVm);
-    props.funGetVM(filterVm);
+    // props.funGetVM(filterVm);
   };
   const handlePowerState = (state: string) => {
     setPowerVm(state);
