@@ -1,3 +1,4 @@
+/* eslint-disable react/no-children-prop */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useState } from 'react';
@@ -16,9 +17,11 @@ interface DataNode {
   isLeaf?: boolean;
 }
 export default function DefaultLayout() {
-  const [infoSelect, setInfoSelect] = useState();
-  const [infoExpand, setInfoExpand] = useState();
+  const [inforSelect, setInforSelect] = useState({});
+  const [keyExpand, setKeyExpand] = useState<string[]>([]);
   const [vmPowerState, setVmPowerState] = useState<object[]>();
+  const [children, setChildren] = useState<object[]>([]);
+
   return (
     <div className="wrapper">
       <div className="header">
@@ -36,13 +39,20 @@ export default function DefaultLayout() {
         <Allotment minSize={100}>
           <Allotment.Pane minSize={200} maxSize={700}>
             <Sidebar
-              propOnSelect={(value) => setInfoSelect(value)}
-              propOnExpand={(value) => setInfoExpand(value)}
+              propOnSelect={(value) => setInforSelect(value)}
+              propOnExpand={(value) => setKeyExpand(value)}
               propVmPowerState={(value) => setVmPowerState(value)}
+              propChildren={(value) => setChildren(value)}
             />
           </Allotment.Pane>
           <Allotment vertical>
-            <Content inforSelect={infoSelect} vmData={vmPowerState} />
+            <Content
+              inforSelect={inforSelect}
+              vmData={vmPowerState}
+              children={children}
+              keyExpand={keyExpand}
+              vmPowerState={vmPowerState}
+            />
             <Footer />
           </Allotment>
         </Allotment>

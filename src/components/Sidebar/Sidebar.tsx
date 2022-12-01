@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { Key, useEffect, useState } from 'react';
-import { Button, Dropdown, Menu, Tree } from 'antd';
+import { Menu } from 'antd';
 import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
 import { InitTreeData } from './SidebarHandle/InitTreeData';
 import useRequest from '../../hooks/useRequest/useRequest';
@@ -23,6 +23,7 @@ interface PropsSidebar {
   propOnSelect: (info: any) => void;
   propOnExpand: (info: any) => void;
   propVmPowerState: (vm: object[]) => void;
+  propChildren: (children: object[]) => void;
 }
 const Sidebar = (props: PropsSidebar) => {
   const [treeData, setTreeData] = useState<DataNode[]>([]);
@@ -35,7 +36,8 @@ const Sidebar = (props: PropsSidebar) => {
   const [renameInput, setRenameInput] = useState<string>('');
   const [keyExpanded, setKeyExpanded] = useState<React.Key[]>([]);
   const [vm, setVm] = useState<object[]>([]);
-  const { request } = useRequest();
+  const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
+  const { request, isLoading } = useRequest();
   useEffect(() => {
     request('/api/vcenter/datacenter', 'GET').then((res: any) => {
       setTreeData(InitTreeData(res));
@@ -70,6 +72,7 @@ const Sidebar = (props: PropsSidebar) => {
                 },
               );
               setKeyExpanded([]);
+              setLoadedKeys([]);
               break;
             case 'powerOn':
               void handlePowerState(keyRightClick, 'start');
@@ -96,47 +99,57 @@ const Sidebar = (props: PropsSidebar) => {
       />
     );
   };
-  const onLoadData = ({ key }: any) => {
-    return new Promise<void>((resolve) => {
-      // setTimeout(() => {
-      if (key?.includes('datacenter')) {
-        const param = 'folder';
-        setKeyDatacenter(key);
-        request(
-          `/api/vcenter/${param}?names=vm&datacenters=${key}`,
-          'GET',
-        ).then((res: any) => {
+  const onLoadData = async ({ key }: any) => {
+    if (key.includes('datacenter')) {
+      const param = 'folder';
+      setKeyDatacenter(key);
+      await request(`/api/vcenter/${param}?names=vm&datacenters=${key}`).then(
+        (res) => {
           setTreeData(() =>
             UpdateTreeData(treeData, key, PushRequestData(res, param)),
           );
-        });
-      }
-      if (key.includes('group')) {
-        const param = 'folder';
-        request(
-          `/api/vcenter/${param}?parent_folders=${key}&datacenters=${keyDatacenter}`,
-          'GET',
-        ).then((res: any) => {
-          setTreeData(() =>
-            UpdateTreeData(treeData, key, PushRequestData(res, param)),
-          );
-        });
-        request(
-          `/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`,
-          'GET',
-        ).then((res: any) => {
-          if (res.length > 0) {
-            setTreeData(() =>
-              UpdateTreeData(treeData, key, PushRequestData(res, 'vm')),
-            );
-            setVm(vm.concat(res));
+          if (key === keySelect) props.propChildren(res);
+        },
+      );
+    }
+    if (key.includes('group')) {
+      const param = 'folder';
+      await request(
+        `/api/vcenter/${param}?parent_folders=${key}&datacenters=${keyDatacenter}`,
+      ).then((res: any) => {
+        if (key === keySelect) {
+          props.propOnSelect({
+            title: inforSelect.node.title,
+            key: key,
+            children: res,
+          });
+          console.log('res', res);
+        }
+        setTreeData(() =>
+          UpdateTreeData(treeData, key, PushRequestData(res, param)),
+        );
+      });
+      await request(
+        `/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`,
+      ).then((res: any) => {
+        if (res.length > 0) {
+          if (key === keySelect) {
+            props.propOnSelect({
+              title: inforSelect.node.title,
+              key: key,
+              children: res,
+            });
+            console.log('res', res);
           }
-          props.propOnSelect(inforSelect);
-        });
-      }
-      resolve();
-      // }, 1000);
-    });
+
+          setTreeData(() =>
+            UpdateTreeData(treeData, key, PushRequestData(res, 'vm')),
+          );
+          setVm(vm.concat(res));
+        }
+      });
+    }
+    setLoadedKeys(loadedKeys.concat([key]));
   };
   const handleOkRename = (value: string) => {
     setTreeData([...findRename(treeData, keyRightClick, value)]);
@@ -155,19 +168,24 @@ const Sidebar = (props: PropsSidebar) => {
         onSelect={(value, info) => {
           setKeySelect(value[0]);
           setInforSelect(info);
-          props.propOnSelect(info);
+
+          props.propOnSelect({
+            title: info.node.title,
+            key: value[0],
+            children: info.node?.children,
+          });
+          props.propOnExpand(value);
         }}
         onExpand={(value, info) => {
-          props.propOnExpand(info);
+          props.propOnExpand(value);
           setKeyExpanded(value);
-          // void onLoadData({ key: value[value.length - 1] });
         }}
         expandedKeys={keyExpanded}
         onCheck={(value, info) => {
           console.log('value', value);
           console.log('info', info);
         }}
-        loadedKeys={[]}
+        loadedKeys={loadedKeys}
       ></DropdownTree>
       <ModalRename
         isModalOpen={isModalRenameOpen}
