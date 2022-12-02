@@ -466,48 +466,48 @@
 //     setCloneValue('');
 //     setIsModalOpenClone(true);
 //   };
-//   const handleOkClone = () => {
-//     setIsModalOpenClone(false);
-//     const idRandom = new Date().getMilliseconds();
-//     const idVmClone = `${infor.node.key.slice(0, 3)}${idRandom}`;
-//     request('/api/vcenter/vm?action=clone', 'POST', {
-//       name: cloneValue,
-//       source: idVmClone,
-//     })
-//       .then((res: any) => console.log('res clone', res))
-//       .catch((e: any) => console.log('error clone', e));
-//     console.log('tree data', treeData);
-//     console.log('datacenter', datacenter);
-//     console.log('folder', folder);
-//     console.log('vm', vm);
-//     console.log('name clone', cloneValue);
-//     console.log('id clone', idVmClone);
-//     const cloneItemVm = vm.filter(
-//       (itemVm: any) => itemVm.vm === infor.node.key,
-//     );
-//     const cloneVmValue: { key: string; title: string; isLeaf: boolean } = {
-//       key: idVmClone,
-//       title: cloneValue,
-//       isLeaf: true,
-//     };
-//     const setVmValue: { name: string; vm: string } = {
-//       ...cloneItemVm[0],
-//       name: cloneValue,
-//       vm: idVmClone,
-//     };
-//     setVm([...vm, setVmValue]);
-//     const findClone = (list: DataNode[]) => {
-//       list?.forEach((itemList: any) => {
-//         if (itemList.key === infor.node.key.slice(0, 3)) {
-//           itemList.children.push(cloneVmValue);
-//         } else {
-//           findClone(itemList.children);
-//         }
-//       });
-//       return list;
-//     };
-//     setTreeData([...findClone(treeData)]);
+// const handleOkClone = () => {
+//   setIsModalOpenClone(false);
+//   const idRandom = new Date().getMilliseconds();
+//   const idVmClone = `${infor.node.key.slice(0, 3)}${idRandom}`;
+//   request('/api/vcenter/vm?action=clone', 'POST', {
+//     name: cloneValue,
+//     source: idVmClone,
+//   })
+//     .then((res: any) => console.log('res clone', res))
+//     .catch((e: any) => console.log('error clone', e));
+//   console.log('tree data', treeData);
+//   console.log('datacenter', datacenter);
+//   console.log('folder', folder);
+//   console.log('vm', vm);
+//   console.log('name clone', cloneValue);
+//   console.log('id clone', idVmClone);
+//   const cloneItemVm = vm.filter(
+//     (itemVm: any) => itemVm.vm === infor.node.key,
+//   );
+//   const cloneVmValue: { key: string; title: string; isLeaf: boolean } = {
+//     key: idVmClone,
+//     title: cloneValue,
+//     isLeaf: true,
 //   };
+//   const setVmValue: { name: string; vm: string } = {
+//     ...cloneItemVm[0],
+//     name: cloneValue,
+//     vm: idVmClone,
+//   };
+//   setVm([...vm, setVmValue]);
+//   const findClone = (list: DataNode[]) => {
+//     list?.forEach((itemList: any) => {
+//       if (itemList.key === infor.node.key.slice(0, 3)) {
+//         itemList.children.push(cloneVmValue);
+//       } else {
+//         findClone(itemList.children);
+//       }
+//     });
+//     return list;
+//   };
+//   setTreeData([...findClone(treeData)]);
+// };
 
 //   const handleCancelClone = () => {
 //     setIsModalOpenClone(false);
@@ -624,18 +624,18 @@
 //               </div>
 //             </div>
 //           </Modal>
-//           <Modal
-//             title="Clone"
-//             open={isModalOpenClone}
-//             onOk={handleOkClone}
-//             onCancel={handleCancelClone}
-//           >
-//             <Input
-//               placeholder="Input VM name"
-//               onChange={onChangeClone}
-//               value={cloneValue}
-//             ></Input>
-//           </Modal>
+// <Modal
+//   title="Clone"
+//   open={isModalOpenClone}
+//   onOk={handleOkClone}
+//   onCancel={handleCancelClone}
+// >
+//   <Input
+//     placeholder="Input VM name"
+//     onChange={onChangeClone}
+//     value={cloneValue}
+//   ></Input>
+// </Modal>
 //         </div>
 //       </Dropdown>
 //     </>
