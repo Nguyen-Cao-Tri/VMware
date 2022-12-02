@@ -14,6 +14,8 @@ import DropdownTree from './SidebarHandle/DropdownTree';
 import ModalRename, { findRename } from '../Modal/ModalRename';
 import ModalGetfile from '../Modal/ModalGetfile';
 import ModalUserLogin from '../Modal/ModalUserLogin';
+import ModalCopyfile from '../Modal/ModalCopyfile';
+import ModalProcess from '../Modal/ModalProcess';
 
 export interface DataNode {
   title: string;
@@ -34,6 +36,9 @@ const Sidebar = (props: PropsSidebar) => {
   const [isModalGetfileOpen, setIsModalGetfileOpen] = useState<boolean>(false);
   const [isModalUserLoginOpen, setIsModalUserLoginOpen] =
     useState<boolean>(false);
+  const [isModalCopyfileOpen, setIsModalCopyfileOpen] =
+    useState<boolean>(false);
+  const [isModalProcessOpen, setIsModalProcessOpen] = useState<boolean>(false);
   const [keyRightClick, setKeyRightClick] = useState<string>('');
   const [nameRightClick, setNameRightClick] = useState<string>('');
   const [inforSelect, setInforSelect] = useState<any>();
@@ -95,6 +100,10 @@ const Sidebar = (props: PropsSidebar) => {
               setIsModalGetfileOpen(true);
               break;
             case 'copyfile':
+              setIsModalCopyfileOpen(true);
+              break;
+            case 'process':
+              setIsModalProcessOpen(true);
               break;
             case key.key:
               void handlePowerState(keyRightClick, key.key);
@@ -207,6 +216,16 @@ const Sidebar = (props: PropsSidebar) => {
         keyRightClick={keyRightClick}
         checkedKeys={checkedKeys}
         handleCancel={() => setIsModalUserLoginOpen(false)}
+      />
+      <ModalCopyfile
+        isModalopen={isModalCopyfileOpen}
+        handleCancel={() => setIsModalCopyfileOpen(false)}
+        keyRightClick={keyRightClick}
+      />
+      <ModalProcess
+        isModalOpen={isModalProcessOpen}
+        handleCancel={() => setIsModalProcessOpen(false)}
+        keyRightClick={keyRightClick}
       />
     </>
   );

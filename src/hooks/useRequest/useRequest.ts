@@ -19,8 +19,9 @@ export default function useRequest() {
       method: method ?? 'GET',
       body: JSON.stringify(data),
       headers: {
-        ...header,
         'vmware-api-session-id': sessionId ?? '',
+        'content-type': 'application/json',
+        ...header,
       },
       credentials: 'omit',
     })
@@ -31,11 +32,9 @@ export default function useRequest() {
         const data = isJson ? await response.json() : await response.text();
         console.log('data', data);
         console.log('res', response);
-
         if (response.ok) {
           return data;
         }
-
         if (response.status === 401) {
           navigate('/login');
           throw data;

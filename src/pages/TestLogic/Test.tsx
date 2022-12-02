@@ -371,41 +371,41 @@
 //   const handleCopyFile = () => {
 //     setIsModalOpenCopyfile(true);
 //   };
-//   const handleOkCopyfile = () => {
-//     setIsModalOpenCopyfile(false);
-//     const vm = 'vm-17';
-//     request(`/api/vcenter/vm/${vm}/guest/filesystem?action=create`, 'POST', {
-//       spec: {
-//         path: copyFileInput,
-//       },
+// const handleOkCopyfile = () => {
+//   setIsModalOpenCopyfile(false);
+//   const vm = 'vm-17';
+//   request(`/api/vcenter/vm/${vm}/guest/filesystem?action=create`, 'POST', {
+//     spec: {
+//       path: copyFileInput,
+//     },
+//   })
+//     .then((response: any) => {
+//       console.log(response);
+//       const formData = new FormData();
+//       formData.append('file', selectFileInput);
+//       request(
+//         response.link,
+//         'PUT',
+//         {
+//           body: formData,
+//         },
+//         {
+//           headers: {
+//             'Content-Type': 'multipart/form-data',
+//           },
+//         },
+//       )
+//         .then((res: any) => {
+//           console.log(res);
+//         })
+//         .catch((error: any) => {
+//           console.log(error);
+//         });
 //     })
-//       .then((response: any) => {
-//         console.log(response);
-//         const formData = new FormData();
-//         formData.append('file', selectFileInput);
-//         request(
-//           response.link,
-//           'PUT',
-//           {
-//             body: formData,
-//           },
-//           {
-//             headers: {
-//               'Content-Type': 'multipart/form-data',
-//             },
-//           },
-//         )
-//           .then((res: any) => {
-//             console.log(res);
-//           })
-//           .catch((error: any) => {
-//             console.log(error);
-//           });
-//       })
-//       .catch((error: any) => {
-//         console.log('Oops errors!', error);
-//       });
-//   };
+//     .catch((error: any) => {
+//       console.log('Oops errors!', error);
+//     });
+// };
 //   const handleCancelCopyfile = () => {
 //     setIsModalOpenCopyfile(false);
 //   };
@@ -458,10 +458,10 @@
 //     // console.log(e.target.value);
 //     setCopyFileInput(e.target.value);
 //   };
-//   const handleChangeFile = (e: any) => {
-//     // console.log(e.target.file[0]);
-//     setSelectFileInput(e.target.files[0]);
-//   };
+// const handleChangeFile = (e: any) => {
+//   // console.log(e.target.file[0]);
+//   setSelectFileInput(e.target.files[0]);
+// };
 //   const handleClone = () => {
 //     setCloneValue('');
 //     setIsModalOpenClone(true);

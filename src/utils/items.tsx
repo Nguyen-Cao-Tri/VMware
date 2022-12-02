@@ -4,6 +4,8 @@ import { PoweroffOutlined, ReloadOutlined } from '@ant-design/icons';
 export const items = (vm: object[], keyRightClick: string) => {
   const vmItem: any = vm.filter((itemVm: any) => itemVm.vm === keyRightClick);
   const powerState = vmItem[0]?.power_state;
+  const isDisable =
+    keyRightClick.includes('datacenter') || keyRightClick.includes('group');
   return [
     {
       label: 'Rename...',
@@ -57,14 +59,22 @@ export const items = (vm: object[], keyRightClick: string) => {
     {
       label: 'Get file from guest',
       key: 'getfile',
+      disabled: isDisable,
     },
     {
       label: 'Copy file to guest',
       key: 'copyfile',
+      disabled: isDisable,
     },
     {
       label: 'Clone',
       key: 'clone',
+      disabled: isDisable,
+    },
+    {
+      label: 'Run process',
+      key: 'process',
+      disabled: isDisable,
     },
   ];
 };
