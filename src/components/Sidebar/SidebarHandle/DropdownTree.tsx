@@ -24,6 +24,7 @@ interface PropsDropdown {
       ) => void)
     | undefined;
   loadedKeys?: Key[];
+  checkedKeys?: Key[];
 }
 const DropdownTree = ({
   onLoadData,
@@ -35,6 +36,7 @@ const DropdownTree = ({
   expandedKeys,
   onCheck,
   loadedKeys,
+  checkedKeys,
 }: PropsDropdown) => {
   return (
     <Dropdown autoFocus overlay={item} trigger={['contextMenu']}>
@@ -56,6 +58,7 @@ const DropdownTree = ({
           treeData={treeData}
           showLine={true}
           onCheck={onCheck}
+          checkedKeys={checkedKeys}
           onRightClick={onRightClick}
           onSelect={onSelect}
           onExpand={onExpand}

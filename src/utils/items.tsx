@@ -4,10 +4,6 @@ import { PoweroffOutlined, ReloadOutlined } from '@ant-design/icons';
 export const items = (vm: object[], keyRightClick: string) => {
   const vmItem: any = vm.filter((itemVm: any) => itemVm.vm === keyRightClick);
   const powerState = vmItem[0]?.power_state;
-  console.log('vm', vm);
-
-  console.log('power state', powerState);
-
   return [
     {
       label: 'Rename...',
@@ -25,23 +21,32 @@ export const items = (vm: object[], keyRightClick: string) => {
       children: [
         {
           label: 'Power On',
-          key: 'powerOn',
-          disabled: powerState === 'start' || powerState === 'POWERED_ON',
+          key: 'start',
+          disabled:
+            powerState === 'start' ||
+            powerState === 'POWERED_ON' ||
+            powerState === 'reset',
         },
         {
           label: 'Power Off',
-          key: 'powerOff',
+          key: 'stop',
           disabled: powerState === 'stop' || powerState === 'POWERED_OFF',
         },
         {
           label: 'Suspend',
-          key: 'powerSuspend',
-          disabled: powerState === 'suspend' || powerState === 'POWERED_OFF',
+          key: 'suspend',
+          disabled:
+            powerState === 'suspend' ||
+            powerState === 'POWERED_OFF' ||
+            powerState === 'stop',
         },
         {
           label: 'Reset',
-          key: 'powerReset',
-          disabled: powerState === 'reset' || powerState === 'POWERED_OFF',
+          key: 'reset',
+          disabled:
+            powerState === 'reset' ||
+            powerState === 'POWERED_OFF' ||
+            powerState === 'stop',
         },
       ],
     },

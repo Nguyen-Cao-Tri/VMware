@@ -12,6 +12,8 @@ import { PushRequestData } from './SidebarHandle/PushRequestData';
 import { items } from '../../utils/items';
 import DropdownTree from './SidebarHandle/DropdownTree';
 import ModalRename, { findRename } from '../Modal/ModalRename';
+import ModalGetfile from '../Modal/ModalGetfile';
+import ModalUserLogin from '../Modal/ModalUserLogin';
 
 export interface DataNode {
   title: string;
@@ -29,6 +31,9 @@ const Sidebar = (props: PropsSidebar) => {
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [keyDatacenter, setKeyDatacenter] = useState<string>('');
   const [isModalRenameOpen, setIsModalRenameOpen] = useState<boolean>(false);
+  const [isModalGetfileOpen, setIsModalGetfileOpen] = useState<boolean>(false);
+  const [isModalUserLoginOpen, setIsModalUserLoginOpen] =
+    useState<boolean>(false);
   const [keyRightClick, setKeyRightClick] = useState<string>('');
   const [nameRightClick, setNameRightClick] = useState<string>('');
   const [inforSelect, setInforSelect] = useState<any>();
@@ -37,26 +42,34 @@ const Sidebar = (props: PropsSidebar) => {
   const [keyExpanded, setKeyExpanded] = useState<React.Key[]>([]);
   const [vm, setVm] = useState<object[]>([]);
   const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
+  const [checkedKeys, setCheckedKeys] = useState<any>([]);
   const { request, isLoading } = useRequest();
   useEffect(() => {
     request('/api/vcenter/datacenter', 'GET').then((res: any) => {
       setTreeData(InitTreeData(res));
     });
   }, []);
-  const handlePowerState = async (idVm: string, action: string) => {
-    await request(
-      `/api/vcenter/vm/${idVm}/power?action=${action}`,
-      'POST',
-    ).then(() => {
-      vm.forEach((itemVm: any) => {
-        if (itemVm.vm === keyRightClick) {
-          itemVm.power_state = action;
-        }
-      });
-    });
-    props.propVmPowerState(vm);
+  const callApiPowerState = (idVm: string, action: string) => {
+    void request(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST').then(
+      () => {
+        vm.forEach((itemVm: any) => {
+          if (itemVm.vm === idVm) {
+            itemVm.power_state = action;
+          }
+          props.propVmPowerState([...vm]);
+        });
+      },
+    );
+  };
+  const handlePowerState = (idVm: string, action: string) => {
+    const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
+    console.log('vmCheckKeys', vmCheckKeys);
+    if (vmCheckKeys?.length > 0) {
+      vmCheckKeys.map((item: any) => callApiPowerState(item, action));
+    } else callApiPowerState(idVm, action);
   };
   const item = () => {
+    const text = 'asd';
     return (
       <Menu
         onClick={(key) => {
@@ -66,33 +79,26 @@ const Sidebar = (props: PropsSidebar) => {
               setRenameInput(keyRightClick);
               break;
             case 'refresh':
-              request('/api/vcenter/datacenter', 'GET').then(
-                (res: DataNode[]) => {
-                  setTreeData(InitTreeData(res));
-                },
-              );
+              request('/api/vcenter/datacenter').then((res: DataNode[]) => {
+                setTreeData(InitTreeData(res));
+              });
               setKeyExpanded([]);
               setLoadedKeys([]);
-              break;
-            case 'powerOn':
-              void handlePowerState(keyRightClick, 'start');
-              break;
-            case 'powerOff':
-              void handlePowerState(keyRightClick, 'stop');
-              break;
-            case 'powerSuspend':
-              void handlePowerState(keyRightClick, 'suspend');
-              break;
-            case 'powerReset':
-              void handlePowerState(keyRightClick, 'reset');
+              setCheckedKeys([]);
               break;
             case 'login':
+              setIsModalUserLoginOpen(true);
               break;
             case 'clone':
               break;
             case 'getfile':
+              setIsModalGetfileOpen(true);
               break;
             case 'copyfile':
+              break;
+            case key.key:
+              void handlePowerState(keyRightClick, key.key);
+              break;
           }
         }}
         items={items(vm, keyRightClick)}
@@ -120,10 +126,9 @@ const Sidebar = (props: PropsSidebar) => {
         if (key === keySelect) {
           props.propOnSelect({
             title: inforSelect.node.title,
-            key: key,
+            key,
             children: res,
           });
-          console.log('res', res);
         }
         setTreeData(() =>
           UpdateTreeData(treeData, key, PushRequestData(res, param)),
@@ -136,12 +141,10 @@ const Sidebar = (props: PropsSidebar) => {
           if (key === keySelect) {
             props.propOnSelect({
               title: inforSelect.node.title,
-              key: key,
+              key,
               children: res,
             });
-            console.log('res', res);
           }
-
           setTreeData(() =>
             UpdateTreeData(treeData, key, PushRequestData(res, 'vm')),
           );
@@ -150,10 +153,6 @@ const Sidebar = (props: PropsSidebar) => {
       });
     }
     setLoadedKeys(loadedKeys.concat([key]));
-  };
-  const handleOkRename = (value: string) => {
-    setTreeData([...findRename(treeData, keyRightClick, value)]);
-    setIsModalRenameOpen(false);
   };
   return (
     <>
@@ -168,31 +167,46 @@ const Sidebar = (props: PropsSidebar) => {
         onSelect={(value, info) => {
           setKeySelect(value[0]);
           setInforSelect(info);
-
           props.propOnSelect({
             title: info.node.title,
             key: value[0],
             children: info.node?.children,
           });
           props.propOnExpand(value);
+          props.propVmPowerState(vm);
         }}
         onExpand={(value, info) => {
           props.propOnExpand(value);
           setKeyExpanded(value);
         }}
+        checkedKeys={checkedKeys}
         expandedKeys={keyExpanded}
         onCheck={(value, info) => {
-          console.log('value', value);
-          console.log('info', info);
+          setCheckedKeys(value);
         }}
         loadedKeys={loadedKeys}
       ></DropdownTree>
       <ModalRename
         isModalOpen={isModalRenameOpen}
-        handleOk={(value) => handleOkRename(value)}
+        handleOk={(value) => {
+          setTreeData([...findRename(treeData, keyRightClick, value)]);
+          setIsModalRenameOpen(false);
+        }}
         handleCancel={() => setIsModalRenameOpen(false)}
         keyRightClick={keyRightClick}
         nameRightClick={nameRightClick}
+      />
+      <ModalGetfile
+        isModalOpen={isModalGetfileOpen}
+        handleCancel={() => setIsModalGetfileOpen(false)}
+        keyRightClick={keyRightClick}
+        checkedKeys={checkedKeys}
+      />
+      <ModalUserLogin
+        isModalOpen={isModalUserLoginOpen}
+        keyRightClick={keyRightClick}
+        checkedKeys={checkedKeys}
+        handleCancel={() => setIsModalUserLoginOpen(false)}
       />
     </>
   );

@@ -302,16 +302,16 @@
 //     setRename('');
 //     setIsModalOpenRename(false);
 //   };
-//   const handleOkLogin = () => {
-//     setIsModalOpenLogin(false);
-//     const obj = {
-//       id: infor?.node.key,
-//       username: userName,
-//       password,
-//     };
-//     localStorage.setItem(`username ${infor.node.key}`, `${obj.username}`);
-//     localStorage.setItem(`password ${infor.node.key}`, `${obj.password}`);
+// const handleOkLogin = () => {
+//   setIsModalOpenLogin(false);
+//   const obj = {
+//     id: infor?.node.key,
+//     username: userName,
+//     password,
 //   };
+//   localStorage.setItem(`username ${infor.node.key}`, `${obj.username}`);
+//   localStorage.setItem(`password ${infor.node.key}`, `${obj.password}`);
+// };
 //   const handleCancelRename = () => {
 //     setIsModalOpenRename(false);
 //   };
@@ -415,45 +415,45 @@
 //   const onChangeGetFile = (e: any) => {
 //     setValueGetFile(e.target.value);
 //   };
-//   const handleOkGetfile = () => {
-//     setIsModalOpenGetfile(false);
-//     const vmId = infor.node.key;
-//     const vmUsername = localStorage.getItem(`username ${infor.node.key}`);
-//     const vmPassword = localStorage.getItem(`password ${infor.node.key}`);
-//     request(`/api/vcenter/vm/${vmId}/guest/filesystem?action=create`, 'POST', {
-//       credentials: {
-//         interactive_session: false,
-//         user_name: vmUsername,
-//         password: vmPassword,
-//         type: 'USERNAME_PASSWORD',
-//       },
-//       spec: {
-//         path: valueGetFile,
-//       },
+// const handleOkGetfile = () => {
+//   setIsModalOpenGetfile(false);
+//   const vmId = infor.node.key;
+//   const vmUsername = localStorage.getItem(`username ${infor.node.key}`);
+//   const vmPassword = localStorage.getItem(`password ${infor.node.key}`);
+//   request(`/api/vcenter/vm/${vmId}/guest/filesystem?action=create`, 'POST', {
+//     credentials: {
+//       interactive_session: false,
+//       user_name: vmUsername,
+//       password: vmPassword,
+//       type: 'USERNAME_PASSWORD',
+//     },
+//     spec: {
+//       path: valueGetFile,
+//     },
+//   })
+//     .then((response: any) => {
+//       console.log(response.link);
+//       if (response.link) {
+//         request(response.link, 'GET')
+//           .then((res: any) => {
+//             const url = window.URL.createObjectURL(new Blob([res.data]));
+//             const link = document.createElement('a');
+//             link.href = url;
+//             link.setAttribute('download', ' file.zip');
+//             document.body.appendChild(link);
+//             link.click();
+//           })
+//           .catch((error: any) => {
+//             console.log(error);
+//           });
+//       }
+//       setIsModalOpenGetfile(false);
 //     })
-//       .then((response: any) => {
-//         console.log(response.link);
-//         if (response.link) {
-//           request(response.link, 'GET')
-//             .then((res: any) => {
-//               const url = window.URL.createObjectURL(new Blob([res.data]));
-//               const link = document.createElement('a');
-//               link.href = url;
-//               link.setAttribute('download', ' file.zip');
-//               document.body.appendChild(link);
-//               link.click();
-//             })
-//             .catch((error: any) => {
-//               console.log(error);
-//             });
-//         }
-//         setIsModalOpenGetfile(false);
-//       })
-//       .catch((error: any) => {
-//         console.log('Oops errors!', error);
-//         setIsModalOpenGetfile(false);
-//       });
-//   };
+//     .catch((error: any) => {
+//       console.log('Oops errors!', error);
+//       setIsModalOpenGetfile(false);
+//     });
+// };
 //   const onChangeCopyfile = (e: any) => {
 //     // console.log(e.target.value);
 //     setCopyFileInput(e.target.value);
@@ -575,23 +575,23 @@
 //               />
 //             </div>
 //           </Modal>
-//           <Modal
-//             title="User login"
-//             open={isModalOpenLogin}
-//             onOk={handleOkLogin}
-//             onCancel={handleCancelLogin}
-//           >
-//             <div className="input__name">
-//               <div>
-//                 Username
-//                 <Input value={userName} onChange={onChangeUsername}></Input>
-//               </div>
-//               <div>
-//                 Password
-//                 <Input.Password value={password} onChange={onChangePassword} />
-//               </div>
-//             </div>
-//           </Modal>
+// <Modal
+//   title="User login"
+//   open={isModalOpenLogin}
+//   onOk={handleOkLogin}
+//   onCancel={handleCancelLogin}
+// >
+//   <div className="input__name">
+//     <div>
+//       Username
+//       <Input value={userName} onChange={onChangeUsername}></Input>
+//     </div>
+//     <div>
+//       Password
+//       <Input.Password value={password} onChange={onChangePassword} />
+//     </div>
+//   </div>
+// </Modal>
 //           <Modal
 //             title="GetFile"
 //             open={isModalOpenGetfile}

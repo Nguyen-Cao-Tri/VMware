@@ -8,6 +8,8 @@ import {
   FolderOutlined,
   LaptopOutlined,
   PlayCircleOutlined,
+  SyncOutlined,
+  PauseOutlined,
 } from '@ant-design/icons';
 const styles = {
   height: '100px',
@@ -20,18 +22,13 @@ const styles = {
 };
 
 const Content = (props: any) => {
-  const object = props.inforSelect;
   const title = props.inforSelect?.title;
   const key = props.inforSelect?.key;
   const totalChildren = props.inforSelect?.children?.length;
   const children = props.inforSelect?.children;
-  const isSelected = props.inforSelect?.selected;
-  const vmPowerState = props.vmPowerState;
-  console.log('title', title);
-  console.log('key', key);
-  console.log('totalChildren', totalChildren);
-  console.log('children', children);
-  console.log('object', object);
+  const vmPowerState = props.vmPowerState?.filter(
+    (item: any) => item.vm === key,
+  );
 
   const RenderUI = () => {
     if (key?.includes('datacenter')) {
@@ -52,7 +49,6 @@ const Content = (props: any) => {
         (itemVm: any) =>
           itemVm.vm?.includes('vm') || itemVm.key?.includes('vm'),
       );
-
       return (
         <div style={{ padding: '20px' }}>
           <h3>Folder name: {title}</h3>
@@ -72,8 +68,6 @@ const Content = (props: any) => {
       );
     }
     if (key?.includes('vm')) {
-      console.log('vmPowerState', vmPowerState);
-
       if (vmPowerState?.length > 0) {
         const powerState = vmPowerState[0].power_state;
 
@@ -84,35 +78,29 @@ const Content = (props: any) => {
               <div>Power On</div>
             </div>
           );
+        if (powerState === 'stop' || powerState === 'POWERED_OFF')
+          return (
+            <div style={styles}>
+              <PlayCircleOutlined style={{ marginRight: '10px' }} />
+              <div>Power Off</div>
+            </div>
+          );
+        if (powerState === 'suspend')
+          return (
+            <div style={styles}>
+              <PauseOutlined style={{ marginRight: '10px' }} />
+              <div>Power Suspend</div>
+            </div>
+          );
+        if (powerState === 'reset')
+          return (
+            <div style={styles}>
+              <SyncOutlined style={{ marginRight: '10px' }} />
+              <div>Power Reset</div>
+            </div>
+          );
       }
     }
-
-    // if (key?.length >= 4) {
-    //   const powerState = vms.filter((item: any) => item.vm === key);
-    //   const state = powerState[0]?.power_state;
-    //   console.log('power state', powerState[0]?.power_state);
-    //   if (state === 'POWER_ON')
-
-    //   if (state === 'POWER_SUSPEND')
-    //     return (
-    //       <div style={styles}>
-    //         <PauseOutlined style={{ marginRight: '10px' }} />
-    //         <div>Power Suspend</div>
-    //       </div>
-    //     );
-    //   if (state === 'POWER_RESET')
-    //     return (
-    //       <div style={styles}>
-    //         <SyncOutlined style={{ marginRight: '10px' }} />
-    //         <div>Power Reset</div>
-    //       </div>
-    //     );
-    //   return (
-    //     <div style={styles}>
-    //       <div>Power off</div>
-    //     </div>
-    //   );
-
     return (
       <h3 style={{ padding: '20px' }}>
         Chose something or expand to know more information

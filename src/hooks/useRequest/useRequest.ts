@@ -9,7 +9,7 @@ export default function useRequest() {
   const request = async (
     url: string,
     method?: string,
-    data?: any,
+    data?: Record<string, unknown>,
     header?: HeadersInit,
   ) => {
     setIsLoading(true);
@@ -17,37 +17,33 @@ export default function useRequest() {
     const sessionId = localStorage.getItem('sessionId');
     const createRequest = fetch(`${baseURL}${url}`, {
       method: method ?? 'GET',
-      body: data,
+      body: JSON.stringify(data),
       headers: {
         ...header,
         'vmware-api-session-id': sessionId ?? '',
       },
       credentials: 'omit',
     })
-      .then((response: any) => {
-        if (response.status >= 300) {
-          throw response;
+      .then(async (response) => {
+        const isJson =
+          response.headers.get('content-type')?.includes('application/json') ??
+          false;
+        const data = isJson ? await response.json() : await response.text();
+        console.log('data', data);
+        console.log('res', response);
+
+        if (response.ok) {
+          return data;
         }
-        return response.json();
-      })
-      .then((data) => {
-        return data;
+
+        if (response.status === 401) {
+          navigate('/login');
+          throw data;
+        } else throw data;
       })
       .catch((error) => {
+        console.log('errorrrrr', error);
         setError(error);
-        if (!(error instanceof Error)) {
-          switch (error.status) {
-            case 401: {
-              navigate('/login');
-              break;
-            }
-            default: {
-              throw error;
-            }
-          }
-        } else {
-          throw error;
-        }
         throw error;
       })
       .finally(() => setIsLoading(false));
