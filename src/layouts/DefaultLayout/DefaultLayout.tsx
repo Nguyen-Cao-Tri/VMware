@@ -8,6 +8,7 @@ import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import { Allotment } from 'allotment';
+import './styles.css';
 import 'allotment/dist/style.css';
 interface DataNode {
   title: string;
@@ -20,6 +21,9 @@ export default function DefaultLayout() {
   const [keyExpand, setKeyExpand] = useState<string[]>([]);
   const [vmPowerState, setVmPowerState] = useState<object[]>();
   const [children, setChildren] = useState<object[]>([]);
+  const [theme, setTheme] = useState<string>(
+    localStorage.getItem('theme') ?? 'dark',
+  );
   const [sidebarSize, setSidebarSize] = useState('200');
   const [logSize, setLogSize] = useState('200');
   const onChangeSidebar = (value: any) => {
@@ -39,9 +43,9 @@ export default function DefaultLayout() {
     if (log != null) setLogSize(log);
   }, []);
   return (
-    <div>
+    <div className={`${theme}`}>
       <div className="header">
-        <Header />
+        <Header theme={(value) => setTheme(value)} />
       </div>
       <div
         style={{
@@ -55,6 +59,7 @@ export default function DefaultLayout() {
         <Allotment minSize={100} onChange={onChangeSidebar}>
           <Allotment.Pane preferredSize={sidebarSize}>
             <Sidebar
+              propTheme={theme}
               propOnSelect={(value) => setInforSelect(value)}
               propOnExpand={(value) => setKeyExpand(value)}
               propVmPowerState={(value) => setVmPowerState(value)}

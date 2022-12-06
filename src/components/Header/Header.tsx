@@ -1,16 +1,34 @@
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Button, Switch } from 'antd';
-import React, { useState } from 'react';
+import { Button, MenuTheme, Switch } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { LoginOutlined } from '@ant-design/icons';
 import './styles.css';
 import { useNavigate } from 'react-router-dom';
-const Header = () => {
+interface PropsHeader {
+  theme: (item: string) => void;
+}
+const Header = (props: PropsHeader) => {
   const navigate = useNavigate();
   const handleOnClick = () => {
     localStorage.setItem('sessionId', '');
     navigate('/login');
   };
-  const [theme, setTheme] = useState<boolean>(true);
+  const [theme, setTheme] = useState<any>(
+    localStorage.getItem('theme') ?? 'dark',
+  );
+  useEffect(() => {
+    const chekedTheme = localStorage.getItem('theme');
+    if (!chekedTheme) {
+      localStorage.setItem('theme', 'dark');
+    }
+    props.theme(theme);
+  }, []);
+  const changeTheme = (value: boolean) => {
+    setTheme(value ? 'dark' : 'light');
+    localStorage.setItem('theme', value ? 'dark' : 'light');
+    props.theme(value ? 'dark' : 'light');
+  };
   return (
     <div className="container">
       <h1>VMware Manager</h1>
@@ -25,9 +43,8 @@ const Header = () => {
         }}
       >
         <Switch
-          style={{ marginRight: 20 }}
-          // checked={theme === 'dark'}
-          onChange={() => setTheme(!theme)}
+          checked={theme === 'dark'}
+          onChange={changeTheme}
           checkedChildren="Dark"
           unCheckedChildren="Light"
         />

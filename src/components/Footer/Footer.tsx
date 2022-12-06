@@ -25,8 +25,8 @@ const Footer = () => {
       {' '}
       {logs.map((log, index) => (
         <div key={index}>
-          {execuTimeFormat(log.executeTime)} {log.title} {log.action}{' '}
-          {log.state} {log.errorMessage}
+          {execuTimeFormat(log.executeTime)} {log.name} {log.action} {log.state}{' '}
+          {log.errorMessage}
         </div>
       ))}
       <div ref={bottomRef} />

@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { Key, useEffect, useState } from 'react';
-import { Menu, TreeProps } from 'antd';
+import { Menu, MenuTheme, TreeProps } from 'antd';
 import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
 import { InitTreeData } from './SidebarHandle/InitTreeData';
 import useRequest from '../../hooks/useRequest/useRequest';
@@ -31,6 +31,7 @@ interface PropsSidebar {
   propOnExpand: (info: any) => void;
   propVmPowerState: (vm: object[]) => void;
   propChildren: (children: object[]) => void;
+  propTheme: any;
 }
 const Sidebar = (props: PropsSidebar) => {
   const [treeData, setTreeData] = useState<DataNode[]>([]);
@@ -53,11 +54,20 @@ const Sidebar = (props: PropsSidebar) => {
   const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<any>([]);
   const { request, isLoading } = useRequest();
+  const themeLocalStorageInit = localStorage.getItem('theme');
+
+  const [theme, setTheme] = useState<any>(themeLocalStorageInit);
   useEffect(() => {
     request('/api/vcenter/datacenter', 'GET').then((res: any) => {
       console.log('res', res);
-
       setTreeData(InitTreeData(res));
+    });
+  }, []);
+  useEffect(() => {
+    window.addEventListener('storage', () => {
+      const themeLocalStorage = localStorage.getItem('theme');
+      console.log(themeLocalStorage);
+      setTheme(themeLocalStorage);
     });
   }, []);
   const callApiPowerState = (idVm: string, action: string) => {
@@ -80,9 +90,9 @@ const Sidebar = (props: PropsSidebar) => {
     } else callApiPowerState(idVm, action);
   };
   const item = () => {
-    const text = 'asd';
     return (
       <Menu
+        theme={props.propTheme}
         onClick={(key) => {
           switch (key.key) {
             case 'rename':

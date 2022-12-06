@@ -10,12 +10,12 @@ import React, {
 export enum VMLogState {
   BEGIN = 'Begin!',
   SUCCESS = 'Success!',
-  ERROR = 'Error:',
+  ERROR = 'Error: ',
 }
 export interface IData {
   executeTime: number;
-  title: string;
-  action: string;
+  name?: string;
+  action?: string;
   state: VMLogState;
   errorMessage?: string;
 }

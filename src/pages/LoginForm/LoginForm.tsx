@@ -4,21 +4,22 @@ import { Button, Checkbox, Form, Input, notification } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import React from 'react';
 import 'antd/dist/antd.min.css';
-import useRequest from '../../hooks/useRequest/useRequest';
+
 import { useNavigate } from 'react-router-dom';
 import './styles.scss';
 import { encode } from 'base-64';
+import useRequestLogin from '../../hooks/useRequest/useRequestLogin';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
-  const { request } = useRequest();
+  const { requestLogin } = useRequestLogin();
 
   const onFinish = (values: Record<string, string>) => {
     const { username, password } = values;
     // console.log('username password', username, password);
     const credential = `${username}:${password}`;
     const base64Credential = encode(credential);
-    request(
+    requestLogin(
       '/api/session',
       'POST',
       {},
