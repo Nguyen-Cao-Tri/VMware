@@ -1,13 +1,12 @@
 /* eslint-disable react/no-children-prop */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Content from '../../components/Content/Content';
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
 import Sidebar from '../../components/Sidebar/Sidebar';
-import './styles.css';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 interface DataNode {
@@ -21,9 +20,26 @@ export default function DefaultLayout() {
   const [keyExpand, setKeyExpand] = useState<string[]>([]);
   const [vmPowerState, setVmPowerState] = useState<object[]>();
   const [children, setChildren] = useState<object[]>([]);
+  const [sidebarSize, setSidebarSize] = useState('200');
+  const [logSize, setLogSize] = useState('200');
+  const onChangeSidebar = (value: any) => {
+    const [firstPane] = value;
+    localStorage.setItem('sizeSidebar', firstPane);
+  };
+  const onChangeLog = (value: any) => {
+    const [firstPane, secondPane] = value;
+    localStorage.setItem('sizeLog', secondPane);
+  };
 
+  useEffect(() => {
+    const size = localStorage.getItem('sizeSidebar');
+    if (size != null) setSidebarSize(size);
+
+    const log = localStorage.getItem('sizeLog');
+    if (log != null) setLogSize(log);
+  }, []);
   return (
-    <div className="wrapper">
+    <div>
       <div className="header">
         <Header />
       </div>
@@ -36,8 +52,8 @@ export default function DefaultLayout() {
           border: '1px solid #ccc',
         }}
       >
-        <Allotment minSize={100}>
-          <Allotment.Pane minSize={200} maxSize={700}>
+        <Allotment minSize={100} onChange={onChangeSidebar}>
+          <Allotment.Pane preferredSize={sidebarSize}>
             <Sidebar
               propOnSelect={(value) => setInforSelect(value)}
               propOnExpand={(value) => setKeyExpand(value)}
@@ -45,16 +61,22 @@ export default function DefaultLayout() {
               propChildren={(value) => setChildren(value)}
             />
           </Allotment.Pane>
-          <Allotment vertical>
-            <Content
-              inforSelect={inforSelect}
-              vmData={vmPowerState}
-              children={children}
-              keyExpand={keyExpand}
-              vmPowerState={vmPowerState}
-            />
-            <Footer />
-          </Allotment>
+          <Allotment.Pane>
+            <Allotment vertical onChange={onChangeLog}>
+              <Allotment.Pane>
+                <Content
+                  inforSelect={inforSelect}
+                  vmData={vmPowerState}
+                  children={children}
+                  keyExpand={keyExpand}
+                  vmPowerState={vmPowerState}
+                />
+              </Allotment.Pane>
+              <Allotment.Pane preferredSize={logSize}>
+                <Footer />
+              </Allotment.Pane>
+            </Allotment>
+          </Allotment.Pane>
         </Allotment>
       </div>
     </div>

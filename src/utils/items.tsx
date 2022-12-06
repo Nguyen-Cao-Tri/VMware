@@ -69,7 +69,8 @@ export const items = (vm: object[], keyRightClick: string) => {
     {
       label: 'Clone',
       key: 'clone',
-      disabled: isDisable,
+      disabled:
+        isDisable || powerState === 'start' || powerState === 'POWERED_ON',
     },
     {
       label: 'Run process',

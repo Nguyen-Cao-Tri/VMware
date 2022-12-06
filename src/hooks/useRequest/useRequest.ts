@@ -9,7 +9,7 @@ export default function useRequest() {
   const request = async (
     url: string,
     method?: string,
-    data?: Record<string, unknown>,
+    data?: Record<string, unknown> | FormData,
     header?: HeadersInit,
   ) => {
     setIsLoading(true);
@@ -30,8 +30,6 @@ export default function useRequest() {
           response.headers.get('content-type')?.includes('application/json') ??
           false;
         const data = isJson ? await response.json() : await response.text();
-        console.log('data', data);
-        console.log('res', response);
         if (response.ok) {
           return data;
         }
@@ -41,7 +39,6 @@ export default function useRequest() {
         } else throw data;
       })
       .catch((error) => {
-        console.log('errorrrrr', error);
         setError(error);
         throw error;
       })

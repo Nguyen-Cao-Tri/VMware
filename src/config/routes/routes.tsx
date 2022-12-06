@@ -6,6 +6,7 @@ import DefaultLayout from '../../layouts/DefaultLayout/DefaultLayout';
 import LoginForm from '../../pages/LoginForm/LoginForm';
 import Demo from '../../pages/DemoPage/DemoPage';
 import Test from '../../pages/TestLogic/Test';
+import MoveToFolder from '../../components/Sidebar/SidebarHandle/MoveToFolder';
 const routes = [
   {
     path: '/',
@@ -17,14 +18,19 @@ const routes = [
     //   { path: 'demo', element: <DemoPage /> },
     // ],
   },
-  { path: 'demo', element: <Demo /> },
   {
     path: '/login',
     element: <LoginForm />,
   },
+  { path: 'demo', element: <Demo /> },
+
   {
     path: '/test',
     element: <Test />,
+  },
+  {
+    path: '/move',
+    element: <MoveToFolder />,
   },
   {
     element: <NotFound />,

@@ -1,6 +1,7 @@
-.wrapper{
+.container{
+    display: flex;
     height: 55px;
-    width: auto;
+    width: 100vw;
     background-color: #59d7e7;
     text-align:start;
 }

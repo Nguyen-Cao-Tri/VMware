@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { Key, useEffect, useState } from 'react';
-import { Menu } from 'antd';
+import { Menu, TreeProps } from 'antd';
 import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
 import { InitTreeData } from './SidebarHandle/InitTreeData';
 import useRequest from '../../hooks/useRequest/useRequest';
@@ -16,6 +17,8 @@ import ModalGetfile from '../Modal/ModalGetfile';
 import ModalUserLogin from '../Modal/ModalUserLogin';
 import ModalCopyfile from '../Modal/ModalCopyfile';
 import ModalProcess from '../Modal/ModalProcess';
+import ModalClone from '../Modal/ModalClone';
+import { LaptopOutlined } from '@ant-design/icons';
 
 export interface DataNode {
   title: string;
@@ -39,6 +42,7 @@ const Sidebar = (props: PropsSidebar) => {
   const [isModalCopyfileOpen, setIsModalCopyfileOpen] =
     useState<boolean>(false);
   const [isModalProcessOpen, setIsModalProcessOpen] = useState<boolean>(false);
+  const [isModalCloneOpen, setIsModalCloneOpen] = useState<boolean>(false);
   const [keyRightClick, setKeyRightClick] = useState<string>('');
   const [nameRightClick, setNameRightClick] = useState<string>('');
   const [inforSelect, setInforSelect] = useState<any>();
@@ -51,6 +55,8 @@ const Sidebar = (props: PropsSidebar) => {
   const { request, isLoading } = useRequest();
   useEffect(() => {
     request('/api/vcenter/datacenter', 'GET').then((res: any) => {
+      console.log('res', res);
+
       setTreeData(InitTreeData(res));
     });
   }, []);
@@ -95,6 +101,7 @@ const Sidebar = (props: PropsSidebar) => {
               setIsModalUserLoginOpen(true);
               break;
             case 'clone':
+              setIsModalCloneOpen(true);
               break;
             case 'getfile':
               setIsModalGetfileOpen(true);
@@ -163,6 +170,38 @@ const Sidebar = (props: PropsSidebar) => {
     }
     setLoadedKeys(loadedKeys.concat([key]));
   };
+  const handleOkClone = (cloneInput: string) => {
+    setIsModalCloneOpen(false);
+    const idRandom = new Date().getMilliseconds();
+    const idVmClone = `vm-${idRandom}`;
+    const vmClone: any = vm.filter(
+      (itemListVm: any) => itemListVm.vm === keyRightClick,
+    );
+    const setVmClone = {
+      ...vmClone[0],
+      name: cloneInput,
+      vm: idVmClone,
+    };
+    setVm([...vm, setVmClone]);
+    const vmCloneValue = {
+      title: cloneInput,
+      key: idVmClone,
+      isLeaf: true,
+      icon: <LaptopOutlined />,
+    };
+
+    const findVmClone = (list: DataNode[]) => {
+      list?.forEach((itemList: any) => {
+        const itemListChildren = itemList.children?.filter(
+          (itemFilter: any) => itemFilter.key === keyRightClick,
+        );
+        if (itemListChildren?.length > 0) itemList.children.push(vmCloneValue);
+        else findVmClone(itemList.children);
+      });
+      return list;
+    };
+    setTreeData([...findVmClone(treeData)]);
+  };
   return (
     <>
       <DropdownTree
@@ -194,6 +233,7 @@ const Sidebar = (props: PropsSidebar) => {
           setCheckedKeys(value);
         }}
         loadedKeys={loadedKeys}
+        updateTreeDrop={(info: any) => setTreeData(info)}
       ></DropdownTree>
       <ModalRename
         isModalOpen={isModalRenameOpen}
@@ -226,6 +266,13 @@ const Sidebar = (props: PropsSidebar) => {
         isModalOpen={isModalProcessOpen}
         handleCancel={() => setIsModalProcessOpen(false)}
         keyRightClick={keyRightClick}
+      />
+      <ModalClone
+        isModalOpen={isModalCloneOpen}
+        handleCancel={() => setIsModalCloneOpen(false)}
+        listVm={vm}
+        keyRightClick={keyRightClick}
+        handleOk={(value) => handleOkClone(value)}
       />
     </>
   );

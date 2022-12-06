@@ -45,7 +45,6 @@ const LoginForm: React.FC = () => {
   return (
     <div className="login">
       <div className="item_login">
-        {/* <p>{isLoading ? 'Loading...' : ''} </p> */}
         <Form
           name="basic"
           initialValues={{ remember: true }}

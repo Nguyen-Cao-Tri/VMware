@@ -20,24 +20,35 @@ const ModalCopyfile = ({
     // console.log(e.target.file[0]);
     setSelectFile(e.target.files[0]);
   };
+
   const handleOk = () => {
     handleCancel();
+    const vmUsername = localStorage.getItem(`username ${keyRightClick}`);
+    const vmPassword = localStorage.getItem(`password ${keyRightClick}`);
     if (keyRightClick.includes('vm')) {
       request(
         `/api/vcenter/vm/${keyRightClick}/guest/filesystem?action=create`,
         'POST',
         {
+          credentials: {
+            interactive_session: false,
+            user_name: vmUsername,
+            password: vmPassword,
+            type: 'USERNAME_PASSWORD',
+          },
           spec: {
             path: pathInput,
           },
         },
       )
         .then((response: any) => {
-          console.log(response);
+          console.log('response', response);
           const formData = new FormData();
+
           formData.append('file', fileInput);
+          console.log('formData', formData);
           request(
-            response.link,
+            response,
             'PUT',
             {
               body: formData,

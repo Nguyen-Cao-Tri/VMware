@@ -22,8 +22,6 @@ const ModalGetfile = ({
   const handleGetfile = (idVm: string) => {
     const vmUsername = localStorage.getItem(`username ${idVm}`);
     const vmPassword = localStorage.getItem(`password ${idVm}`);
-    console.log('vmUsername', vmUsername);
-    console.log('vmPassword', vmPassword);
     request(`/api/vcenter/vm/${idVm}/guest/filesystem?action=create`, 'POST', {
       credentials: {
         interactive_session: false,
@@ -36,17 +34,11 @@ const ModalGetfile = ({
       },
     })
       .then((response: any) => {
-        console.log(response.link);
-        if (response.link) {
-          request(response.link, 'GET')
-            .then((res: any) => {
-              const url = window.URL.createObjectURL(new Blob([res.data]));
-              const link = document.createElement('a');
-              link.href = url;
-              link.setAttribute('download', ' file.zip');
-              document.body.appendChild(link);
-              link.click();
-            })
+        console.log('response.link', response);
+        // window.open(response, '_blank', 'noopener,noreferrer');
+        if (response) {
+          fetch(response, { method: 'GET' })
+            .then((res: any) => {})
             .catch((error: any) => {
               console.log(error);
             });
@@ -65,6 +57,7 @@ const ModalGetfile = ({
         handleGetfile(item);
       });
     } else handleGetfile(keyRightClick);
+    setGetfileInput('');
   };
   return (
     <Modal
