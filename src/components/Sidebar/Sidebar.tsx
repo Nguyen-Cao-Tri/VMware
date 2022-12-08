@@ -19,7 +19,8 @@ import ModalCopyfile from '../Modal/ModalCopyfile';
 import ModalProcess from '../Modal/ModalProcess';
 import ModalClone from '../Modal/ModalClone';
 import { LaptopOutlined } from '@ant-design/icons';
-
+import { Action } from '../../hooks/logProvider/LogProvider';
+import PowerStart from '../IconCustom/PowerStart';
 export interface DataNode {
   title: string;
   key: string;
@@ -54,33 +55,51 @@ const Sidebar = (props: PropsSidebar) => {
   const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<any>([]);
   const { request, isLoading } = useRequest();
-  const themeLocalStorageInit = localStorage.getItem('theme');
+  const [datacenter, setDatacenter] = useState<object[]>();
+  const [folder, setFolder] = useState<object[]>();
+  const [vmApi, setVmApi] = useState<object[]>();
 
-  const [theme, setTheme] = useState<any>(themeLocalStorageInit);
+  const [infoExpanded, setInfoExpanded] = useState<any>('');
   useEffect(() => {
-    request('/api/vcenter/datacenter', 'GET').then((res: any) => {
-      console.log('res', res);
+    request('/api/vcenter/datacenter', 'GET', {
+      action: Action.GET_LIST_DATACENTER,
+    }).then((res: any) => {
+      setDatacenter(res);
       setTreeData(InitTreeData(res));
     });
-  }, []);
-  useEffect(() => {
-    window.addEventListener('storage', () => {
-      const themeLocalStorage = localStorage.getItem('theme');
-      console.log(themeLocalStorage);
-      setTheme(themeLocalStorage);
-    });
+    request('/api/vcenter/folder').then((res: any) => setFolder(res));
+    request('/api/vcenter/vm').then((res: any) => setVmApi(res));
   }, []);
   const callApiPowerState = (idVm: string, action: string) => {
-    void request(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST').then(
-      () => {
-        vm.forEach((itemVm: any) => {
-          if (itemVm.vm === idVm) {
-            itemVm.power_state = action;
-          }
-          props.propVmPowerState([...vm]);
-        });
-      },
-    );
+    void request(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST', {
+      action: `Power ${action}`,
+      name: nameRightClick,
+    }).then(() => {
+      vm.forEach((itemVm: any) => {
+        if (itemVm.vm === idVm) {
+          itemVm.power_state = action;
+          localStorage.setItem(itemVm.vm, action);
+        }
+        props.propVmPowerState([...vm]);
+      });
+    });
+    const updateIconStart = (list: DataNode[], icon: any) => {
+      list.forEach((item: any) => {
+        if (item.key === idVm) {
+          item.icon = icon;
+        }
+        if (item.children) {
+          updateIconStart(item.children, icon);
+        }
+      });
+      return list;
+    };
+    if (action === 'start') {
+      setTreeData([...updateIconStart(treeData, <PowerStart />)]);
+    }
+    if (action === 'stop') {
+      setTreeData([...updateIconStart(treeData, <LaptopOutlined />)]);
+    }
   };
   const handlePowerState = (idVm: string, action: string) => {
     const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
@@ -100,7 +119,10 @@ const Sidebar = (props: PropsSidebar) => {
               setRenameInput(keyRightClick);
               break;
             case 'refresh':
-              request('/api/vcenter/datacenter').then((res: DataNode[]) => {
+              request('/api/vcenter/datacenter', 'GET', {
+                action: Action.REFRESH,
+                // name: nameRightClick,
+              }).then((res: DataNode[]) => {
                 setTreeData(InitTreeData(res));
               });
               setKeyExpanded([]);
@@ -133,21 +155,38 @@ const Sidebar = (props: PropsSidebar) => {
   };
   const onLoadData = async ({ key }: any) => {
     if (key.includes('datacenter')) {
+      const datacenterName: any = datacenter?.filter(
+        (item: any) => item.datacenter === key,
+      );
       const param = 'folder';
       setKeyDatacenter(key);
-      await request(`/api/vcenter/${param}?names=vm&datacenters=${key}`).then(
-        (res) => {
-          setTreeData(() =>
-            UpdateTreeData(treeData, key, PushRequestData(res, param)),
-          );
-          if (key === keySelect) props.propChildren(res);
+      await request(
+        `/api/vcenter/${param}?names=vm&datacenters=${key}`,
+        'GET',
+        {
+          action: Action.GET_LIST_FOLDER,
+          name: datacenterName[0].name,
         },
-      );
+      ).then((res) => {
+        setTreeData(() =>
+          UpdateTreeData(treeData, key, PushRequestData(res, param)),
+        );
+        if (key === keySelect) props.propChildren(res);
+      });
     }
     if (key.includes('group')) {
+      const folderName: any = folder?.filter(
+        (item: any) => item.folder === key,
+      );
+      const vmName: any = vmApi?.filter((item: any) => item.vm === key);
       const param = 'folder';
       await request(
         `/api/vcenter/${param}?parent_folders=${key}&datacenters=${keyDatacenter}`,
+        'GET',
+        {
+          action: Action.GET_LIST_FOLDER,
+          name: folderName[0].name,
+        },
       ).then((res: any) => {
         if (key === keySelect) {
           props.propOnSelect({
@@ -162,6 +201,7 @@ const Sidebar = (props: PropsSidebar) => {
       });
       await request(
         `/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`,
+        'GET',
       ).then((res: any) => {
         if (res.length > 0) {
           if (key === keySelect) {
@@ -182,39 +222,26 @@ const Sidebar = (props: PropsSidebar) => {
   };
   const handleOkClone = (cloneInput: string) => {
     setIsModalCloneOpen(false);
-    const idRandom = new Date().getMilliseconds();
-    const idVmClone = `vm-${idRandom}`;
-    const vmClone: any = vm.filter(
-      (itemListVm: any) => itemListVm.vm === keyRightClick,
+    const vmName: any = vmApi?.filter((item: any) => item.vm === keyRightClick);
+    console.log('vmName', vmName);
+    request(
+      '/api/vcenter/vm?action=clone',
+      'POST',
+      {
+        action: Action.CLONE_VM,
+        name: vmName[0].name,
+      },
+      false,
+      {
+        name: cloneInput,
+        source: keyRightClick,
+      },
     );
-    const setVmClone = {
-      ...vmClone[0],
-      name: cloneInput,
-      vm: idVmClone,
-    };
-    setVm([...vm, setVmClone]);
-    const vmCloneValue = {
-      title: cloneInput,
-      key: idVmClone,
-      isLeaf: true,
-      icon: <LaptopOutlined />,
-    };
-
-    const findVmClone = (list: DataNode[]) => {
-      list?.forEach((itemList: any) => {
-        const itemListChildren = itemList.children?.filter(
-          (itemFilter: any) => itemFilter.key === keyRightClick,
-        );
-        if (itemListChildren?.length > 0) itemList.children.push(vmCloneValue);
-        else findVmClone(itemList.children);
-      });
-      return list;
-    };
-    setTreeData([...findVmClone(treeData)]);
   };
   return (
-    <>
+    <div id={`tree__${props.propTheme}`}>
       <DropdownTree
+        theme={props.propTheme}
         onLoadData={onLoadData}
         treeData={treeData}
         item={item}
@@ -236,6 +263,7 @@ const Sidebar = (props: PropsSidebar) => {
         onExpand={(value, info) => {
           props.propOnExpand(value);
           setKeyExpanded(value);
+          setInfoExpanded(info);
         }}
         checkedKeys={checkedKeys}
         expandedKeys={keyExpanded}
@@ -256,6 +284,7 @@ const Sidebar = (props: PropsSidebar) => {
         nameRightClick={nameRightClick}
       />
       <ModalGetfile
+        nameRightClick={nameRightClick}
         isModalOpen={isModalGetfileOpen}
         handleCancel={() => setIsModalGetfileOpen(false)}
         keyRightClick={keyRightClick}
@@ -268,11 +297,13 @@ const Sidebar = (props: PropsSidebar) => {
         handleCancel={() => setIsModalUserLoginOpen(false)}
       />
       <ModalCopyfile
+        nameRightClick={nameRightClick}
         isModalopen={isModalCopyfileOpen}
         handleCancel={() => setIsModalCopyfileOpen(false)}
         keyRightClick={keyRightClick}
       />
       <ModalProcess
+        nameRightClick={nameRightClick}
         isModalOpen={isModalProcessOpen}
         handleCancel={() => setIsModalProcessOpen(false)}
         keyRightClick={keyRightClick}
@@ -284,7 +315,7 @@ const Sidebar = (props: PropsSidebar) => {
         keyRightClick={keyRightClick}
         handleOk={(value) => handleOkClone(value)}
       />
-    </>
+    </div>
   );
 };
 

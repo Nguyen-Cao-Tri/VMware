@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, MenuTheme, Switch } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { LoginOutlined } from '@ant-design/icons';
-import './styles.css';
+import './header.scss';
 import { useNavigate } from 'react-router-dom';
 interface PropsHeader {
   theme: (item: string) => void;
@@ -30,7 +31,7 @@ const Header = (props: PropsHeader) => {
     props.theme(value ? 'dark' : 'light');
   };
   return (
-    <div className="container">
+    <div className={`container__${theme}`}>
       <h1>VMware Manager</h1>
       <div
         style={{
@@ -49,7 +50,7 @@ const Header = (props: PropsHeader) => {
           unCheckedChildren="Light"
         />
         <Button
-          style={{ borderRadius: 15, display: 'flex' }}
+          style={{ borderRadius: 15, display: 'flex', marginLeft: 10 }}
           onClick={handleOnClick}
         >
           <LoginOutlined style={{ marginTop: 5, marginRight: 5 }} />

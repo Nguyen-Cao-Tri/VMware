@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Input, Modal } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
+import { Action } from '../../hooks/logProvider/LogProvider';
 interface PropModal {
   isModalOpen?: boolean;
   vmId?: string;
@@ -9,6 +10,7 @@ interface PropModal {
   handleCancel: () => void;
   checkedKeys: string[];
   keyRightClick: string;
+  nameRightClick: string;
 }
 
 const ModalGetfile = ({
@@ -16,32 +18,40 @@ const ModalGetfile = ({
   handleCancel,
   checkedKeys,
   keyRightClick,
+  nameRightClick,
 }: PropModal) => {
   const [getfileInput, setGetfileInput] = useState<string>('');
   const { request } = useRequest();
   const handleGetfile = (idVm: string) => {
     const vmUsername = localStorage.getItem(`username ${idVm}`);
     const vmPassword = localStorage.getItem(`password ${idVm}`);
-    request(`/api/vcenter/vm/${idVm}/guest/filesystem?action=create`, 'POST', {
-      credentials: {
-        interactive_session: false,
-        user_name: vmUsername,
-        password: vmPassword,
-        type: 'USERNAME_PASSWORD',
+    request(
+      `/api/vcenter/vm/${idVm}/guest/filesystem?action=create`,
+      'POST',
+      { action: Action.GET_FILE, name: nameRightClick },
+      false,
+      {
+        credentials: {
+          interactive_session: false,
+          user_name: vmUsername,
+          password: vmPassword,
+          type: 'USERNAME_PASSWORD',
+        },
+        spec: {
+          path: getfileInput,
+        },
       },
-      spec: {
-        path: getfileInput,
-      },
-    })
+    )
       .then((response: any) => {
         console.log('response.link', response);
-        // window.open(response, '_blank', 'noopener,noreferrer');
+        window.open(response, '_blank', 'noopener,noreferrer');
         if (response) {
-          fetch(response, { method: 'GET' })
-            .then((res: any) => {})
-            .catch((error: any) => {
-              console.log(error);
-            });
+          void request(
+            response,
+            'GET',
+            { action: Action.OPEN_FILE_NEWTAB, name: nameRightClick },
+            true,
+          );
         }
         handleCancel();
       })

@@ -3,6 +3,8 @@ import './styles/App.scss';
 import Router from './config/routes/routes';
 import LogProvider, { Handler } from './hooks/logProvider/LogProvider';
 import { url } from './utils/env';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // import useRequest from './hooks/useRequest/useRequest';
 const App: React.FC = () => {
@@ -16,6 +18,7 @@ const App: React.FC = () => {
     <LogProvider handler={customHandler}>
       <div className="wrapper">
         <Router />
+        <ToastContainer />
       </div>
     </LogProvider>
   );

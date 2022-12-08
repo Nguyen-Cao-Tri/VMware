@@ -2,13 +2,14 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import { Button, Checkbox, Form, Input, notification } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'antd/dist/antd.min.css';
 
 import { useNavigate } from 'react-router-dom';
-import './styles.scss';
+import './login.scss';
 import { encode } from 'base-64';
 import useRequestLogin from '../../hooks/useRequest/useRequestLogin';
+import { toast } from 'react-toastify';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
@@ -31,13 +32,21 @@ const LoginForm: React.FC = () => {
         // console.log('res', data);
         const sessionId = data;
         localStorage.setItem('sessionId', sessionId);
+        toast.success('🦄 Logged in successfully!');
         navigate('/');
       })
       .catch((error: any) => {
         console.log(error, 'UNAUTHENTICATED');
-        notification.error({ message: 'Login Fail' });
+        toast.error('💩 Login failed!');
       });
   };
+  useEffect(() => {
+    const sessionId = localStorage.getItem('sessionId');
+    if (sessionId) {
+      navigate('/');
+      toast('🦄 Logged in, pleasessssssss!');
+    }
+  }, []);
 
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);

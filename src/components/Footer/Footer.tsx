@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import React, { useEffect, useRef } from 'react';
 import { useLog } from '../../hooks/logProvider/LogProvider';
-
-const Footer = () => {
+import { WarningOutlined } from '@ant-design/icons';
+import './footer.scss';
+const Footer = (props: any) => {
   const execuTimeFormat = (time: number) => {
     const date = new Date(time);
     const year = date.getFullYear();
@@ -13,7 +16,6 @@ const Footer = () => {
 
     return `${year}-${month}-${dates} ${hours}:${minutes}:${seconds}`;
   };
-  console.log(execuTimeFormat(Date.now()));
   const bottomRef = useRef<any>(null);
   const { logs = [] } = useLog();
 
@@ -21,14 +23,41 @@ const Footer = () => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
   return (
-    <div className="footer">
-      {' '}
-      {logs.map((log, index) => (
-        <div key={index}>
-          {execuTimeFormat(log.executeTime)} {log.name} {log.action} {log.state}{' '}
-          {log.errorMessage}
-        </div>
-      ))}
+    <div className={`footer__${props.theme}`}>
+      {logs.map((log, index) => {
+        return (
+          <div
+            key={index}
+            style={{
+              padding: 5,
+              color: props.theme === 'dark' ? 'white' : 'black',
+            }}
+          >
+            {/* <span style={{ marginRight: 5 }}>
+              {log.errorMessage != null ? <WarningOutlined /> : null}
+            </span>
+            <span
+              style={{
+                color: log.errorMessage != null ? 'red' : 'black',
+              }}
+            >
+              [{execuTimeFormat(log.executeTime)}] {log.name} {log.action}{' '}
+              {log.state} {log.errorMessage}
+            </span> */}
+            {log.errorMessage != null ? (
+              <span style={{ color: 'red' }}>
+                <WarningOutlined /> [{execuTimeFormat(log.executeTime)}]{' '}
+                {log.name} {log.action} {log.state} {log.errorMessage}
+              </span>
+            ) : (
+              <span>
+                [{execuTimeFormat(log.executeTime)}] {log.name} {log.action}{' '}
+                {log.state}
+              </span>
+            )}
+          </div>
+        );
+      })}
       <div ref={bottomRef} />
     </div>
   );

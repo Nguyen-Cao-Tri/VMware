@@ -1,0 +1,11 @@
+.powerStart {
+  height: 24px;
+  width: 24px;
+  position: relative;
+  display: flex;
+}
+.powerStart__icon__start {
+  position: absolute;
+  left: 5px;
+  top: 4px;
+}

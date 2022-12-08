@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
+/* eslint-disable react/react-in-jsx-scope */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-base-to-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,14 +16,14 @@ export default function useVcenter() {
   const request = async (
     url: string,
     method?: string,
-    data?: Record<string, unknown> | FormData,
-    header?: HeadersInit,
-    isFullUrl = false,
     metadata?: {
       action?: string;
-      object?: string;
+      name?: string;
       indirectObject?: string;
     },
+    isFullUrl = false,
+    data?: Record<string, unknown> | FormData,
+    header?: HeadersInit,
   ) => {
     setIsLoading(true);
     const baseURL = process.env.REACT_APP_API_URL ?? '';
@@ -29,10 +33,10 @@ export default function useVcenter() {
     const requestUrl = isFullUrl ? url : `${baseURL}${url}`;
 
     // log action begin
-    if (vmLog !== undefined) {
+    if (vmLog !== undefined && metadata !== undefined) {
       vmLog({
         executeTime: Date.now(),
-        name: metadata?.object,
+        name: metadata?.name,
         action: metadata?.action,
         state: VMLogState.BEGIN,
       });
@@ -53,11 +57,12 @@ export default function useVcenter() {
           response.headers.get('content-type')?.includes('application/json') ??
           false;
         const data = isJson ? await response.json() : await response.text();
+
         if (response.ok) {
-          if (vmLog !== undefined) {
+          if (vmLog !== undefined && metadata !== undefined) {
             vmLog({
               executeTime: Date.now(),
-              name: metadata?.object,
+              name: metadata?.name,
               action: metadata?.action,
               state: VMLogState.SUCCESS,
             });
@@ -71,17 +76,17 @@ export default function useVcenter() {
         } else throw data;
       })
       .catch((error) => {
-        console.log(error);
-
+        console.log('error', error);
         setError(error);
-
-        if (vmLog !== undefined) {
+        if (vmLog !== undefined && metadata !== undefined) {
           vmLog({
             executeTime: Date.now(),
-            name: metadata?.object,
+            name: metadata?.name,
             action: metadata?.action,
             state: VMLogState.ERROR,
-            errorMessage: error.messages[0].default_message,
+            errorMessage: error.messages[0]
+              ? error.messages[0].default_message
+              : error,
           });
         }
         throw error;

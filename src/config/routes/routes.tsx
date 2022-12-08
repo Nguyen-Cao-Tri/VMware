@@ -7,6 +7,7 @@ import LoginForm from '../../pages/LoginForm/LoginForm';
 import Demo from '../../pages/DemoPage/DemoPage';
 import Test from '../../pages/TestLogic/Test';
 import MoveToFolder from '../../components/Sidebar/SidebarHandle/MoveToFolder';
+import PowerStart from '../../components/IconCustom/PowerStart';
 const routes = [
   {
     path: '/',
@@ -35,6 +36,10 @@ const routes = [
   {
     element: <NotFound />,
     path: '*',
+  },
+  {
+    element: <PowerStart />,
+    path: '/icon',
   },
 ];
 

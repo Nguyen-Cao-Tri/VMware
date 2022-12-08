@@ -2,13 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
 import Content from '../../components/Content/Content';
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import { Allotment } from 'allotment';
-import './styles.css';
+import './layout.scss';
 import 'allotment/dist/style.css';
 interface DataNode {
   title: string;
@@ -51,9 +50,8 @@ export default function DefaultLayout() {
         style={{
           minHeight: 200,
           minWidth: 200,
-          height: '100vh',
+          height: '93vh',
           width: '100vw',
-          border: '1px solid #ccc',
         }}
       >
         <Allotment minSize={100} onChange={onChangeSidebar}>
@@ -78,7 +76,7 @@ export default function DefaultLayout() {
                 />
               </Allotment.Pane>
               <Allotment.Pane preferredSize={logSize}>
-                <Footer />
+                <Footer theme={theme} />
               </Allotment.Pane>
             </Allotment>
           </Allotment.Pane>

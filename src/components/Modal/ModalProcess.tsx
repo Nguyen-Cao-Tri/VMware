@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { Input, Modal, notification } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
+import { Action } from '../../hooks/logProvider/LogProvider';
 interface PropsMadal {
   isModalOpen: boolean;
   handleCancel: () => void;
   keyRightClick: string;
+  nameRightClick: string;
 }
 const ModalProcess = ({
   isModalOpen,
   handleCancel,
   keyRightClick,
+  nameRightClick,
 }: PropsMadal) => {
   const [pathInput, setPathInput] = useState<string>('');
   const { request } = useRequest();
@@ -21,6 +24,8 @@ const ModalProcess = ({
       request(
         `/api/vcenter/vm/${keyRightClick}/guest/processes?action=create`,
         'POST',
+        { action: Action.RUN_PROCCESS, name: nameRightClick },
+        false,
         {
           credentials: {
             interactive_session: false,

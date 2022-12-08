@@ -1,0 +1,25 @@
+.ant-tree-draggable-icon{
+    display:none
+    }
+    #tree__light .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected{
+    background-color: #04AA6D ;
+    color: #fff;
+    }
+    #tree__dark .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected {
+    background-color: whitesmoke;
+    color: black;
+    }
+    .tree__dark {
+    .ant-tree-list{
+    background-color: #343746;
+    color: white;
+    }
+    .ant-tree-switcher {
+    background: #343746 !important;
+    
+    }
+    .ant-tree-checkbox-inner{
+    background-color: #52556c;
+    border: 1px solid #343746;
+    }
+    }

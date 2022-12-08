@@ -1,0 +1,21 @@
+.footer__light, .footer__dark{
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;   
+    margin-left: 10px;
+   
+}
+
+*::-webkit-scrollbar {
+    width: 12px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: #f8f5f5;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background-color: #04AA6D;
+    border-radius: 20px;
+    border: 1px solid #f8f5f5;
+  }

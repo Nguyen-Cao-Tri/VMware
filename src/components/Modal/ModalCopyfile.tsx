@@ -2,15 +2,18 @@
 import React, { useState } from 'react';
 import { Input, Modal } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
+import { Action } from '../../hooks/logProvider/LogProvider';
 interface PropsModal {
   isModalopen: boolean;
   handleCancel: () => void;
   keyRightClick: string;
+  nameRightClick: string;
 }
 const ModalCopyfile = ({
   isModalopen,
   handleCancel,
   keyRightClick,
+  nameRightClick,
 }: PropsModal) => {
   const [pathInput, setPathInput] = useState<string>('');
   const [fileInput, setFileInput] = useState<string>('');
@@ -29,6 +32,8 @@ const ModalCopyfile = ({
       request(
         `/api/vcenter/vm/${keyRightClick}/guest/filesystem?action=create`,
         'POST',
+        { action: Action.COPY_FILE, name: nameRightClick },
+        false,
         {
           credentials: {
             interactive_session: false,
@@ -42,14 +47,13 @@ const ModalCopyfile = ({
         },
       )
         .then((response: any) => {
-          console.log('response', response);
           const formData = new FormData();
-
           formData.append('file', fileInput);
-          console.log('formData', formData);
           request(
             response,
             'PUT',
+            { action: Action.PUT_COPY_FILE, name: nameRightClick },
+            true,
             {
               body: formData,
             },

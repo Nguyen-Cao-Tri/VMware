@@ -5,7 +5,7 @@ import React, { Key, useState } from 'react';
 import { Dropdown, Tree, TreeProps } from 'antd';
 import { DataNode } from '../Sidebar';
 import { DirectoryTreeProps } from 'antd/es/tree';
-import './styles.css';
+import './sidebar.scss';
 interface PropsDropdown {
   onLoadData: ({ key }: any) => Promise<void>;
   treeData: DataNode[];
@@ -29,6 +29,7 @@ interface PropsDropdown {
   checkedKeys?: Key[];
   onDragEnter?: (info: any) => void;
   updateTreeDrop: (info: any) => void;
+  theme: string;
 }
 const DropdownTree = ({
   onLoadData,
@@ -43,6 +44,7 @@ const DropdownTree = ({
   checkedKeys,
   onDragEnter,
   updateTreeDrop,
+  theme,
 }: PropsDropdown) => {
   const [infoDrop, setInfoDrop] = useState<any>({});
   const onDrop: TreeProps['onDrop'] = (info) => {
@@ -123,6 +125,7 @@ const DropdownTree = ({
         }}
       >
         <Tree
+          className={`tree__${theme}`}
           checkable
           draggable
           showIcon={true}
