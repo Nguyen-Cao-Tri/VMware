@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import { Button, Checkbox, Form, Input, notification } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import 'antd/dist/antd.min.css';
@@ -76,9 +76,8 @@ const LoginForm: React.FC = () => {
             name="password"
             rules={[{ required: true, message: 'Please input your Password!' }]}
           >
-            <Input
+            <Input.Password
               prefix={<LockOutlined className="site-form-item-icon" />}
-              type="password"
               placeholder="Password"
               style={{ borderRadius: '4px' }}
             />

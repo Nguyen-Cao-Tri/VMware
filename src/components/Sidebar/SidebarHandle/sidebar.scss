@@ -1,25 +1,52 @@
-.ant-tree-draggable-icon{
-    display:none
+.ant-tree-draggable-icon {
+  display: none;
+}
+
+.light{
+  .loading{
+    color: #71A73B;
+  }
+  #dropTree {
+    .ant-tree-node-selected {
+      background-color: #71A73B;
+      color: #fff;
+      .loading{
+        color: #fff;
+      }
     }
-    #tree__light .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected{
-    background-color: #04AA6D ;
-    color: #fff;
-    }
-    #tree__dark .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected {
-    background-color: whitesmoke;
-    color: black;
-    }
-    .tree__dark {
-    .ant-tree-list{
-    background-color: #343746;
-    color: white;
+  }
+}
+.dark{
+  .tree {
+    .ant-tree-list {
+      background-color: #343746;
+      color: white;
+       .ant-tree-node-content-wrapper:hover{
+
+        // :hover{
+        background-color: #52556c;
+      // }
+      }
+      
     }
     .ant-tree-switcher {
-    background: #343746 !important;
-    
+      background: #343746 !important;
     }
-    .ant-tree-checkbox-inner{
-    background-color: #52556c;
-    border: 1px solid #343746;
+    .ant-tree-checkbox-inner {
+      background-color: #52556c;
+      border: 1px solid #343746;
     }
+  }
+  #dropTree{
+    .loading{
+      color: #fff;
     }
+    .ant-tree-node-selected {
+      background-color: #fff;
+      color: black;
+      .loading{
+        color: black;
+      }
+    }
+  }
+}

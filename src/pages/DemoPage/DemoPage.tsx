@@ -52,7 +52,7 @@ const Demo: React.FC = () => {
   const [treeData, setTreeData] = useState<DataNode[]>(initData);
   const [expandedKey, setExpandedKey] = useState<string>('');
   useEffect(() => {
-    request('/api/vcenter/datacenter', 'GET').then((res: any) => {
+    void request('/api/vcenter/datacenter', 'GET').then((res: any) => {
       initTreeData(res);
       setInitData(res);
     });

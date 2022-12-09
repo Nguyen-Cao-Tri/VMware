@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 
 import React from 'react';
+import './content.scss';
 import {
   FolderOutlined,
   LaptopOutlined,
@@ -102,9 +103,11 @@ const Content = (props: any) => {
       }
     }
     return (
-      <h3 style={{ padding: '20px' }}>
-        Chose something or expand to know more information
-      </h3>
+      <div className="bg">
+        <h3 style={{ padding: '20px' }}>
+          Chose something or expand to know more information
+        </h3>
+      </div>
     );
   };
   return <RenderUI />;

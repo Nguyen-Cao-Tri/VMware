@@ -1,0 +1,32 @@
+.light{
+    .bg{
+        position: absolute;
+        background-image: url(./background.jpg);
+        background-repeat: no-repeat;
+        height: 100%;
+        width: 100%;
+        left: 20%;
+    
+        h3{
+            margin-left: 50px;
+        }
+       
+    }
+}
+.dark{
+    .bg{
+        position: absolute;
+        background-image: url(./bg.png);
+        background-repeat: no-repeat;
+        height: 100%;
+        width: 100%;
+        left: 20%;
+
+        // top: 10%;
+        h3{
+            margin-left: 50px;
+        }
+    }
+}
+
+

@@ -67,13 +67,15 @@ export default function DefaultLayout() {
           <Allotment.Pane>
             <Allotment vertical onChange={onChangeLog}>
               <Allotment.Pane>
-                <Content
-                  inforSelect={inforSelect}
-                  vmData={vmPowerState}
-                  children={children}
-                  keyExpand={keyExpand}
-                  vmPowerState={vmPowerState}
-                />
+                <div className="content">
+                  <Content
+                    inforSelect={inforSelect}
+                    vmData={vmPowerState}
+                    children={children}
+                    keyExpand={keyExpand}
+                    vmPowerState={vmPowerState}
+                  />
+                </div>
               </Allotment.Pane>
               <Allotment.Pane preferredSize={logSize}>
                 <Footer theme={theme} />

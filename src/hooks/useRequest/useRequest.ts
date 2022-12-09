@@ -73,7 +73,10 @@ export default function useVcenter() {
           localStorage.removeItem('sessionId');
           navigate('/login');
           throw data;
-        } else throw data;
+        } else {
+          setIsLoading(false);
+          throw data;
+        }
       })
       .catch((error) => {
         console.log('error', error);
@@ -89,9 +92,10 @@ export default function useVcenter() {
               : error,
           });
         }
+        setIsLoading(false);
         throw error;
-      })
-      .finally(() => setIsLoading(false));
+      });
+    // .finally(() => setIsLoading(false));
   };
   return { request, isLoading, error };
 }

@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { Key, useEffect, useState } from 'react';
-import { Menu, MenuTheme, TreeProps } from 'antd';
+import { Menu, Spin } from 'antd';
 import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
 import { InitTreeData } from './SidebarHandle/InitTreeData';
 import useRequest from '../../hooks/useRequest/useRequest';
@@ -18,7 +18,7 @@ import ModalUserLogin from '../Modal/ModalUserLogin';
 import ModalCopyfile from '../Modal/ModalCopyfile';
 import ModalProcess from '../Modal/ModalProcess';
 import ModalClone from '../Modal/ModalClone';
-import { LaptopOutlined } from '@ant-design/icons';
+import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Action } from '../../hooks/logProvider/LogProvider';
 import PowerStart from '../IconCustom/PowerStart';
 export interface DataNode {
@@ -58,7 +58,9 @@ const Sidebar = (props: PropsSidebar) => {
   const [datacenter, setDatacenter] = useState<object[]>();
   const [folder, setFolder] = useState<object[]>();
   const [vmApi, setVmApi] = useState<object[]>();
-
+  const antIcon = (
+    <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />
+  );
   const [infoExpanded, setInfoExpanded] = useState<any>('');
   useEffect(() => {
     request('/api/vcenter/datacenter', 'GET', {
@@ -70,8 +72,25 @@ const Sidebar = (props: PropsSidebar) => {
     request('/api/vcenter/folder').then((res: any) => setFolder(res));
     request('/api/vcenter/vm').then((res: any) => setVmApi(res));
   }, []);
-  const callApiPowerState = (idVm: string, action: string) => {
-    void request(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST', {
+  const updateIconStart = (list: DataNode[], icon: any, idVm: string) => {
+    list.forEach((item: any) => {
+      if (item.key === idVm) {
+        item.icon = icon;
+      }
+      if (item.children) {
+        updateIconStart(item.children, icon, idVm);
+      }
+    });
+    return list;
+  };
+  const callApiPowerState = async (idVm: string, action: string) => {
+    console.log(`${isLoading}`);
+
+    if (isLoading)
+      setTreeData([
+        ...updateIconStart(treeData, <Spin indicator={antIcon} />, idVm),
+      ]);
+    await request(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST', {
       action: `Power ${action}`,
       name: nameRightClick,
     }).then(() => {
@@ -82,31 +101,23 @@ const Sidebar = (props: PropsSidebar) => {
         }
         props.propVmPowerState([...vm]);
       });
+      console.log(`${isLoading}`);
+      if (action === 'start') {
+        setTreeData([...updateIconStart(treeData, <PowerStart />, idVm)]);
+      }
+      if (action === 'stop') {
+        setTreeData([...updateIconStart(treeData, <LaptopOutlined />, idVm)]);
+      }
     });
-    const updateIconStart = (list: DataNode[], icon: any) => {
-      list.forEach((item: any) => {
-        if (item.key === idVm) {
-          item.icon = icon;
-        }
-        if (item.children) {
-          updateIconStart(item.children, icon);
-        }
-      });
-      return list;
-    };
-    if (action === 'start') {
-      setTreeData([...updateIconStart(treeData, <PowerStart />)]);
-    }
-    if (action === 'stop') {
-      setTreeData([...updateIconStart(treeData, <LaptopOutlined />)]);
-    }
   };
-  const handlePowerState = (idVm: string, action: string) => {
+  const handlePowerState = async (idVm: string, action: string) => {
     const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
     console.log('vmCheckKeys', vmCheckKeys);
     if (vmCheckKeys?.length > 0) {
-      vmCheckKeys.map((item: any) => callApiPowerState(item, action));
-    } else callApiPowerState(idVm, action);
+      vmCheckKeys.map(
+        async (item: any) => await callApiPowerState(item, action),
+      );
+    } else await callApiPowerState(idVm, action);
   };
   const item = () => {
     return (
@@ -239,7 +250,7 @@ const Sidebar = (props: PropsSidebar) => {
     );
   };
   return (
-    <div id={`tree__${props.propTheme}`}>
+    <div id="dropTree">
       <DropdownTree
         theme={props.propTheme}
         onLoadData={onLoadData}

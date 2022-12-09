@@ -42,12 +42,14 @@ export interface ILogContext {
   log?: (data: any) => void;
   vmLog?: (data: IData) => void;
   logs?: IData[];
+  clearLog?: () => void;
 }
 
 const LogContext = createContext<ILogContext>({
   handler: () => {},
   vmLog: () => {},
   logs: [],
+  clearLog: () => {},
 });
 
 export default function LogProvider(props: PropsWithChildren<ILogContext>) {
@@ -68,6 +70,9 @@ export default function LogProvider(props: PropsWithChildren<ILogContext>) {
   const vmLog = (data: IData): void => {
     setLogs((prev) => [...prev, data]);
   };
+  const clearLog = () => {
+    setLogs([]);
+  };
   useEffect(() => {
     window.addEventListener('error', handler);
     return () => {
@@ -80,6 +85,7 @@ export default function LogProvider(props: PropsWithChildren<ILogContext>) {
     log,
     vmLog,
     logs,
+    clearLog,
   };
   return (
     <LogContext.Provider value={value}>{props.children}</LogContext.Provider>

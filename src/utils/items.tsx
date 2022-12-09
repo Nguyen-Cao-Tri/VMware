@@ -1,15 +1,31 @@
 import React from 'react';
-import { PoweroffOutlined, ReloadOutlined } from '@ant-design/icons';
+import {
+  PoweroffOutlined,
+  ReloadOutlined,
+  UserOutlined,
+  FileTextOutlined,
+  CopyOutlined,
+  UploadOutlined,
+  PlayCircleOutlined,
+  PauseCircleOutlined,
+  StopOutlined,
+  RedoOutlined,
+} from '@ant-design/icons';
+import { ItemType } from 'antd/lib/menu/hooks/useItems';
 
-export const items = (vm: object[], keyRightClick: string) => {
+export const items = (vm: object[], keyRightClick: string): ItemType[] => {
   const vmItem: any = vm.filter((itemVm: any) => itemVm.vm === keyRightClick);
   const powerState = vmItem[0]?.power_state;
+
   const isDisable =
     keyRightClick.includes('datacenter') || keyRightClick.includes('group');
   return [
     {
       label: 'Rename...',
       key: 'rename',
+    },
+    {
+      type: 'divider',
     },
     {
       label: 'Refresh',
@@ -24,6 +40,7 @@ export const items = (vm: object[], keyRightClick: string) => {
         {
           label: 'Power On',
           key: 'start',
+          icon: <PlayCircleOutlined />,
           disabled:
             powerState === 'start' ||
             powerState === 'POWERED_ON' ||
@@ -31,12 +48,14 @@ export const items = (vm: object[], keyRightClick: string) => {
         },
         {
           label: 'Power Off',
+          icon: <StopOutlined />,
           key: 'stop',
           disabled: powerState === 'stop' || powerState === 'POWERED_OFF',
         },
         {
           label: 'Suspend',
           key: 'suspend',
+          icon: <PauseCircleOutlined />,
           disabled:
             powerState === 'suspend' ||
             powerState === 'POWERED_OFF' ||
@@ -45,6 +64,7 @@ export const items = (vm: object[], keyRightClick: string) => {
         {
           label: 'Reset',
           key: 'reset',
+          icon: <RedoOutlined />,
           disabled:
             powerState === 'reset' ||
             powerState === 'POWERED_OFF' ||
@@ -55,16 +75,32 @@ export const items = (vm: object[], keyRightClick: string) => {
     {
       label: 'Set user login',
       key: 'login',
+      icon: <UserOutlined />,
     },
     {
-      label: 'Get file from guest',
-      key: 'getfile',
-      disabled: isDisable,
+      type: 'divider',
     },
     {
-      label: 'Copy file to guest',
-      key: 'copyfile',
-      disabled: isDisable,
+      label: 'File',
+      key: 'file',
+      icon: <FileTextOutlined />,
+      children: [
+        {
+          label: 'Get file from guest',
+          key: 'getfile',
+          icon: <UploadOutlined />,
+          disabled: isDisable,
+        },
+        {
+          label: 'Copy file to guest',
+          icon: <CopyOutlined />,
+          key: 'copyfile',
+          disabled: isDisable,
+        },
+      ],
+    },
+    {
+      type: 'divider',
     },
     {
       label: 'Clone',
@@ -72,6 +108,7 @@ export const items = (vm: object[], keyRightClick: string) => {
       disabled:
         isDisable || powerState === 'start' || powerState === 'POWERED_ON',
     },
+
     {
       label: 'Run process',
       key: 'process',

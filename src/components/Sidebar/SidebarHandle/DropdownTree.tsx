@@ -125,7 +125,7 @@ const DropdownTree = ({
         }}
       >
         <Tree
-          className={`tree__${theme}`}
+          className="tree"
           checkable
           draggable
           showIcon={true}
