@@ -64,13 +64,13 @@ const Footer = (props: any) => {
             >
               {log.errorMessage != null ? (
                 <span style={{ color: 'red' }}>
-                  <WarningOutlined /> [{execuTimeFormat(log.executeTime)}]
+                  <WarningOutlined /> [{execuTimeFormat(log.executeTime)}]{' '}
                   {log.name} {log.action} {log.state} {log.errorMessage}
                 </span>
               ) : (
                 <span>
                   <IssuesCloseOutlined style={{ color: '#71A73B' }} /> [
-                  {execuTimeFormat(log.executeTime)}]{log.name} {log.action}{' '}
+                  {execuTimeFormat(log.executeTime)}] {log.name} {log.action}{' '}
                   {log.state}
                 </span>
               )}

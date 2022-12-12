@@ -19,8 +19,9 @@ import ModalCopyfile from '../Modal/ModalCopyfile';
 import ModalProcess from '../Modal/ModalProcess';
 import ModalClone from '../Modal/ModalClone';
 import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Action } from '../../hooks/logProvider/LogProvider';
+import { Action, useLog } from '../../hooks/logProvider/LogProvider';
 import PowerStart from '../IconCustom/PowerStart';
+
 export interface DataNode {
   title: string;
   key: string;
@@ -33,6 +34,9 @@ interface PropsSidebar {
   propVmPowerState: (vm: object[]) => void;
   propChildren: (children: object[]) => void;
   propTheme: any;
+  propVm: (vm: any) => void;
+  propTool: (tool: any) => void;
+  propNetwork: (net: any) => void;
 }
 const Sidebar = (props: PropsSidebar) => {
   const [treeData, setTreeData] = useState<DataNode[]>([]);
@@ -58,6 +62,8 @@ const Sidebar = (props: PropsSidebar) => {
   const [datacenter, setDatacenter] = useState<object[]>();
   const [folder, setFolder] = useState<object[]>();
   const [vmApi, setVmApi] = useState<object[]>();
+  const { vmLog } = useLog();
+  const [nameChange, setNameChange] = useState<string>('');
   const antIcon = (
     <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />
   );
@@ -70,7 +76,25 @@ const Sidebar = (props: PropsSidebar) => {
       setTreeData(InitTreeData(res));
     });
     request('/api/vcenter/folder').then((res: any) => setFolder(res));
-    request('/api/vcenter/vm').then((res: any) => setVmApi(res));
+    request('/api/vcenter/vm').then((res: any) => {
+      setVmApi(res);
+      res.map((item: any) => {
+        request(`/api/vcenter/vm/${item.vm}`).then((infoVm) => {
+          const obj = { idVm: item.vm, infor: infoVm };
+          props.propVm(obj);
+        });
+        request(`/api/vcenter/vm/${item.vm}/tools`).then((vmTool) => {
+          const obj = { idVm: item.vm, tool: vmTool };
+          props.propTool(obj);
+        });
+        request(`/api/vcenter/vm/${item.vm}/guest/networking`).then(
+          (network) => {
+            const obj = { idVm: item.vm, network };
+            props.propNetwork(obj);
+          },
+        );
+      });
+    });
   }, []);
   const updateIconStart = (list: DataNode[], icon: any, idVm: string) => {
     list.forEach((item: any) => {
@@ -93,22 +117,34 @@ const Sidebar = (props: PropsSidebar) => {
     await request(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST', {
       action: `Power ${action}`,
       name: nameRightClick,
-    }).then(() => {
-      vm.forEach((itemVm: any) => {
-        if (itemVm.vm === idVm) {
-          itemVm.power_state = action;
-          localStorage.setItem(itemVm.vm, action);
-        }
-        props.propVmPowerState([...vm]);
+    })
+      .then(() => {
+        vm.forEach((itemVm: any) => {
+          if (itemVm.vm === idVm) {
+            itemVm.power_state = action;
+            localStorage.setItem(itemVm.vm, action);
+          }
+          props.propVmPowerState([...vm]);
+        });
+        console.log(`${isLoading}`);
+
+        setTreeData([
+          ...updateIconStart(
+            treeData,
+            <>{action === 'stop' ? <LaptopOutlined /> : <PowerStart />}</>,
+            idVm,
+          ),
+        ]);
+      })
+      .catch(() => {
+        setTreeData([
+          ...updateIconStart(
+            treeData,
+            <>{action === 'start' ? <LaptopOutlined /> : <PowerStart />}</>,
+            idVm,
+          ),
+        ]);
       });
-      console.log(`${isLoading}`);
-      if (action === 'start') {
-        setTreeData([...updateIconStart(treeData, <PowerStart />, idVm)]);
-      }
-      if (action === 'stop') {
-        setTreeData([...updateIconStart(treeData, <LaptopOutlined />, idVm)]);
-      }
-    });
   };
   const handlePowerState = async (idVm: string, action: string) => {
     const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
@@ -176,7 +212,7 @@ const Sidebar = (props: PropsSidebar) => {
         'GET',
         {
           action: Action.GET_LIST_FOLDER,
-          name: datacenterName[0].name,
+          name: nameChange || datacenterName[0].name,
         },
       ).then((res) => {
         setTreeData(() =>
@@ -196,7 +232,7 @@ const Sidebar = (props: PropsSidebar) => {
         'GET',
         {
           action: Action.GET_LIST_FOLDER,
-          name: folderName[0].name,
+          name: nameChange || folderName[0].name,
         },
       ).then((res: any) => {
         if (key === keySelect) {
@@ -287,6 +323,14 @@ const Sidebar = (props: PropsSidebar) => {
       <ModalRename
         isModalOpen={isModalRenameOpen}
         handleOk={(value) => {
+          setNameChange(value);
+          if (vmLog !== undefined) {
+            vmLog({
+              executeTime: Date.now(),
+              name: nameRightClick,
+              action: `Changed name to ${value}`,
+            });
+          }
           setTreeData([...findRename(treeData, keyRightClick, value)]);
           setIsModalRenameOpen(false);
         }}
@@ -302,6 +346,7 @@ const Sidebar = (props: PropsSidebar) => {
         checkedKeys={checkedKeys}
       />
       <ModalUserLogin
+        nameRightClick={nameRightClick}
         isModalOpen={isModalUserLoginOpen}
         keyRightClick={keyRightClick}
         checkedKeys={checkedKeys}

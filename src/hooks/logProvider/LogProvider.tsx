@@ -32,7 +32,7 @@ export interface IData {
   executeTime: number;
   name?: string;
   action?: string;
-  state: VMLogState;
+  state?: VMLogState;
   errorMessage?: string;
 }
 export type Handler = (data: any) => void;

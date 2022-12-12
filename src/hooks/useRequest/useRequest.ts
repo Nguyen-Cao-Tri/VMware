@@ -57,7 +57,6 @@ export default function useVcenter() {
           response.headers.get('content-type')?.includes('application/json') ??
           false;
         const data = isJson ? await response.json() : await response.text();
-
         if (response.ok) {
           if (vmLog !== undefined && metadata !== undefined) {
             vmLog({
@@ -68,11 +67,6 @@ export default function useVcenter() {
             });
           }
           return data;
-        }
-        if (response.status === 401) {
-          localStorage.removeItem('sessionId');
-          navigate('/login');
-          throw data;
         } else {
           setIsLoading(false);
           throw data;
@@ -87,9 +81,9 @@ export default function useVcenter() {
             name: metadata?.name,
             action: metadata?.action,
             state: VMLogState.ERROR,
-            errorMessage: error.messages[0]
+            errorMessage: error.messages
               ? error.messages[0].default_message
-              : error,
+              : `${error}`,
           });
         }
         setIsLoading(false);

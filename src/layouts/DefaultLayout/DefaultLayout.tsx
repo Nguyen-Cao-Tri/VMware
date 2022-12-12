@@ -19,12 +19,14 @@ export default function DefaultLayout() {
   const [inforSelect, setInforSelect] = useState({});
   const [keyExpand, setKeyExpand] = useState<string[]>([]);
   const [vmPowerState, setVmPowerState] = useState<object[]>();
+  const [vm, setVm] = useState<object[]>([]);
   const [children, setChildren] = useState<object[]>([]);
   const [theme, setTheme] = useState<string>(
     localStorage.getItem('theme') ?? 'dark',
   );
   const [sidebarSize, setSidebarSize] = useState('200');
   const [logSize, setLogSize] = useState('200');
+  const [vmTools, setVmTools] = useState<object[]>([]);
   const onChangeSidebar = (value: any) => {
     const [firstPane] = value;
     localStorage.setItem('sizeSidebar', firstPane);
@@ -33,7 +35,7 @@ export default function DefaultLayout() {
     const [firstPane, secondPane] = value;
     localStorage.setItem('sizeLog', secondPane);
   };
-
+  const [vmNetwork, setVmNetwork] = useState<object[]>([]);
   useEffect(() => {
     const size = localStorage.getItem('sizeSidebar');
     if (size != null) setSidebarSize(size);
@@ -62,6 +64,9 @@ export default function DefaultLayout() {
               propOnExpand={(value) => setKeyExpand(value)}
               propVmPowerState={(value) => setVmPowerState(value)}
               propChildren={(value) => setChildren(value)}
+              propVm={(value) => setVm((prev) => [...prev, value])}
+              propNetwork={(value) => setVmNetwork((prev) => [...prev, value])}
+              propTool={(value) => setVmTools((prev) => [...prev, value])}
             />
           </Allotment.Pane>
           <Allotment.Pane>
@@ -70,10 +75,12 @@ export default function DefaultLayout() {
                 <div className="content">
                   <Content
                     inforSelect={inforSelect}
-                    vmData={vmPowerState}
+                    vmData={vm}
                     children={children}
                     keyExpand={keyExpand}
                     vmPowerState={vmPowerState}
+                    tool={vmTools}
+                    network={vmNetwork}
                   />
                 </div>
               </Allotment.Pane>

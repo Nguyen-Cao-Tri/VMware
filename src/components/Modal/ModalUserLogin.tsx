@@ -1,20 +1,24 @@
 import { Input, Modal } from 'antd';
 import React, { useState } from 'react';
+import { useLog } from '../../hooks/logProvider/LogProvider';
 interface PropsModal {
   isModalOpen: boolean;
   handleOk?: (username: string, password: string) => void;
   handleCancel: () => void;
   checkedKeys: string[];
   keyRightClick: string;
+  nameRightClick: string;
 }
 const ModalUserLogin = ({
   isModalOpen,
   handleCancel,
   keyRightClick,
   checkedKeys,
+  nameRightClick,
 }: PropsModal) => {
   const [userName, setUserName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const { vmLog } = useLog();
   const handleUserLogin = (
     item: string,
     username: string,
@@ -29,6 +33,13 @@ const ModalUserLogin = ({
     localStorage.setItem(`password ${item}`, `${obj.password}`);
   };
   const handleOk = (userName: string, password: string) => {
+    if (vmLog !== undefined) {
+      vmLog({
+        executeTime: Date.now(),
+        name: nameRightClick,
+        action: 'Set user login success',
+      });
+    }
     handleCancel();
     const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
     if (vmCheckKeys.length > 0) {
@@ -38,6 +49,8 @@ const ModalUserLogin = ({
     } else if (keyRightClick.includes('vm')) {
       handleUserLogin(keyRightClick, userName, password);
     }
+    setUserName('');
+    setPassword('');
   };
   return (
     <Modal

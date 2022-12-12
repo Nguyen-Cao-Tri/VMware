@@ -20,6 +20,7 @@ const ModalRename = ({
   useEffect(() => {
     setRenameInput(nameRightClick);
   }, [nameRightClick]);
+
   return (
     <Modal
       title="Rename"

@@ -68,7 +68,9 @@ export const items = (vm: object[], keyRightClick: string): ItemType[] => {
           disabled:
             powerState === 'reset' ||
             powerState === 'POWERED_OFF' ||
-            powerState === 'stop',
+            powerState === 'stop' ||
+            powerState === 'suspend' ||
+            powerState === 'SUSPEND',
         },
       ],
     },
