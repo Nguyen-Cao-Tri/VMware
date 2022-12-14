@@ -24,6 +24,7 @@ export default function useVcenter() {
     isFullUrl = false,
     data?: Record<string, unknown> | FormData,
     header?: HeadersInit,
+    isRemoveSession = true,
   ) => {
     setIsLoading(true);
     const baseURL = process.env.REACT_APP_API_URL ?? '';
@@ -66,11 +67,18 @@ export default function useVcenter() {
               state: VMLogState.SUCCESS,
             });
           }
+
           return data;
-        } else {
-          setIsLoading(false);
+        }
+        if (response.status === 401) {
+          if (isRemoveSession) {
+            localStorage.removeItem('sessionId');
+            navigate('/login');
+          }
           throw data;
         }
+        setIsLoading(false);
+        throw data;
       })
       .catch((error) => {
         console.log('error', error);

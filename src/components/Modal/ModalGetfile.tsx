@@ -21,12 +21,12 @@ const ModalGetfile = ({
   nameRightClick,
 }: PropModal) => {
   const [getfileInput, setGetfileInput] = useState<string>('');
-  const { request } = useRequest();
+  const { request, isLoading } = useRequest();
   const { vmLog } = useLog();
-  const handleGetfile = (idVm: string) => {
+  const handleGetfile = async (idVm: string) => {
     const vmUsername = localStorage.getItem(`username ${idVm}`);
     const vmPassword = localStorage.getItem(`password ${idVm}`);
-    request(
+    await request(
       `/api/vcenter/vm/${idVm}/guest/filesystem?action=create`,
       'POST',
       { action: Action.GET_FILE, name: nameRightClick },
@@ -42,6 +42,8 @@ const ModalGetfile = ({
           path: getfileInput,
         },
       },
+      {},
+      false,
     )
       .then((response: any) => {
         console.log('response.link', response);
@@ -72,9 +74,9 @@ const ModalGetfile = ({
     const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
     if (vmCheckKeys.length > 0) {
       vmCheckKeys.map((item: any) => {
-        handleGetfile(item);
+        void handleGetfile(item);
       });
-    } else handleGetfile(keyRightClick);
+    } else void handleGetfile(keyRightClick);
     setGetfileInput('');
   };
   return (
@@ -83,6 +85,7 @@ const ModalGetfile = ({
       open={isModalOpen}
       onOk={handleOk}
       onCancel={handleCancel}
+      confirmLoading={isLoading}
     >
       <Input
         placeholder="Enter path"

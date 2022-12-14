@@ -1,11 +1,12 @@
 .powerStart {
-  height: 24px;
-  width: 24px;
+  height: 14px;
+  width: 14px;
   position: relative;
   display: flex;
+  padding-left: 5px;
 }
 .powerStart__icon__start {
   position: absolute;
-  left: 5px;
+  left: 10px;
   top: 4px;
 }

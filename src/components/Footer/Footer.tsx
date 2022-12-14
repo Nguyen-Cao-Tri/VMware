@@ -37,7 +37,7 @@ const Footer = (props: any) => {
         }}
       >
         <Menu
-          style={{ height: '100%', width: '75%' }}
+          style={{ height: '100%', width: '100%', position: 'relative' }}
           theme={props.theme}
           mode="horizontal"
           defaultSelectedKeys={['log']}
@@ -45,12 +45,17 @@ const Footer = (props: any) => {
           <Menu.Item id="log" key="log">
             LOG
           </Menu.Item>
-        </Menu>
-        <div className="menu">
-          <div className="icon" onClick={clearLog}>
-            <ClearOutlined />
+          <div
+            style={{
+              position: 'absolute',
+              right: 20,
+              cursor: ' pointer',
+            }}
+            onClick={clearLog}
+          >
+            <ClearOutlined className="icon" />
           </div>
-        </div>
+        </Menu>
       </div>
       <div className="footer">
         {logs.map((log, index) => {
@@ -69,7 +74,7 @@ const Footer = (props: any) => {
                 </span>
               ) : (
                 <span>
-                  <IssuesCloseOutlined style={{ color: '#71A73B' }} /> [
+                  <IssuesCloseOutlined style={{ color: '#75c02b' }} /> [
                   {execuTimeFormat(log.executeTime)}] {log.name} {log.action}{' '}
                   {log.state}
                 </span>

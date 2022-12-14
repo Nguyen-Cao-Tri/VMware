@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 import { Input, Modal } from 'antd';
@@ -18,18 +19,17 @@ const ModalCopyfile = ({
   const [pathInput, setPathInput] = useState<string>('');
   const [fileInput, setFileInput] = useState<string>('');
   const [selectFile, setSelectFile] = useState<string>('');
-  const { request } = useRequest();
+  const { request, isLoading } = useRequest();
   const handleChangeFile = (e: any) => {
     // console.log(e.target.file[0]);
     setSelectFile(e.target.files[0]);
   };
 
-  const handleOk = () => {
-    handleCancel();
+  const handleOk = async () => {
     const vmUsername = localStorage.getItem(`username ${keyRightClick}`);
     const vmPassword = localStorage.getItem(`password ${keyRightClick}`);
     if (keyRightClick.includes('vm')) {
-      request(
+      await request(
         `/api/vcenter/vm/${keyRightClick}/guest/filesystem?action=create`,
         'POST',
         { action: Action.COPY_FILE, name: nameRightClick },
@@ -45,6 +45,8 @@ const ModalCopyfile = ({
             path: pathInput,
           },
         },
+        {},
+        false,
       )
         .then((response: any) => {
           const formData = new FormData();
@@ -60,6 +62,7 @@ const ModalCopyfile = ({
             {
               'Content-Type': 'multipart/form-data',
             },
+            false,
           )
             .then((res: any) => {
               console.log(res);
@@ -72,6 +75,7 @@ const ModalCopyfile = ({
           console.log('Oops errors!', error);
         });
     }
+    handleCancel();
   };
 
   return (
@@ -80,6 +84,7 @@ const ModalCopyfile = ({
       open={isModalopen}
       onOk={handleOk}
       onCancel={handleCancel}
+      confirmLoading={isLoading}
     >
       <div className="inputCopyfile">
         <div className="path">

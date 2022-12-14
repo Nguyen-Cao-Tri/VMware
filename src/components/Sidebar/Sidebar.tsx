@@ -88,8 +88,8 @@ const Sidebar = (props: PropsSidebar) => {
           props.propTool(obj);
         });
         request(`/api/vcenter/vm/${item.vm}/guest/networking`).then(
-          (network) => {
-            const obj = { idVm: item.vm, network };
+          (vmNetwork) => {
+            const obj = { idVm: item.vm, network: vmNetwork };
             props.propNetwork(obj);
           },
         );
@@ -108,17 +108,18 @@ const Sidebar = (props: PropsSidebar) => {
     return list;
   };
   const callApiPowerState = async (idVm: string, action: string) => {
-    console.log(`${isLoading}`);
-
-    if (isLoading)
+    if (isLoading) {
+      // if (action === 'start') {
       setTreeData([
         ...updateIconStart(treeData, <Spin indicator={antIcon} />, idVm),
       ]);
+      // }
+    }
     await request(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST', {
       action: `Power ${action}`,
       name: nameRightClick,
     })
-      .then(() => {
+      .then(async () => {
         vm.forEach((itemVm: any) => {
           if (itemVm.vm === idVm) {
             itemVm.power_state = action;
@@ -126,7 +127,6 @@ const Sidebar = (props: PropsSidebar) => {
           }
           props.propVmPowerState([...vm]);
         });
-        console.log(`${isLoading}`);
 
         setTreeData([
           ...updateIconStart(
@@ -158,6 +158,7 @@ const Sidebar = (props: PropsSidebar) => {
   const item = () => {
     return (
       <Menu
+        items={items(vm, keyRightClick)}
         theme={props.propTheme}
         onClick={(key) => {
           switch (key.key) {
@@ -196,7 +197,6 @@ const Sidebar = (props: PropsSidebar) => {
               break;
           }
         }}
-        items={items(vm, keyRightClick)}
       />
     );
   };
@@ -285,6 +285,7 @@ const Sidebar = (props: PropsSidebar) => {
       },
     );
   };
+
   return (
     <div id="dropTree">
       <DropdownTree
