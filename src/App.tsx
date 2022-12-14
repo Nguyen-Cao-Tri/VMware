@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import './styles/App.scss';
+import './styles/reset.css';
 import Router from './config/routes/routes';
 import LogProvider, { Handler } from './hooks/logProvider/LogProvider';
 import { url } from './utils/env';

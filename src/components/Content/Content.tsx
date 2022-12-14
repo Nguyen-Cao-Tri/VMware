@@ -15,6 +15,7 @@ import {
   PauseOutlined,
   WindowsOutlined,
   QqOutlined,
+  DesktopOutlined,
 } from '@ant-design/icons';
 import {
   FaChalkboard,
@@ -27,6 +28,7 @@ import {
 } from 'react-icons/fa';
 import { BsCaretRight, BsSquare, BsCameraFill } from 'react-icons/bs';
 import { MdOutlineDns } from 'react-icons/md';
+import { Button, Tooltip } from 'antd';
 
 const Content = (props: any) => {
   const title = props.inforSelect?.title;
@@ -36,12 +38,36 @@ const Content = (props: any) => {
   const vmPowerState = props.vmPowerState?.filter(
     (item: any) => item.vm === key,
   );
+  console.log('vmPowerState', vmPowerState);
+
   const arrayInfoVm = props.vmData.filter((item: any) => item.idVm === key);
   const infoVm = arrayInfoVm[0]?.infor;
   const arrayVmTools = props.tool.filter((item: any) => item.idVm === key);
   const vmTool = arrayVmTools[0]?.tool;
   const arrayVmNetwork = props.network.filter((item: any) => item.idVm === key);
   const vmNetwork = arrayVmNetwork[0]?.network;
+
+  const start = <span>Power On</span>;
+  const stop = <span>Power Off</span>;
+  const edit = <span>Edit Settings</span>;
+  const snap = <span>Take snapshot</span>;
+
+  const isStop = () => {
+    if (vmPowerState.length > 0) {
+      return (
+        vmPowerState[0].power_state === 'stop' ||
+        vmPowerState[0].power_state === 'POWERED_OFF'
+      );
+    }
+  };
+  const isStart = () => {
+    if (vmPowerState.length > 0) {
+      return (
+        vmPowerState[0].power_state === 'start' ||
+        vmPowerState[0].power_state === 'POWERED_ON'
+      );
+    }
+  };
   const RenderUI = () => {
     if (key?.includes('datacenter')) {
       return (
@@ -132,7 +158,7 @@ const Content = (props: any) => {
                     <MdOutlineDns className="iconSumary" />
                     DNS Name:
                   </td>
-                  <td> {vmNetwork?.dns_values.host_name}</td>
+                  <td> {vmNetwork?.dns_values?.host_name}</td>
                 </tr>
                 <tr>
                   <td style={{ position: 'relative' }}>
@@ -142,23 +168,27 @@ const Content = (props: any) => {
                     </div>
                   </td>
                   <td>
-                    {' '}
-                    {vmNetwork?.dns.ip_addresses?.map(
-                      (item: any, index: any) => (
-                        <div key={index}>{item}</div>
-                      ),
-                    )}
+                    {vmNetwork?.dns.ip_addresses &&
+                      vmNetwork?.dns.ip_addresses?.map(
+                        (item: any, index: any) => (
+                          <div key={index}>{item}</div>
+                        ),
+                      )}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ position: 'relative' }}>
+                    <div className="iconInfo">
+                      {infoVm.guest_OS.includes('WINDOW') ? (
+                        <WindowsOutlined className="iconWindow" />
+                      ) : (
+                        <QqOutlined className="iconUbuntu" />
+                      )}
+                    </div>
                   </td>
                 </tr>
               </tbody>
             </table>
-            <div className="iconInfo">
-              {infoVm.guest_OS.includes('WINDOW') ? (
-                <WindowsOutlined className="iconWindow" />
-              ) : (
-                <QqOutlined className="iconUbuntu" />
-              )}
-            </div>
           </div>
         );
       };
@@ -166,7 +196,7 @@ const Content = (props: any) => {
       if (vmPowerState?.length > 0) {
         const powerState = vmPowerState[0].power_state;
 
-        if (powerState === 'start' || powerState === 'POWERED_ON')
+        if (isStart())
           return (
             <>
               <div>
@@ -228,28 +258,40 @@ const Content = (props: any) => {
         <div className="title">
           <span>{title}</span>
         </div>
-        <div className="nav_item">
-          <div className="line ml"></div>
-          <div className="icon_item ml">
-            {key?.includes('vm') && (
+        {key?.includes('vm') && vmPowerState.length > 0 && (
+          <div className="nav_item">
+            <div className="line ml"></div>
+            <div className="icon_item ml">
               <div className="item">
-                <div className="start mr">
-                  <BsCaretRight />
-                </div>
-                <div className="pause mr">
-                  <BsSquare />
-                </div>
-                <div className="edit mr">
-                  <FaEdit />
-                </div>
-                <div className="snap ">
-                  <BsCameraFill />
-                </div>
+                <Tooltip placement="bottom" title={'Power On'}>
+                  <Button
+                    type="text"
+                    icon={<BsCaretRight className="start" />}
+                  />
+                </Tooltip>
+                <Tooltip placement="bottom" title={'Power Off'}>
+                  <Button type="text" icon={<BsSquare className="stop" />} />
+                </Tooltip>
+                <Tooltip placement="bottom" title={'Launch Console'}>
+                  <Button
+                    type="text"
+                    icon={<DesktopOutlined className="launch" />}
+                  />
+                </Tooltip>
+                <Tooltip placement="bottom" title={'Edit Settings'}>
+                  <Button type="text" icon={<FaEdit className="edit" />} />
+                </Tooltip>
+                <Tooltip placement="bottom" title={'Take Snapshot'}>
+                  <Button
+                    type="text"
+                    icon={<BsCameraFill className="snap " />}
+                  />
+                </Tooltip>
               </div>
-            )}
+            </div>
+            <div className="line ml"></div>
           </div>
-          <div className="line ml"></div>
-        </div>
+        )}
       </div>
       <div className="content_item">
         <RenderUI />

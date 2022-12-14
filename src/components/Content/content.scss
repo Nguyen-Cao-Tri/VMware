@@ -35,19 +35,22 @@
           color: #71a73b;
           font-size: 20px;
         }
-        .pause {
+        .stop {
           color: red;
           font-size: 13px;
-          margin-top: 6px;
+          margin-top: 4px;
+        }
+        .launch {
+          margin-top: 4px;
         }
         .edit {
           color: rgb(82, 81, 81);
-          margin-top: 2px;
-          font-size: 17px;
+          margin-top: 1px;
+          font-size: 18px;
         }
         .snap {
-          margin-top: 3px;
-          font-size: 17px;
+          margin-top: 2px;
+          font-size: 19px;
           color: rgb(82, 81, 81);
         }
       }
@@ -79,7 +82,7 @@
     }
     .iconInfo {
       font-size: 30px;
-      margin: 10px;
+      margin-top: 40px;
     }
   }
 }
