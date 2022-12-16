@@ -1,7 +1,7 @@
 /* eslint-disable react/no-children-prop */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import Content from '../../components/Content/Content';
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/Header/Header';
@@ -9,14 +9,18 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import { Allotment } from 'allotment';
 import './layout.scss';
 import 'allotment/dist/style.css';
+import { Outlet } from 'react-router-dom';
+import { ConfigProvider } from 'antd';
+
 interface DataNode {
   title: string;
   key: string;
   children?: DataNode[];
   isLeaf?: boolean;
 }
+export const InformationContext = createContext({});
 export default function DefaultLayout() {
-  const [inforSelect, setInforSelect] = useState({});
+  const [inforSelect, setInforSelect] = useState<any>({});
   const [keyExpand, setKeyExpand] = useState<string[]>([]);
   const [vmPowerState, setVmPowerState] = useState<object[]>();
   const [vm, setVm] = useState<object[]>([]);
@@ -26,7 +30,17 @@ export default function DefaultLayout() {
   );
   const [sidebarSize, setSidebarSize] = useState('200');
   const [logSize, setLogSize] = useState('200');
+  const [vmNetwork, setVmNetwork] = useState<object[]>([]);
   const [vmTools, setVmTools] = useState<object[]>([]);
+  const lightTheme = {
+    colorPrimary: '#71A73B',
+  };
+
+  const darkTheme = {
+    colorPrimary: '#44475a',
+    colorBgBase: '#44475a',
+    colorTextBase: '#fff',
+  };
   const onChangeSidebar = (value: any) => {
     const [firstPane] = value;
     localStorage.setItem('sizeSidebar', firstPane);
@@ -35,7 +49,6 @@ export default function DefaultLayout() {
     const [firstPane, secondPane] = value;
     localStorage.setItem('sizeLog', secondPane);
   };
-  const [vmNetwork, setVmNetwork] = useState<object[]>([]);
   useEffect(() => {
     const size = localStorage.getItem('sizeSidebar');
     if (size != null) setSidebarSize(size);
@@ -43,54 +56,62 @@ export default function DefaultLayout() {
     const log = localStorage.getItem('sizeLog');
     if (log != null) setLogSize(log);
   }, []);
+  const value = {
+    inforSelect,
+    keyExpand,
+    vmTools,
+    vmNetwork,
+    vm,
+    vmPowerState,
+  };
   return (
-    <div className={`${theme}`}>
-      <div className="header">
-        <Header theme={(value) => setTheme(value)} />
-      </div>
-      <div
-        style={{
-          minHeight: 200,
-          minWidth: 200,
-          height: '93vh',
-          width: '100vw',
+    <InformationContext.Provider value={value}>
+      <ConfigProvider
+        theme={{
+          token: theme === 'dark' ? darkTheme : lightTheme,
         }}
       >
-        <Allotment minSize={100} onChange={onChangeSidebar}>
-          <Allotment.Pane preferredSize={sidebarSize}>
-            <Sidebar
-              propTheme={theme}
-              propOnSelect={(value) => setInforSelect(value)}
-              propOnExpand={(value) => setKeyExpand(value)}
-              propVmPowerState={(value) => setVmPowerState(value)}
-              propChildren={(value) => setChildren(value)}
-              propVm={(value) => setVm((prev) => [...prev, value])}
-              propNetwork={(value) => setVmNetwork((prev) => [...prev, value])}
-              propTool={(value) => setVmTools((prev) => [...prev, value])}
-            />
-          </Allotment.Pane>
-          <Allotment.Pane>
-            <Allotment vertical onChange={onChangeLog}>
-              <Allotment.Pane>
-                <div className="content">
-                  <Content
-                    inforSelect={inforSelect}
-                    vmData={vm}
-                    children={children}
-                    keyExpand={keyExpand}
-                    vmPowerState={vmPowerState}
-                    tool={vmTools}
-                    network={vmNetwork}
-                  />
-                </div>
+        <div className={`${theme}`}>
+          <div className="header">
+            <Header theme={(value) => setTheme(value)} />
+          </div>
+          <div
+            style={{
+              minHeight: 200,
+              minWidth: 200,
+              height: '93vh',
+              width: '100vw',
+            }}
+          >
+            <Allotment minSize={100} onChange={onChangeSidebar}>
+              <Allotment.Pane preferredSize={sidebarSize}>
+                <Sidebar
+                  propTheme={theme}
+                  propOnSelect={(value) => setInforSelect(value)}
+                  propOnExpand={(value) => setKeyExpand(value)}
+                  propVmPowerState={(value) => setVmPowerState(value)}
+                  propChildren={(value) => setChildren(value)}
+                  propVm={(value) => setVm((prev) => [...prev, value])}
+                  propNetwork={(value) =>
+                    setVmNetwork((prev) => [...prev, value])
+                  }
+                  propTool={(value) => setVmTools((prev) => [...prev, value])}
+                />
               </Allotment.Pane>
-              <Allotment.Pane preferredSize={logSize}>
-                <Footer theme={theme} />
+              <Allotment.Pane>
+                <Allotment vertical onChange={onChangeLog}>
+                  <Allotment.Pane>
+                    <Content />
+                  </Allotment.Pane>
+                  <Allotment.Pane preferredSize={logSize}>
+                    <Footer theme={theme} />
+                  </Allotment.Pane>
+                </Allotment>
               </Allotment.Pane>
             </Allotment>
-          </Allotment.Pane>
-        </Allotment>
-      </div>
-    </div>
+          </div>
+        </div>
+      </ConfigProvider>
+    </InformationContext.Provider>
   );
 }

@@ -8,17 +8,20 @@ import Demo from '../../pages/DemoPage/DemoPage';
 import Test from '../../pages/TestLogic/Test';
 import MoveToFolder from '../../components/Sidebar/SidebarHandle/MoveToFolder';
 import PowerStart from '../../components/IconCustom/PowerStart';
+import Datacenter from '../../pages/Datacenter/Datacenter';
+import Folder from '../../pages/Folder/Folder';
+import Vm from '../../pages/Vm/Vm';
 const routes = [
   {
     path: '/',
     element: <DefaultLayout />,
-    // children: [
-    //   { path: 'api/vcenter/datacenter', element: <DemoPage /> },
-    //   { path: 'api/vcenter/folder', element: <DemoPage /> },
-    //   { path: 'api/vcenter/vm', element: <DemoPage /> },
-    //   { path: 'demo', element: <DemoPage /> },
-    // ],
+    children: [
+      { path: '/datacenter', element: <Datacenter /> },
+      { path: '/group', element: <Folder /> },
+      { path: '/vm', element: <Vm /> },
+    ],
   },
+
   {
     path: '/login',
     element: <LoginForm />,

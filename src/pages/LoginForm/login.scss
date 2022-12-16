@@ -10,7 +10,7 @@
 
     h1 {
       text-align: center;
-      color: #71A73B;
+      color: #71a73b;
     }
     Form {
       border-radius: 5px;
@@ -19,18 +19,14 @@
       width: 400px;
       height: 250px;
       padding: 50px;
-     
+
       button {
         width: 100%;
         border-radius: 4px;
-        border: 1px solid #71A73B;
-        background: #71A73B ;
+        border: 1px solid #71a73b;
+        background: #71a73b;
         cursor: pointer;
       }
-     
     }
   }
-}
-.ant-input-affix-wrapper:hover{
-  border: 1px solid #71A73B !important;
 }

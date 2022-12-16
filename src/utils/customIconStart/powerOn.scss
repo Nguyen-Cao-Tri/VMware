@@ -1,0 +1,12 @@
+.powerOn {
+  height: 14px;
+  width: 14px;
+  position: relative;
+  display: flex;
+  margin: 0 5px 5px 0;
+  .powerOn__icon__start {
+    position: absolute;
+    left: 5px;
+    top: 4px;
+  }
+}

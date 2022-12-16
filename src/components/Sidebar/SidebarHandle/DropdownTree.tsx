@@ -4,12 +4,13 @@
 import React, { Key, useState } from 'react';
 import { Dropdown, Tree, TreeProps } from 'antd';
 import { DataNode } from '../Sidebar';
+import type { MenuProps } from 'antd';
 import { DirectoryTreeProps } from 'antd/es/tree';
 import './sidebar.scss';
 interface PropsDropdown {
   onLoadData: ({ key }: any) => Promise<void>;
   treeData: DataNode[];
-  item: any;
+  items: any;
   onRightClick: ({ info }: any) => void;
   onSelect: (selectedKeysValue: React.Key[], info: any) => void;
   onExpand?: (expandedKeysValue: React.Key[], info: any) => void;
@@ -34,7 +35,7 @@ interface PropsDropdown {
 const DropdownTree = ({
   onLoadData,
   treeData,
-  item,
+  items,
   onRightClick,
   onSelect,
   onExpand,
@@ -114,7 +115,7 @@ const DropdownTree = ({
   };
 
   return (
-    <Dropdown autoFocus overlay={item} trigger={['contextMenu']}>
+    <Dropdown autoFocus overlay={items} trigger={['contextMenu']}>
       <div
         className="site-dropdown-context-menu"
         style={{

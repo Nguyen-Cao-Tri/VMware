@@ -10,19 +10,39 @@ import {
   PauseCircleOutlined,
   StopOutlined,
   RedoOutlined,
+  DesktopOutlined,
+  DatabaseOutlined,
+  LaptopOutlined,
+  FolderOutlined,
 } from '@ant-design/icons';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
+import { FaEdit } from 'react-icons/fa';
+import PowerOn from './customIconStart/PowerOn';
 
-export const items = (vm: object[], keyRightClick: string): ItemType[] => {
+export const items = (
+  vm: object[],
+  keyRightClick: string,
+  title: string,
+): ItemType[] => {
   const vmItem: any = vm.filter((itemVm: any) => itemVm.vm === keyRightClick);
   const powerState = vmItem[0]?.power_state;
-
+  const iconRightclick = () => {
+    if (keyRightClick.includes('datacenter')) return <DatabaseOutlined />;
+    if (keyRightClick.includes('group')) return <FolderOutlined />;
+    if (keyRightClick.includes('vm')) return <LaptopOutlined />;
+  };
   const isDisable =
     keyRightClick.includes('datacenter') || keyRightClick.includes('group');
   return [
     {
+      label: `Action - ${title} `,
+      key: 'action',
+      icon: powerState === 'POWERED_ON' ? <PowerOn /> : iconRightclick(),
+    },
+    {
       label: 'Rename...',
       key: 'rename',
+      icon: <UserOutlined className="icon_items" />,
     },
     {
       type: 'divider',
@@ -74,6 +94,28 @@ export const items = (vm: object[], keyRightClick: string): ItemType[] => {
         },
       ],
     },
+
+    {
+      label: 'Guest OS',
+      key: 'guestos',
+      icon: <UserOutlined style={{ opacity: '0' }} />,
+      disabled: true,
+    },
+    {
+      label: 'Snapshots',
+      key: 'snap',
+      icon: <UserOutlined style={{ opacity: '0' }} />,
+      disabled: true,
+    },
+    {
+      label: 'Open Remote Console',
+      key: 'remote',
+      icon: <DesktopOutlined style={{ opacity: '0' }} />,
+      disabled: true,
+    },
+    {
+      type: 'divider',
+    },
     {
       label: 'Set user login',
       key: 'login',
@@ -107,6 +149,7 @@ export const items = (vm: object[], keyRightClick: string): ItemType[] => {
     {
       label: 'Clone',
       key: 'clone',
+      icon: <CopyOutlined style={{ opacity: '0' }} />,
       disabled:
         isDisable || powerState === 'start' || powerState === 'POWERED_ON',
     },
@@ -114,7 +157,17 @@ export const items = (vm: object[], keyRightClick: string): ItemType[] => {
     {
       label: 'Run process',
       key: 'process',
+      icon: <CopyOutlined style={{ opacity: '0' }} />,
       disabled: isDisable,
+    },
+    {
+      type: 'divider',
+    },
+    {
+      label: 'Edit Settings',
+      key: 'edit',
+      icon: <FaEdit />,
+      disabled: true,
     },
   ];
 };

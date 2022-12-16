@@ -8,7 +8,7 @@ import {
   ClearOutlined,
 } from '@ant-design/icons';
 import './footer.scss';
-import { Menu } from 'antd';
+import { Button, Menu, Tooltip } from 'antd';
 const Footer = (props: any) => {
   const execuTimeFormat = (time: number) => {
     const date = new Date(time);
@@ -53,7 +53,9 @@ const Footer = (props: any) => {
             }}
             onClick={clearLog}
           >
-            <ClearOutlined className="icon" />
+            <Tooltip placement="bottom" title={'Clear'}>
+              <Button type="text" icon={<ClearOutlined className="icon" />} />
+            </Tooltip>
           </div>
         </Menu>
       </div>

@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { Key, useEffect, useState } from 'react';
 import { Menu, Spin } from 'antd';
+import type { MenuProps } from 'antd';
 import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
 import { InitTreeData } from './SidebarHandle/InitTreeData';
 import useRequest from '../../hooks/useRequest/useRequest';
@@ -21,7 +22,7 @@ import ModalClone from '../Modal/ModalClone';
 import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Action, useLog } from '../../hooks/logProvider/LogProvider';
 import PowerStart from '../IconCustom/PowerStart';
-
+import { useNavigate } from 'react-router-dom';
 export interface DataNode {
   title: string;
   key: string;
@@ -64,6 +65,7 @@ const Sidebar = (props: PropsSidebar) => {
   const [vmApi, setVmApi] = useState<object[]>();
   const { vmLog } = useLog();
   const [nameChange, setNameChange] = useState<string>('');
+  const navigate = useNavigate();
   const antIcon = (
     <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />
   );
@@ -158,10 +160,12 @@ const Sidebar = (props: PropsSidebar) => {
   const item = () => {
     return (
       <Menu
-        items={items(vm, keyRightClick)}
+        items={items(vm, keyRightClick, nameRightClick)}
         theme={props.propTheme}
         onClick={(key) => {
           switch (key.key) {
+            case 'action':
+              break;
             case 'rename':
               setIsModalRenameOpen(true);
               setRenameInput(keyRightClick);
@@ -199,6 +203,29 @@ const Sidebar = (props: PropsSidebar) => {
         }}
       />
     );
+  };
+
+  const navigateSelect = (param: string, value: string) => {
+    if (value?.includes(param)) {
+      navigate(`/${param}?${param}_id=${value}`);
+    }
+  };
+  const handleOnSelect = (
+    value: any[],
+    info: { node: { title: any; children: any } },
+  ) => {
+    ['datacenter', 'group', 'vm'].forEach((item: any) =>
+      navigateSelect(item, value[0]),
+    );
+    setKeySelect(value[0]);
+    setInforSelect(info);
+    props.propOnSelect({
+      title: info.node.title,
+      key: value[0],
+      children: info.node?.children,
+    });
+    props.propOnExpand(value);
+    props.propVmPowerState(vm);
   };
   const onLoadData = async ({ key }: any) => {
     if (key.includes('datacenter')) {
@@ -292,22 +319,12 @@ const Sidebar = (props: PropsSidebar) => {
         theme={props.propTheme}
         onLoadData={onLoadData}
         treeData={treeData}
-        item={item}
+        items={item}
         onRightClick={(value) => {
           setKeyRightClick(value.node.key);
           setNameRightClick(value.node.title);
         }}
-        onSelect={(value, info) => {
-          setKeySelect(value[0]);
-          setInforSelect(info);
-          props.propOnSelect({
-            title: info.node.title,
-            key: value[0],
-            children: info.node?.children,
-          });
-          props.propOnExpand(value);
-          props.propVmPowerState(vm);
-        }}
+        onSelect={(value, info) => handleOnSelect(value, info)}
         onExpand={(value, info) => {
           props.propOnExpand(value);
           setKeyExpanded(value);
