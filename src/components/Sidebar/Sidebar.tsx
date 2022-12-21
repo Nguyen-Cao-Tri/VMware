@@ -44,10 +44,8 @@ const Sidebar = (props: PropsSidebar) => {
   const [keyDatacenter, setKeyDatacenter] = useState<string>('');
   const [isModalRenameOpen, setIsModalRenameOpen] = useState<boolean>(false);
   const [isModalGetfileOpen, setIsModalGetfileOpen] = useState<boolean>(false);
-  const [isModalUserLoginOpen, setIsModalUserLoginOpen] =
-    useState<boolean>(false);
-  const [isModalCopyfileOpen, setIsModalCopyfileOpen] =
-    useState<boolean>(false);
+  const [isModalUserLoginOpen, setIsModalUserLoginOpen] = useState<boolean>(false);
+  const [isModalCopyfileOpen, setIsModalCopyfileOpen] = useState<boolean>(false);
   const [isModalProcessOpen, setIsModalProcessOpen] = useState<boolean>(false);
   const [isModalCloneOpen, setIsModalCloneOpen] = useState<boolean>(false);
   const [keyRightClick, setKeyRightClick] = useState<string>('');
@@ -66,9 +64,7 @@ const Sidebar = (props: PropsSidebar) => {
   const { vmLog } = useLog();
   const [nameChange, setNameChange] = useState<string>('');
   const navigate = useNavigate();
-  const antIcon = (
-    <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />
-  );
+  const antIcon = <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />;
   const [infoExpanded, setInfoExpanded] = useState<any>('');
   useEffect(() => {
     request('/api/vcenter/datacenter', 'GET', {
@@ -81,23 +77,29 @@ const Sidebar = (props: PropsSidebar) => {
     request('/api/vcenter/vm').then((res: any) => {
       setVmApi(res);
       res.map((item: any) => {
-        request(`/api/vcenter/vm/${item.vm}`).then((infoVm) => {
+        request(`/api/vcenter/vm/${item.vm}`).then(infoVm => {
           const obj = { idVm: item.vm, infor: infoVm };
           props.propVm(obj);
         });
-        request(`/api/vcenter/vm/${item.vm}/tools`).then((vmTool) => {
+        request(`/api/vcenter/vm/${item.vm}/tools`).then(vmTool => {
           const obj = { idVm: item.vm, tool: vmTool };
           props.propTool(obj);
         });
-        request(`/api/vcenter/vm/${item.vm}/guest/networking`).then(
-          (vmNetwork) => {
-            const obj = { idVm: item.vm, network: vmNetwork };
-            props.propNetwork(obj);
-          },
-        );
+        request(`/api/vcenter/vm/${item.vm}/guest/networking`).then(vmNetwork => {
+          const obj = { idVm: item.vm, network: vmNetwork };
+          props.propNetwork(obj);
+        });
       });
     });
   }, []);
+  const checkUpdateIcon = (action: string, idVm: string) => {
+    if (action === 'start') {
+      setTreeData([...updateIconStart(treeData, <PowerStart />, idVm)]);
+    }
+    if (action === 'stop') {
+      setTreeData([...updateIconStart(treeData, <LaptopOutlined />, idVm)]);
+    }
+  };
   const updateIconStart = (list: DataNode[], icon: any, idVm: string) => {
     list.forEach((item: any) => {
       if (item.key === idVm) {
@@ -112,9 +114,7 @@ const Sidebar = (props: PropsSidebar) => {
   const callApiPowerState = async (idVm: string, action: string) => {
     if (isLoading) {
       // if (action === 'start') {
-      setTreeData([
-        ...updateIconStart(treeData, <Spin indicator={antIcon} />, idVm),
-      ]);
+      setTreeData([...updateIconStart(treeData, <Spin indicator={antIcon} />, idVm)]);
       // }
     }
     await request(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST', {
@@ -129,32 +129,16 @@ const Sidebar = (props: PropsSidebar) => {
           }
           props.propVmPowerState([...vm]);
         });
-
-        setTreeData([
-          ...updateIconStart(
-            treeData,
-            <>{action === 'stop' ? <LaptopOutlined /> : <PowerStart />}</>,
-            idVm,
-          ),
-        ]);
+        checkUpdateIcon(action, idVm);
       })
-      .catch(() => {
-        setTreeData([
-          ...updateIconStart(
-            treeData,
-            <>{action === 'start' ? <LaptopOutlined /> : <PowerStart />}</>,
-            idVm,
-          ),
-        ]);
+      .catch((err: any) => {
+        `${err}`.includes('Failed to fetch') ? setTreeData([...treeData]) : checkUpdateIcon(action, idVm);
       });
   };
   const handlePowerState = async (idVm: string, action: string) => {
     const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
-    console.log('vmCheckKeys', vmCheckKeys);
     if (vmCheckKeys?.length > 0) {
-      vmCheckKeys.map(
-        async (item: any) => await callApiPowerState(item, action),
-      );
+      vmCheckKeys.map(async (item: any) => await callApiPowerState(item, action));
     } else await callApiPowerState(idVm, action);
   };
   const item = () => {
@@ -162,7 +146,7 @@ const Sidebar = (props: PropsSidebar) => {
       <Menu
         items={items(vm, keyRightClick, nameRightClick)}
         theme={props.propTheme}
-        onClick={(key) => {
+        onClick={key => {
           switch (key.key) {
             case 'action':
               break;
@@ -210,13 +194,8 @@ const Sidebar = (props: PropsSidebar) => {
       navigate(`/${param}?${param}_id=${value}`);
     }
   };
-  const handleOnSelect = (
-    value: any[],
-    info: { node: { title: any; children: any } },
-  ) => {
-    ['datacenter', 'group', 'vm'].forEach((item: any) =>
-      navigateSelect(item, value[0]),
-    );
+  const handleOnSelect = (value: any[], info: { node: { title: any; children: any } }) => {
+    ['datacenter', 'group', 'vm'].forEach((item: any) => navigateSelect(item, value[0]));
     setKeySelect(value[0]);
     setInforSelect(info);
     props.propOnSelect({
@@ -229,39 +208,25 @@ const Sidebar = (props: PropsSidebar) => {
   };
   const onLoadData = async ({ key }: any) => {
     if (key.includes('datacenter')) {
-      const datacenterName: any = datacenter?.filter(
-        (item: any) => item.datacenter === key,
-      );
+      const datacenterName: any = datacenter?.filter((item: any) => item.datacenter === key);
       const param = 'folder';
       setKeyDatacenter(key);
-      await request(
-        `/api/vcenter/${param}?names=vm&datacenters=${key}`,
-        'GET',
-        {
-          action: Action.GET_LIST_FOLDER,
-          name: nameChange || datacenterName[0].name,
-        },
-      ).then((res) => {
-        setTreeData(() =>
-          UpdateTreeData(treeData, key, PushRequestData(res, param)),
-        );
+      await request(`/api/vcenter/${param}?names=vm&datacenters=${key}`, 'GET', {
+        action: Action.GET_LIST_FOLDER,
+        name: nameChange || datacenterName[0].name,
+      }).then(res => {
+        setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
         if (key === keySelect) props.propChildren(res);
       });
     }
     if (key.includes('group')) {
-      const folderName: any = folder?.filter(
-        (item: any) => item.folder === key,
-      );
+      const folderName: any = folder?.filter((item: any) => item.folder === key);
       const vmName: any = vmApi?.filter((item: any) => item.vm === key);
       const param = 'folder';
-      await request(
-        `/api/vcenter/${param}?parent_folders=${key}&datacenters=${keyDatacenter}`,
-        'GET',
-        {
-          action: Action.GET_LIST_FOLDER,
-          name: nameChange || folderName[0].name,
-        },
-      ).then((res: any) => {
+      await request(`/api/vcenter/${param}?parent_folders=${key}&datacenters=${keyDatacenter}`, 'GET', {
+        action: Action.GET_LIST_FOLDER,
+        name: nameChange || folderName[0].name,
+      }).then((res: any) => {
         if (key === keySelect) {
           props.propOnSelect({
             title: inforSelect.node.title,
@@ -269,14 +234,9 @@ const Sidebar = (props: PropsSidebar) => {
             children: res,
           });
         }
-        setTreeData(() =>
-          UpdateTreeData(treeData, key, PushRequestData(res, param)),
-        );
+        setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
       });
-      await request(
-        `/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`,
-        'GET',
-      ).then((res: any) => {
+      await request(`/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`, 'GET').then((res: any) => {
         if (res.length > 0) {
           if (key === keySelect) {
             props.propOnSelect({
@@ -285,9 +245,7 @@ const Sidebar = (props: PropsSidebar) => {
               children: res,
             });
           }
-          setTreeData(() =>
-            UpdateTreeData(treeData, key, PushRequestData(res, 'vm')),
-          );
+          setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, 'vm')));
           setVm(vm.concat(res));
         }
       });
@@ -320,7 +278,7 @@ const Sidebar = (props: PropsSidebar) => {
         onLoadData={onLoadData}
         treeData={treeData}
         items={item}
-        onRightClick={(value) => {
+        onRightClick={value => {
           setKeyRightClick(value.node.key);
           setNameRightClick(value.node.title);
         }}
@@ -340,7 +298,7 @@ const Sidebar = (props: PropsSidebar) => {
       ></DropdownTree>
       <ModalRename
         isModalOpen={isModalRenameOpen}
-        handleOk={(value) => {
+        handleOk={value => {
           setNameChange(value);
           if (vmLog !== undefined) {
             vmLog({
@@ -387,7 +345,7 @@ const Sidebar = (props: PropsSidebar) => {
         handleCancel={() => setIsModalCloneOpen(false)}
         listVm={vm}
         keyRightClick={keyRightClick}
-        handleOk={(value) => handleOkClone(value)}
+        handleOk={value => handleOkClone(value)}
       />
     </div>
   );

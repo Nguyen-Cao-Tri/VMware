@@ -4,79 +4,15 @@
   overflow-y: scroll;
   padding: 20px;
 
-  .render_ui {
-    display: flex;
-    justify-content: flex-start;
-    .border {
-      height: 150px;
-      width: 150px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .infoVm {
-      margin-left: 50px;
-      line-height: 25px;
-      td {
-        padding: 0px 10px;
-      }
-      .iconSumary {
-        margin-right: 5px;
-        padding-top: 3px;
-        // color: rgb(82, 81, 81);
-      }
-      .iconInfo {
-        font-size: 30px;
-        margin-top: 40px;
-      }
-    }
-  }
   .table_content {
     margin-top: 20px;
   }
 }
-.light {
-  .bg {
-    position: absolute;
-    background-image: url(./imgContent/background.jpg);
-    background-repeat: no-repeat;
-    height: 100%;
-    width: 100%;
-    left: 20%;
-    h3 {
-      margin-left: 50px;
-    }
-  }
-  .border {
-    border: 1px solid #333;
-  }
-}
+
 .dark {
   .content_item {
     width: 100%;
     height: calc(100% - 70px);
     overflow-y: scroll;
-  }
-  .bg {
-    position: absolute;
-    background-image: url(./imgContent/bg.png);
-    background-repeat: no-repeat;
-    height: 100%;
-    width: 100%;
-    left: 20%;
-    h3 {
-      margin-left: 50px;
-    }
-  }
-  .infoVm {
-    .iconSumary {
-      color: #fff;
-    }
-  }
-  .iconUbuntu {
-    color: white;
-  }
-  .border {
-    border: 1px solid #fff;
   }
 }

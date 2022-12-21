@@ -3,17 +3,14 @@
 }
 
 .light{
-  .loading{
-    color: #71A73B;
-  }
   #dropTree {
-    .ant-tree-node-selected {
+   .ant-tree-node-selected {
       background-color: #71A73B;
       color: #fff;
       .loading{
         color: #fff;
       }
-    }
+    } 
   }
 }
 .dark{
@@ -22,10 +19,7 @@
       background-color: #343746;
       color: white;
        .ant-tree-node-content-wrapper:hover{
-
-        // :hover{
-        background-color: #52556c;
-      // }
+        // background-color: #52556c;
       }
       
     }
@@ -38,9 +32,9 @@
     }
   }
   #dropTree{
-    .loading{
-      color: #fff;
-    }
+      .loading{
+        color: #fff;
+      }
     .ant-tree-node-selected {
       background-color: #fff;
       color: black;

@@ -1,6 +1,4 @@
-/* eslint-disable react/no-children-prop */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { createContext, useEffect, useState } from 'react';
 import Content from '../../components/Content/Content';
 import Footer from '../../components/Footer/Footer';
@@ -9,29 +7,22 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import { Allotment } from 'allotment';
 import './layout.scss';
 import 'allotment/dist/style.css';
-import { Outlet } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 
-interface DataNode {
-  title: string;
-  key: string;
-  children?: DataNode[];
-  isLeaf?: boolean;
-}
 export const InformationContext = createContext({});
+
 export default function DefaultLayout() {
   const [inforSelect, setInforSelect] = useState<any>({});
   const [keyExpand, setKeyExpand] = useState<string[]>([]);
   const [vmPowerState, setVmPowerState] = useState<object[]>();
   const [vm, setVm] = useState<object[]>([]);
   const [children, setChildren] = useState<object[]>([]);
-  const [theme, setTheme] = useState<string>(
-    localStorage.getItem('theme') ?? 'dark',
-  );
-  const [sidebarSize, setSidebarSize] = useState('200');
-  const [logSize, setLogSize] = useState('200');
   const [vmNetwork, setVmNetwork] = useState<object[]>([]);
   const [vmTools, setVmTools] = useState<object[]>([]);
+
+  const [theme, setTheme] = useState<string>(localStorage.getItem('theme') ?? 'dark');
+  const [sidebarSize, setSidebarSize] = useState('200');
+  const [logSize, setLogSize] = useState('200');
   const lightTheme = {
     colorPrimary: '#71A73B',
   };
@@ -63,6 +54,7 @@ export default function DefaultLayout() {
     vmNetwork,
     vm,
     vmPowerState,
+    children,
   };
   return (
     <InformationContext.Provider value={value}>
@@ -73,7 +65,7 @@ export default function DefaultLayout() {
       >
         <div className={`${theme}`}>
           <div className="header">
-            <Header theme={(value) => setTheme(value)} />
+            <Header theme={value => setTheme(value)} />
           </div>
           <div
             style={{
@@ -87,15 +79,13 @@ export default function DefaultLayout() {
               <Allotment.Pane preferredSize={sidebarSize}>
                 <Sidebar
                   propTheme={theme}
-                  propOnSelect={(value) => setInforSelect(value)}
-                  propOnExpand={(value) => setKeyExpand(value)}
-                  propVmPowerState={(value) => setVmPowerState(value)}
-                  propChildren={(value) => setChildren(value)}
-                  propVm={(value) => setVm((prev) => [...prev, value])}
-                  propNetwork={(value) =>
-                    setVmNetwork((prev) => [...prev, value])
-                  }
-                  propTool={(value) => setVmTools((prev) => [...prev, value])}
+                  propOnSelect={value => setInforSelect(value)}
+                  propOnExpand={value => setKeyExpand(value)}
+                  propVmPowerState={value => setVmPowerState(value)}
+                  propChildren={value => setChildren(value)}
+                  propVm={value => setVm(prev => [...prev, value])}
+                  propNetwork={value => setVmNetwork(prev => [...prev, value])}
+                  propTool={value => setVmTools(prev => [...prev, value])}
                 />
               </Allotment.Pane>
               <Allotment.Pane>

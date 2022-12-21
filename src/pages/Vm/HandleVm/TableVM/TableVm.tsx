@@ -1,65 +1,87 @@
-/* eslint-disable @typescript-eslint/consistent-type-assertions */
-import React, { useState } from 'react';
-import type { MenuProps } from 'antd';
-import { Menu } from 'antd';
+import React from 'react';
+import { Collapse, List } from 'antd';
+import './tableVm.scss';
+import { data } from './Data';
 
-type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[],
-  type?: 'group',
-): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label,
-    type,
-  } as MenuItem;
-}
-
-const items: MenuItem[] = [
-  getItem('VM HardWare', 'parent', null, [
-    getItem('CPU', 'sub1', null, [
-      getItem('Utilization', '1'),
-      getItem('Shares', '2'),
-      getItem('Reservation', '3'),
-      getItem('Limit', '4'),
-    ]),
-    getItem('Memory', 'sub2', null, [
-      getItem('Utilization', '5'),
-      getItem('VM overhead consumed', '6'),
-    ]),
-    getItem('Order', 'sub4', null, [
-      getItem('Controllers', '9'),
-      getItem('SCSI Adapters', '10'),
-      getItem('Input Devices', '11'),
-    ]),
-  ]),
-];
+const { Panel } = Collapse;
 
 const TableContent: React.FC = () => {
-  const [openKeys, setOpenKeys] = useState(['']);
-
-  const onOpenChange: MenuProps['onOpenChange'] = (keys) => {
-    setOpenKeys(keys);
+  const onChange = (key: string | string[]) => {
+    console.log(key);
   };
 
   return (
-    <Menu
-      mode="inline"
-      openKeys={openKeys}
-      onOpenChange={onOpenChange}
-      items={items}
-      style={{
-        border: '1px solid #d3d3d3',
-        boxShadow: '1px 1px 4px 0 rgb(0 0 0 / 10%)',
-        borderRadius: '3px',
-      }}
-    />
+    <div className="wrapper_content">
+      <div className="table_content1">
+        <div className="item_table">
+          <Collapse onChange={onChange} style={{ boxShadow: '1px 1px 4px 0 rgb(0 0 0 / 10%)' }}>
+            <Panel header="VM HardWare" key="1">
+              <Collapse defaultActiveKey="1">
+                <Panel header="CPU" key="1">
+                  <List
+                    size="small"
+                    dataSource={data.slice(0, 4)}
+                    renderItem={item => (
+                      <List.Item key={item.key}>
+                        <div>{item.title} </div>
+                        <div>{item.content}</div>
+                      </List.Item>
+                    )}
+                  />
+                </Panel>
+                <Panel header="Memory" key="2">
+                  <List
+                    size="small"
+                    dataSource={data.slice(4, 6)}
+                    renderItem={item => (
+                      <List.Item key={item.key}>
+                        <div>{item.title} </div>
+                        <div>{item.content}</div>
+                      </List.Item>
+                    )}
+                  />
+                </Panel>
+                <Panel header="Order" key="3">
+                  <List
+                    size="small"
+                    dataSource={data.slice(6)}
+                    renderItem={item => (
+                      <List.Item key={item.key}>
+                        <div>{item.title} </div>
+                        <div>{item.content}</div>
+                      </List.Item>
+                    )}
+                  />
+                </Panel>
+              </Collapse>
+            </Panel>
+          </Collapse>
+        </div>
+        <div className="item_table">
+          <Collapse collapsible="header" defaultActiveKey={['1']}>
+            <Panel header="Notes" key="1">
+              <p>Edit Notes...</p>
+            </Panel>
+          </Collapse>
+        </div>
+      </div>
+      <div className="table_content2">
+        <div className="item_table">
+          <Collapse collapsible="header" defaultActiveKey={['1']}>
+            <Panel header="Notes" key="1">
+              <p>Edit Notes...</p>
+            </Panel>
+          </Collapse>
+        </div>
+        <div className="item_table">
+          <Collapse collapsible="header" defaultActiveKey={['1']}>
+            <Panel header="Notes" key="1">
+              <p>Edit Notes...</p>
+            </Panel>
+          </Collapse>
+        </div>
+      </div>
+    </div>
   );
 };
 

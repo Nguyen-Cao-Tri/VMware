@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import { Button, Form, Input } from 'antd';
+import { Button, ConfigProvider, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 
@@ -52,48 +52,46 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="login">
-      <div className="item_login">
-        <Form
-          name="basic"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-        >
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: 'Please input your Username!' }]}
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#71A73B',
+        },
+      }}
+    >
+      <div className="login">
+        <div className="item_login">
+          <Form
+            name="basic"
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+            autoComplete="off"
           >
-            <Input
-              prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="Username"
-              style={{ borderRadius: '4px' }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Please input your Password!' }]}
-          >
-            <Input.Password
-              prefix={<LockOutlined className="site-form-item-icon" />}
-              placeholder="Password"
-              style={{ borderRadius: '4px' }}
-            />
-          </Form.Item>
+            <Form.Item name="username" rules={[{ required: true, message: 'Please input your Username!' }]}>
+              <Input
+                prefix={<UserOutlined className="site-form-item-icon" />}
+                placeholder="Username"
+                style={{ borderRadius: '4px' }}
+              />
+            </Form.Item>
+            <Form.Item name="password" rules={[{ required: true, message: 'Please input your Password!' }]}>
+              <Input.Password
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                placeholder="Password"
+                style={{ borderRadius: '4px' }}
+              />
+            </Form.Item>
 
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="login-form-button"
-            >
-              Log in
-            </Button>
-          </Form.Item>
-        </Form>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" className="login-form-button">
+                Log in
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
       </div>
-    </div>
+    </ConfigProvider>
   );
 };
 

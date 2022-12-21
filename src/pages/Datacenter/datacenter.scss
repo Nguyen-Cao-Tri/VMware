@@ -1,0 +1,42 @@
+.light {
+  .text_item{
+    .text{
+      text-align: center;
+      margin-top: 20px;
+    }
+  }
+    .bg {
+      position: absolute;
+      background: url(./imgContent/background1.jpg) no-repeat center;
+      height: 100%;
+      width: 100%;
+      top: -5%;     
+    }
+    .layout_content{
+      h3{
+        text-align: center;
+      }
+    }
+  }
+  .dark {
+    .text_item{
+    .text{
+      // text-align: center;
+      // margin-top: 20px;
+    }}
+    .bg {
+      position: absolute;
+      background: url(./imgContent/bg2.png) no-repeat center;
+      height: 100%;
+      width: 100%;
+    }
+    
+    
+    .layout_content{
+      h3{
+        text-align: center;
+        margin-top: 20px;
+      }
+    }
+  }
+  
