@@ -1,46 +1,64 @@
 .ant-tree-draggable-icon {
   display: none;
 }
+.container_sidebar {
+  // position: absolute;
+  max-width: none !important;
+  width: 100% !important;
+  height: 100%;
+  position: relative;
 
-.light{
-  #dropTree {
-   .ant-tree-node-selected {
-      background-color: #71A73B;
-      color: #fff;
-      .loading{
-        color: #fff;
-      }
-    } 
-  }
-}
-.dark{
+  .drop_tree{
+    // position: absolute;
+    width: 100%;
+    height: 100%;
   .tree {
-    .ant-tree-list {
-      background-color: #343746;
-      color: white;
-       .ant-tree-node-content-wrapper:hover{
-        // background-color: #52556c;
-      }
-      
-    }
-    .ant-tree-switcher {
-      background: #343746 !important;
-    }
-    .ant-tree-checkbox-inner {
-      background-color: #52556c;
-      border: 1px solid #343746;
-    }
-  }
-  #dropTree{
-      .loading{
-        color: #fff;
-      }
-    .ant-tree-node-selected {
-      background-color: #fff;
-      color: black;
-      .loading{
-        color: black;
-      }
-    }
-  }
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding-top: 20px;
+  }}
 }
+
+// .light{
+
+//    .ant-tree-node-selected {
+//       background-color: #71A73B;
+//       color: #fff;
+//       .loading{
+//         color: #fff;
+//       }
+//     }
+
+// }
+// .dark{
+
+//     .ant-tree-list {
+//       background-color: red;
+//       color: white;
+//        .ant-tree-node-content-wrapper:hover{
+//         // background-color: #52556c;
+//       }
+
+//     }
+//     .ant-tree-switcher {
+//       background: #343746 !important;
+//     }
+//     .ant-tree-checkbox-inner {
+//       background-color: #52556c;
+//       border: 1px solid #343746;
+//     }
+
+//   #dropTree{
+//       .loading{
+//         color: #fff;
+//       }
+//     .ant-tree-node-selected {
+//       background-color: #fff;
+//       color: black;
+//       .loading{
+//         color: black;
+//       }
+//     }
+//   }
+// }

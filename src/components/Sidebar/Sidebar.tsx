@@ -4,8 +4,8 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { Key, useEffect, useState } from 'react';
-import { Menu, Spin } from 'antd';
+import React, { Key, useContext, useEffect, useState } from 'react';
+import { Menu, Spin, theme } from 'antd';
 import type { MenuProps } from 'antd';
 import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
 import { InitTreeData } from './SidebarHandle/InitTreeData';
@@ -23,6 +23,7 @@ import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Action, useLog } from '../../hooks/logProvider/LogProvider';
 import PowerStart from '../IconCustom/PowerStart';
 import { useNavigate } from 'react-router-dom';
+import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
 export interface DataNode {
   title: string;
   key: string;
@@ -30,11 +31,11 @@ export interface DataNode {
   isLeaf?: boolean;
 }
 interface PropsSidebar {
-  propOnSelect: (info: any) => void;
+  propOnSelect?: (info: any) => void;
   propOnExpand: (info: any) => void;
   propVmPowerState: (vm: object[]) => void;
   propChildren: (children: object[]) => void;
-  propTheme: any;
+  // propTheme: any;
   propVm: (vm: any) => void;
   propTool: (tool: any) => void;
   propNetwork: (net: any) => void;
@@ -66,6 +67,7 @@ const Sidebar = (props: PropsSidebar) => {
   const navigate = useNavigate();
   const antIcon = <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />;
   const [infoExpanded, setInfoExpanded] = useState<any>('');
+  const inforContext: any = useContext(InformationContext);
   useEffect(() => {
     request('/api/vcenter/datacenter', 'GET', {
       action: Action.GET_LIST_DATACENTER,
@@ -145,7 +147,7 @@ const Sidebar = (props: PropsSidebar) => {
     return (
       <Menu
         items={items(vm, keyRightClick, nameRightClick)}
-        theme={props.propTheme}
+        theme={inforContext.theme}
         onClick={key => {
           switch (key.key) {
             case 'action':
@@ -198,7 +200,7 @@ const Sidebar = (props: PropsSidebar) => {
     ['datacenter', 'group', 'vm'].forEach((item: any) => navigateSelect(item, value[0]));
     setKeySelect(value[0]);
     setInforSelect(info);
-    props.propOnSelect({
+    inforContext.onSelect({
       title: info.node.title,
       key: value[0],
       children: info.node?.children,
@@ -228,7 +230,7 @@ const Sidebar = (props: PropsSidebar) => {
         name: nameChange || folderName[0].name,
       }).then((res: any) => {
         if (key === keySelect) {
-          props.propOnSelect({
+          inforContext.onSelect({
             title: inforSelect.node.title,
             key,
             children: res,
@@ -239,7 +241,7 @@ const Sidebar = (props: PropsSidebar) => {
       await request(`/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`, 'GET').then((res: any) => {
         if (res.length > 0) {
           if (key === keySelect) {
-            props.propOnSelect({
+            inforContext.onSelect({
               title: inforSelect.node.title,
               key,
               children: res,
@@ -272,9 +274,9 @@ const Sidebar = (props: PropsSidebar) => {
   };
 
   return (
-    <div id="dropTree">
+    <div className="drop_tree">
       <DropdownTree
-        theme={props.propTheme}
+        theme={inforContext.theme}
         onLoadData={onLoadData}
         treeData={treeData}
         items={item}

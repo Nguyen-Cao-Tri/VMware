@@ -5,7 +5,7 @@
   height: 70px;
   width: 100%;
   padding: 20px;
-  border-bottom: 1px solid #777676;
+  // border-bottom: 1px solid #777676;
   .title {
     span {
       font-size: 20px;
@@ -44,31 +44,34 @@
           margin-top: 4px;
         }
         .edit {
-          color: rgb(82, 81, 81);
+          // color: rgb(82, 81, 81);
           margin-top: 1px;
           font-size: 18px;
         }
         .snap {
           margin-top: 2px;
           font-size: 19px;
-          color: rgb(82, 81, 81);
+          // color: rgb(82, 81, 81);
         }
       }
     }
   }
 }
 
-.dark {
-  .nav {
-    .icon_item {
-      .item {
-        .edit {
-          color: #fff;
-        }
-        .snap {
-          color: #fff;
-        }
-      }
-    }
-  }
-}
+// .dark {
+//   .nav {
+//     .icon_item {
+//       .item {
+//         .launch{
+//           color: #fafafa;
+//         }
+//         .edit {
+//           color: #fafafa;
+//         }
+//         .snap {
+//           color: #fafafa;
+//         }
+//       }
+//     }
+//   }
+// }

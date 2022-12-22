@@ -1,15 +1,8 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext } from 'react';
 import { InformationContext } from '../../../../layouts/DefaultLayout/DefaultLayout';
-import {
-  FaChalkboard,
-  FaDigitalTachograph,
-  FaMemory,
-  FaMicrochip,
-  FaNetworkWired,
-  FaRegWindowMaximize,
-} from 'react-icons/fa';
+import { FaChalkboard, FaDigitalTachograph, FaMemory, FaNetworkWired, FaRegWindowMaximize } from 'react-icons/fa';
+import { HiOutlineChip } from 'react-icons/hi';
 import { PlayCircleOutlined, SyncOutlined, PauseOutlined, WindowsOutlined, QqOutlined } from '@ant-design/icons';
 import { MdOutlineDns } from 'react-icons/md';
 import './renderUI.scss';
@@ -102,23 +95,23 @@ const RenderUI = () => {
   };
   const RenderSummaryVm = () => {
     return (
-      <div className="infoVm">
+      <div className="summary">
         <table>
           <tr>
             <td>
-              <FaMicrochip className="iconSumary" />
+              <HiOutlineChip className="icon_summary fs" />
             </td>
             <td>
-              <div> CPU USAGE:</div>
+              <div> CPU USAGE</div>
               <div>{infoVm.cpu?.count}</div>
             </td>
           </tr>
           <tr>
             <td>
-              <FaMemory className="iconSumary" />
+              <FaMemory className="icon_summary fs2" style={{ marginLeft: '5px' }} />
             </td>
-            <td>
-              <div> MEMORY USAGE:</div>
+            <td className="memory">
+              <div> MEMORY USAGE</div>
               <div>{infoVm.memory?.size_MiB} MB</div>
             </td>
           </tr>
@@ -132,9 +125,11 @@ const RenderUI = () => {
       return (
         <>
           <div>
-            <div className="border">
-              <PlayCircleOutlined style={{ marginRight: '10px' }} />
-              <div>Power On</div>
+            <div className="vm">
+              <div className="border">
+                <PlayCircleOutlined style={{ marginRight: '10px' }} />
+                <div>Power On</div>
+              </div>
             </div>
             <div style={{ marginTop: 20, color: '#4EADCC' }}>LAUNCH WEB CONSOLE</div>
           </div>
@@ -146,9 +141,11 @@ const RenderUI = () => {
     if (powerState === 'stop' || powerState === 'POWERED_OFF')
       return (
         <>
-          <div className="border">
-            <PlayCircleOutlined style={{ marginRight: '10px' }} />
-            <div>Power Off</div>
+          <div className="vm">
+            <div className="border">
+              <PlayCircleOutlined style={{ marginRight: '10px' }} />
+              <div>Power Off</div>
+            </div>
           </div>
           <RenderInforVm />
           <RenderSummaryVm />
@@ -157,9 +154,11 @@ const RenderUI = () => {
     if (powerState === 'suspend' || powerState === 'SUSPENDED')
       return (
         <>
-          <div className="border">
-            <PauseOutlined style={{ marginRight: '10px' }} />
-            <div>Power Suspend</div>
+          <div className="vm">
+            <div className="border">
+              <PauseOutlined style={{ marginRight: '10px' }} />
+              <div>Power Suspend</div>
+            </div>
           </div>
           <RenderInforVm />
           <RenderSummaryVm />
@@ -168,10 +167,13 @@ const RenderUI = () => {
     if (powerState === 'reset')
       return (
         <>
-          <div className="border">
-            <SyncOutlined style={{ marginRight: '10px' }} />
-            <div>Power Reset</div>
+          <div className="vm">
+            <div className="border">
+              <SyncOutlined style={{ marginRight: '10px' }} />
+              <div>Power Reset</div>
+            </div>
           </div>
+
           <RenderInforVm />
           <RenderSummaryVm />
         </>

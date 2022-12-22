@@ -2,11 +2,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import React, { useEffect, useRef } from 'react';
 import { useLog } from '../../hooks/logProvider/LogProvider';
-import {
-  WarningOutlined,
-  IssuesCloseOutlined,
-  ClearOutlined,
-} from '@ant-design/icons';
+import { WarningOutlined, IssuesCloseOutlined, ClearOutlined } from '@ant-design/icons';
 import './footer.scss';
 import { Button, Menu, Tooltip } from 'antd';
 const Footer = (props: any) => {
@@ -29,30 +25,17 @@ const Footer = (props: any) => {
   }, [logs]);
   return (
     <>
-      <div
-        style={{
-          height: 45,
-          display: 'flex',
-          width: '100%',
-        }}
-      >
+      <div>
         <Menu
-          style={{ height: '100%', width: '100%', position: 'relative' }}
-          theme={props.theme}
+          className="menu_item"
+          // theme={props.theme}
           mode="horizontal"
           defaultSelectedKeys={['log']}
         >
-          <Menu.Item id="log" key="log">
+          <Menu.Item className="log" key="log">
             LOG
           </Menu.Item>
-          <div
-            style={{
-              position: 'absolute',
-              right: 20,
-              cursor: ' pointer',
-            }}
-            onClick={clearLog}
-          >
+          <div className="icon_item" onClick={clearLog}>
             <Tooltip placement="bottom" title={'Clear'}>
               <Button type="text" icon={<ClearOutlined className="icon" />} />
             </Tooltip>
@@ -66,19 +49,18 @@ const Footer = (props: any) => {
               key={index}
               style={{
                 padding: 5,
-                color: props.theme === 'dark' ? 'white' : 'black',
+                // color: props.theme === 'dark' ? 'white' : 'black',
               }}
             >
               {log.errorMessage != null ? (
                 <span style={{ color: 'red' }}>
-                  <WarningOutlined /> [{execuTimeFormat(log.executeTime)}]{' '}
-                  {log.name} {log.action} {log.state} {log.errorMessage}
+                  <WarningOutlined /> [{execuTimeFormat(log.executeTime)}] {log.name} {log.action} {log.state}{' '}
+                  {log.errorMessage}
                 </span>
               ) : (
                 <span>
-                  <IssuesCloseOutlined style={{ color: '#75c02b' }} /> [
-                  {execuTimeFormat(log.executeTime)}] {log.name} {log.action}{' '}
-                  {log.state}
+                  <IssuesCloseOutlined style={{ color: '#75c02b' }} /> [{execuTimeFormat(log.executeTime)}] {log.name}{' '}
+                  {log.action} {log.state}
                 </span>
               )}
             </div>

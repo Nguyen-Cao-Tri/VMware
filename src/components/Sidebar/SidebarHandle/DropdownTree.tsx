@@ -48,14 +48,13 @@ const DropdownTree = ({
   theme,
 }: PropsDropdown) => {
   const [infoDrop, setInfoDrop] = useState<any>({});
-  const onDrop: TreeProps['onDrop'] = (info) => {
+  const onDrop: TreeProps['onDrop'] = info => {
     console.log('info drop', info);
     const dropKey = info?.node?.key;
     const dragKey = info?.dragNode?.key;
     const dropPos = info?.node?.pos.split('-');
     if (dropPos?.length > 0) {
-      const dropPosition =
-        info?.dropPosition - Number(dropPos[dropPos?.length - 1]);
+      const dropPosition = info?.dropPosition - Number(dropPos[dropPos?.length - 1]);
       const loop = (
         data: DataNode[],
         key: React.Key,
@@ -80,7 +79,7 @@ const DropdownTree = ({
 
       if (!info.dropToGap) {
         // Drop on the content
-        loop(data, dropKey, (item) => {
+        loop(data, dropKey, item => {
           item.children = item.children ?? [];
           // where to insert 示例添加到头部，可以是随意位置
           item.children.unshift(dragObj);
@@ -90,7 +89,7 @@ const DropdownTree = ({
         info.node.expanded && // Is expanded
         dropPosition === 1 // On the bottom gap
       ) {
-        loop(data, dropKey, (item) => {
+        loop(data, dropKey, item => {
           item.children = item.children ?? [];
           // where to insert 示例添加到头部，可以是随意位置
           item.children.unshift(dragObj);
@@ -115,45 +114,43 @@ const DropdownTree = ({
   };
 
   return (
-    <Dropdown autoFocus overlay={items} trigger={['contextMenu']}>
-      <div
-        className="site-dropdown-context-menu"
-        style={{
-          textAlign: 'center',
-          height: 200,
-          lineHeight: '200px',
-          width: 200,
-        }}
-      >
-        <Tree
-          className="tree"
-          checkable
-          draggable
-          showIcon={true}
-          defaultExpandParent={true}
-          loadData={onLoadData}
-          loadedKeys={loadedKeys}
-          treeData={treeData}
-          showLine={true}
-          onCheck={onCheck}
-          checkedKeys={checkedKeys}
-          onRightClick={onRightClick}
-          onSelect={onSelect}
-          onExpand={onExpand}
-          expandedKeys={expandedKeys}
-          onDragEnter={onDragEnter}
-          onDrop={(info) => {
-            onDrop(info);
-            setInfoDrop(info);
-          }}
-          style={{
-            width: '350px',
-            height: '500px',
-            paddingTop: '20px',
-          }}
-        />
-      </div>
-    </Dropdown>
+    <>
+      <Dropdown autoFocus overlay={items} trigger={['contextMenu']}>
+        <div
+          className="site-dropdown-context-menu"
+          // style={{
+          //   textAlign: 'center',
+          //   height: '100%',
+          //   lineHeight: '200px',
+          //   width: '100%',
+          // }}
+        >
+          <Tree
+            // className={`${theme}`}
+            className="tree"
+            checkable
+            draggable
+            showIcon={true}
+            defaultExpandParent={true}
+            loadData={onLoadData}
+            loadedKeys={loadedKeys}
+            treeData={treeData}
+            showLine={true}
+            onCheck={onCheck}
+            checkedKeys={checkedKeys}
+            onRightClick={onRightClick}
+            onSelect={onSelect}
+            onExpand={onExpand}
+            expandedKeys={expandedKeys}
+            onDragEnter={onDragEnter}
+            onDrop={info => {
+              onDrop(info);
+              setInfoDrop(info);
+            }}
+          />
+        </div>
+      </Dropdown>
+    </>
   );
 };
 

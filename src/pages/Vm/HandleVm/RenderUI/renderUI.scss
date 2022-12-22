@@ -1,7 +1,8 @@
 
   .render_ui {
     display: flex;
-    // justify-content: flex-start;
+    flex-direction: row;
+    .vm{
     .border {
       height: 130px;
       width: 160px;
@@ -10,9 +11,12 @@
       justify-content: center;
       margin-top: 10px;
     }
+  }
     .infoVm {
       margin-left: 50px;
       line-height: 25px;
+      font-size: 14px;
+      flex: 1 1 auto;
       td {
         padding: 0px 10px;
       }
@@ -26,23 +30,48 @@
         margin-top: 40px;
       }
     }
-  }
-  .light {
-
-    .border {
-      border: 1px solid #333;
-    }
-  }
-  .dark {
-    .infoVm {
-      .iconSumary {
-        color: #fff;
+    .summary{
+      line-height: 30px;
+      float: right;
+      td {
+        padding: 0px 10px;
+      }
+      
+      .icon_summary{
+        margin-top: 5px;
       }
     }
-    .iconUbuntu {
-      color: white;
-    }
-    .border {
-      border: 1px solid #fff;
-    }
   }
+ .fs{
+  font-size: 30px;
+ }
+ .fs2{
+  font-size: 23px;
+ }
+  // .light {
+  //   .border {
+  //     border: 1px solid #333;
+  //   }
+  // }
+  .border {
+    border: 1px solid #333;
+  }
+  // .dark {
+  //   .infoVm {
+  //     .iconSumary {
+  //       // color: #fff;
+  //     }
+  //   }
+  //   .iconUbuntu {
+  //     // color: #fafafa;
+  //   }
+  //   .border {
+  //     border: 1px solid #fafafa;
+  //   }
+  //   .summary{
+  //   .icon_summary{
+  //     font-size: 20px;
+  //     // color: #fafafa;
+  //     }
+  //   }
+  // }

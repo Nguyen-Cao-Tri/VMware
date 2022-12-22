@@ -7,7 +7,12 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import { Allotment } from 'allotment';
 import './layout.scss';
 import 'allotment/dist/style.css';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, Layout, theme as themeAnt } from 'antd';
+const HeaderAnt = Layout.Header;
+const ContentAnt = Layout.Content;
+const SiderAnt = Layout.Sider;
+const FooterAnt = Layout.Footer;
+const { useToken } = themeAnt;
 
 export const InformationContext = createContext({});
 
@@ -23,14 +28,9 @@ export default function DefaultLayout() {
   const [theme, setTheme] = useState<string>(localStorage.getItem('theme') ?? 'dark');
   const [sidebarSize, setSidebarSize] = useState('200');
   const [logSize, setLogSize] = useState('200');
-  const lightTheme = {
-    colorPrimary: '#71A73B',
-  };
 
-  const darkTheme = {
-    colorPrimary: '#44475a',
-    colorBgBase: '#44475a',
-    colorTextBase: '#fff',
+  const handleTheme = (value: any) => {
+    setTheme(value);
   };
   const onChangeSidebar = (value: any) => {
     const [firstPane] = value;
@@ -39,6 +39,10 @@ export default function DefaultLayout() {
   const onChangeLog = (value: any) => {
     const [firstPane, secondPane] = value;
     localStorage.setItem('sizeLog', secondPane);
+  };
+  const onSelect = (value: any) => {
+    setInforSelect(value);
+    console.log('aaa', value);
   };
   useEffect(() => {
     const size = localStorage.getItem('sizeSidebar');
@@ -55,53 +59,93 @@ export default function DefaultLayout() {
     vm,
     vmPowerState,
     children,
+    theme,
+    handleTheme,
+    onSelect,
   };
+  const lightTheme = {
+    colorPrimary: '#10b7a4',
+    // colorPrimaryBg: '#fafafa',
+    // colorBgBase: '#fafafa',
+    // colorTextBase: '#565656',
+  };
+
+  const darkTheme = {
+    colorPrimary: '#10b7a4',
+    colorBgBase: '#44475a',
+    // colorTextBase: '#fafafa',
+  };
+  // const { darkAlgorithm, compactAlgorithm } = themeAnt;
+  const { token } = useToken();
+  // const { defaultAlgorithm, defaultSeed } = themeAnt;
+  // console.log('gg', defaultAlgorithm);
+
+  // const mapToken = defaultAlgorithm(defaultSeed);
+
   return (
-    <InformationContext.Provider value={value}>
-      <ConfigProvider
-        theme={{
-          token: theme === 'dark' ? darkTheme : lightTheme,
-        }}
-      >
-        <div className={`${theme}`}>
-          <div className="header">
-            <Header theme={value => setTheme(value)} />
-          </div>
-          <div
-            style={{
-              minHeight: 200,
-              minWidth: 200,
-              height: '93vh',
-              width: '100vw',
-            }}
-          >
-            <Allotment minSize={100} onChange={onChangeSidebar}>
-              <Allotment.Pane preferredSize={sidebarSize}>
-                <Sidebar
-                  propTheme={theme}
-                  propOnSelect={value => setInforSelect(value)}
-                  propOnExpand={value => setKeyExpand(value)}
-                  propVmPowerState={value => setVmPowerState(value)}
-                  propChildren={value => setChildren(value)}
-                  propVm={value => setVm(prev => [...prev, value])}
-                  propNetwork={value => setVmNetwork(prev => [...prev, value])}
-                  propTool={value => setVmTools(prev => [...prev, value])}
-                />
-              </Allotment.Pane>
-              <Allotment.Pane>
-                <Allotment vertical onChange={onChangeLog}>
-                  <Allotment.Pane>
-                    <Content />
+    <Layout>
+      <InformationContext.Provider value={value}>
+        <ConfigProvider
+          theme={{
+            token: theme === 'dark' ? darkTheme : lightTheme,
+            // token: mapToken,
+            // token: { colorPrimary: '#62a51f' },
+            algorithm: theme === 'dark' ? themeAnt.darkAlgorithm : themeAnt.defaultAlgorithm,
+            // algorithm: [darkAlgorithm, compactAlgorithm],
+          }}
+        >
+          <div>
+            <HeaderAnt className="container_header">
+              <Header />
+            </HeaderAnt>
+            <Layout>
+              <div
+                style={{
+                  minHeight: 200,
+                  minWidth: 200,
+                  height: '93vh',
+                  width: '100vw',
+                }}
+              >
+                <Allotment minSize={100} onChange={onChangeSidebar}>
+                  {/* sidebar */}
+                  <Allotment.Pane preferredSize={sidebarSize}>
+                    <SiderAnt className="container_sidebar">
+                      <Sidebar
+                        // propOnSelect={value => setInforSelect(value)}
+                        propOnExpand={value => setKeyExpand(value)}
+                        propVmPowerState={value => setVmPowerState(value)}
+                        propChildren={value => setChildren(value)}
+                        propVm={value => setVm(prev => [...prev, value])}
+                        propNetwork={value => setVmNetwork(prev => [...prev, value])}
+                        propTool={value => setVmTools(prev => [...prev, value])}
+                      />
+                    </SiderAnt>
                   </Allotment.Pane>
-                  <Allotment.Pane preferredSize={logSize}>
-                    <Footer theme={theme} />
+
+                  <Allotment.Pane>
+                    <Allotment vertical onChange={onChangeLog}>
+                      {/* content */}
+                      <Allotment.Pane>
+                        <ContentAnt className="container_content">
+                          <Content />
+                        </ContentAnt>
+                      </Allotment.Pane>
+
+                      {/* footer */}
+                      <Allotment.Pane preferredSize={logSize}>
+                        <FooterAnt id="container_footer">
+                          <Footer />
+                        </FooterAnt>
+                      </Allotment.Pane>
+                    </Allotment>
                   </Allotment.Pane>
                 </Allotment>
-              </Allotment.Pane>
-            </Allotment>
+              </div>
+            </Layout>
           </div>
-        </div>
-      </ConfigProvider>
-    </InformationContext.Provider>
+        </ConfigProvider>
+      </InformationContext.Provider>
+    </Layout>
   );
 }
