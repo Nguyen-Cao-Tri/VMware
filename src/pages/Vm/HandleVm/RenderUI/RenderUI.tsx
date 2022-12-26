@@ -15,6 +15,7 @@ const RenderUI = () => {
   const infoVm = inforContext?.vm;
   const arrayVmPowerState = inforContext?.vmPowerState;
   const vmPowerState = arrayVmPowerState?.filter((item: any) => item.vm === key);
+  // const currentTheme = inforContext.currentTheme;
   // const isStop = () => {
   //   if (vmPowerState.length > 0) {
   //     return (
@@ -37,23 +38,23 @@ const RenderUI = () => {
             <tr>
               <td>
                 <FaChalkboard className="iconSumary" />
-                Guest OS:
               </td>
-              <td> {infoVm.guest_OS}</td>
+              <td>Guest OS:</td>
+              <td style={{ padding: '0 10px' }}> {infoVm.guest_OS}</td>
             </tr>
             <tr>
               <td>
                 <FaDigitalTachograph className="iconSumary" />
-                Compatibility:
               </td>
-              <td> ESXi 7.0 U2 and later (VM version 19)</td>
+              <td>Compatibility:</td>
+              <td style={{ padding: '0 10px' }}> ESXi 7.0 U2 and later (VM version 19)</td>
             </tr>
             <tr>
               <td>
                 <FaRegWindowMaximize className="iconSumary" />
-                VMware Tools:
               </td>
-              <td>
+              <td>VMware Tools:</td>
+              <td style={{ padding: '0 10px' }}>
                 {vmTool.run_state === 'NOT_RUNNING' ? `Not running` : `Running`}, version:
                 {vmTool.version_number} (Current)
               </td>
@@ -61,18 +62,18 @@ const RenderUI = () => {
             <tr>
               <td>
                 <MdOutlineDns className="iconSumary" />
-                DNS Name:
               </td>
-              <td> {vmNetwork?.dns_values?.host_name}</td>
+              <td>DNS Name:</td>
+              <td style={{ padding: '0 10px' }}> {vmNetwork?.dns_values?.host_name}</td>
             </tr>
             <tr>
-              <td style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', top: 0 }}>
-                  <FaNetworkWired className="iconSumary" />
-                  IP Addresses:
-                </div>
-              </td>
               <td>
+                <FaNetworkWired className="iconSumary" />
+              </td>
+              <td style={{ position: 'relative' }}>
+                <div style={{ position: 'absolute', top: 0 }}>IP Addresses:</div>
+              </td>
+              <td style={{ padding: '0 10px' }}>
                 {Boolean(vmNetwork?.dns?.ip_addresses) &&
                   vmNetwork?.dns?.ip_addresses?.map((item: any, index: any) => <div key={index}>{item}</div>)}
               </td>
@@ -180,7 +181,7 @@ const RenderUI = () => {
       );
   }
 
-  return <span></span>;
+  return <div></div>;
 };
 
 export default RenderUI;

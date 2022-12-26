@@ -33,13 +33,15 @@ const Header = () => {
   };
   return (
     <div className="container">
-      <h1>VMware Manager</h1>
-      <div className="header_right">
-        <Switch checked={theme === 'dark'} onChange={changeTheme} checkedChildren="Dark" unCheckedChildren="Light" />
-        <Button style={{ borderRadius: 15, display: 'flex', marginLeft: 10 }} onClick={handleOnClick}>
-          <LoginOutlined style={{ marginTop: 5, marginRight: 5 }} />
-          <div>Log out</div>
-        </Button>
+      <div className="header">
+        <div className="header_left">VMware Manager</div>
+        <div className="header_right">
+          <Switch checked={theme === 'dark'} onChange={changeTheme} checkedChildren="Dark" unCheckedChildren="Light" />
+          <Button style={{ borderRadius: 15, display: 'flex', marginLeft: 10 }} onClick={handleOnClick}>
+            <LoginOutlined style={{ marginTop: 5, marginRight: 5 }} />
+            <div>Log out</div>
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,11 +1,10 @@
 .nav {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  height: 70px;
+  height: 50px;
   width: 100%;
   padding: 20px;
-  // border-bottom: 1px solid #777676;
+  
   .title {
     span {
       font-size: 20px;
@@ -58,20 +57,15 @@
   }
 }
 
-// .dark {
-//   .nav {
-//     .icon_item {
-//       .item {
-//         .launch{
-//           color: #fafafa;
-//         }
-//         .edit {
-//           color: #fafafa;
-//         }
-//         .snap {
-//           color: #fafafa;
-//         }
-//       }
-//     }
-//   }
-// }
+.dark {
+  .nav {
+    background-color: #374248;
+  }
+}
+.light{
+  
+    .nav {
+      background-color: #fff;
+    }
+  
+}

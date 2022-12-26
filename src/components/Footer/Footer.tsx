@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { useLog } from '../../hooks/logProvider/LogProvider';
 import { WarningOutlined, IssuesCloseOutlined, ClearOutlined } from '@ant-design/icons';
 import './footer.scss';
-import { Button, Menu, Tooltip } from 'antd';
+import { Button, List, Menu, Tooltip } from 'antd';
+import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
 const Footer = (props: any) => {
   const execuTimeFormat = (time: number) => {
     const date = new Date(time);
@@ -23,6 +24,8 @@ const Footer = (props: any) => {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
+  const inforContext: any = useContext(InformationContext);
+
   return (
     <>
       <div>
@@ -42,31 +45,27 @@ const Footer = (props: any) => {
           </div>
         </Menu>
       </div>
-      <div className="footer">
-        {logs.map((log, index) => {
-          return (
-            <div
-              key={index}
-              style={{
-                padding: 5,
-                // color: props.theme === 'dark' ? 'white' : 'black',
-              }}
-            >
-              {log.errorMessage != null ? (
-                <span style={{ color: 'red' }}>
-                  <WarningOutlined /> [{execuTimeFormat(log.executeTime)}] {log.name} {log.action} {log.state}{' '}
-                  {log.errorMessage}
-                </span>
-              ) : (
-                <span>
-                  <IssuesCloseOutlined style={{ color: '#75c02b' }} /> [{execuTimeFormat(log.executeTime)}] {log.name}{' '}
-                  {log.action} {log.state}
-                </span>
-              )}
-            </div>
-          );
-        })}
-        <div ref={bottomRef} />
+      <div className={inforContext.curentTheme}>
+        <div className="footer">
+          {logs.map((log, index) => {
+            return (
+              <div key={index} style={{ padding: 5 }}>
+                {log.errorMessage != null ? (
+                  <span style={{ color: 'red' }}>
+                    <WarningOutlined /> [{execuTimeFormat(log.executeTime)}] {log.name} {log.action} {log.state}{' '}
+                    {log.errorMessage}
+                  </span>
+                ) : (
+                  <span>
+                    <IssuesCloseOutlined style={{ color: '#75c02b' }} /> [{execuTimeFormat(log.executeTime)}] {log.name}{' '}
+                    {log.action} {log.state}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+          <div ref={bottomRef} />
+        </div>
       </div>
     </>
   );

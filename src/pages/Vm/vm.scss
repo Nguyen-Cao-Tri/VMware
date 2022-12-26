@@ -1,18 +1,13 @@
 .content_item {
+  position: absolute;
   width: 100%;
   height: calc(100% - 70px);
   overflow-y: scroll;
+  overflow-x:hidden;
+
   padding: 20px;
 
   .table_content {
     margin-top: 20px;
-  }
-}
-
-.dark {
-  .content_item {
-    width: 100%;
-    height: calc(100% - 70px);
-    overflow-y: scroll;
   }
 }

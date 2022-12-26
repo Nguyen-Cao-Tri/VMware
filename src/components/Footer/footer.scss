@@ -1,12 +1,12 @@
 #container_footer {
-  overflow-y: scroll;
-  overflow-x: hidden;
   width: 100%;
   height: 100%;
   position: relative;
   padding: 0;
   .footer {
     position: absolute;
+    overflow-y: scroll;
+    overflow-x: hidden;
     margin-left: 10px;
     width: calc(100% - 12px);
     height: calc(100% - 50px);
@@ -15,49 +15,18 @@
   .menu_item {
     width: 100%;
     height: 50px;
-
+.log{
+  font-size: 18px;
+font-weight: 500;
+}
     .icon_item {
       position: absolute;
       right: 10px;
       .icon {
-        margin: 0 15px;
         cursor: pointer;
+        color: #2997ce;
+        font-size: 20px;
       }
     }
   }
 }
-//   .light {
-//     // color:#44475a;
-//     .menu {
-//       background-color: #fff;
-//       border-bottom: 1px solid #f0f0f0;
-//     }
-//     #log {
-//       color: #71a73b;
-//     }
-//     .icon {
-//       color: #71a73b;
-//       font-size: 20px;
-//     }
-//     #log::after {
-//       border-bottom: 2px solid #71a73b;
-//     }
-//   }
-
-//   .dark {
-//     .menu {
-//       background-color: #001529;
-//       border-bottom: 1px solid #001529;
-//     }
-//     .icon {
-//       font-size: 20px;
-//       color: #fff;
-//     }
-//     #log {
-//       color: #fff;
-//       background-color: #44475a;
-//     }
-//     #log::after {
-//       border-bottom: 2px solid #fff;
-//     }
-//   }

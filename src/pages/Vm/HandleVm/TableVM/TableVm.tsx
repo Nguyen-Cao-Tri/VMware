@@ -23,7 +23,7 @@ const TableContent: React.FC = () => {
                     dataSource={data.slice(0, 4)}
                     renderItem={item => (
                       <List.Item key={item.key}>
-                        <div>{item.title} </div>
+                        <div>{item.title}</div>
                         <div>{item.content}</div>
                       </List.Item>
                     )}

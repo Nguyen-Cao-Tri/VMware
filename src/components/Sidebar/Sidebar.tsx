@@ -4,9 +4,8 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { Key, useContext, useEffect, useState } from 'react';
-import { Menu, Spin, theme } from 'antd';
-import type { MenuProps } from 'antd';
+import React, { useContext, useEffect, useState } from 'react';
+import { Menu, Spin } from 'antd';
 import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
 import { InitTreeData } from './SidebarHandle/InitTreeData';
 import useRequest from '../../hooks/useRequest/useRequest';
@@ -276,7 +275,7 @@ const Sidebar = (props: PropsSidebar) => {
   return (
     <div className="drop_tree">
       <DropdownTree
-        theme={inforContext.theme}
+        theme={inforContext.curentTheme}
         onLoadData={onLoadData}
         treeData={treeData}
         items={item}

@@ -2,22 +2,32 @@
 import React, { useContext } from 'react';
 import { Outlet } from 'react-router-dom';
 import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
-import background from '../../pages/Datacenter/imgContent/background.png';
-import bg from '../../pages/Datacenter/imgContent/bg.png';
+import bgLight from '../../pages/Datacenter/imgContent/bgLight.png';
+import bgDark from '../../pages/Datacenter/imgContent/bgDark.png';
 const Content = () => {
   const inforContext: any = useContext(InformationContext);
   return (
-    <div className="content" style={{ height: '100%' }}>
+    // <div className={inforContext.curentTheme}>
+    <div className="content">
       {inforContext.inforSelect.key === undefined && (
         <div className="layout_content">
-          <h3>Chose something or expand to know more information</h3>
           <div className="bg">
-            {inforContext.theme === 'dark' ? <img src={bg} alt="bgDark" /> : <img src={background} alt="bgLight" />}
+            <h3>Chose something or expand to know more information</h3>
+            {inforContext.curentTheme === 'dark' ? (
+              <div className="bgDark">
+                <img src={bgDark} alt="" />
+              </div>
+            ) : (
+              <div className="bgLight">
+                <img src={bgLight} alt="" />
+              </div>
+            )}
           </div>
         </div>
       )}
       <Outlet />
     </div>
+    // </div>
   );
 };
 

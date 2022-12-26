@@ -10,6 +10,7 @@ const MenuVm = () => {
   const inforContext: any = useContext(InformationContext);
 
   return (
+    // <div className={inforContext.curentTheme}>
     <div className="nav">
       <div className="title">
         <span>{inforContext.inforSelect.title}</span>
@@ -40,6 +41,7 @@ const MenuVm = () => {
         </div>
       )}
     </div>
+    // </div>
   );
 };
 

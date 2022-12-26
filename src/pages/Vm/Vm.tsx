@@ -16,12 +16,14 @@ const Vm = () => {
   const key = inforContext?.inforSelect.key;
   return (
     <>
-      {key !== undefined && <MenuVm />}
-      <div className="content_item">
-        <div className="render_ui">
-          <RenderUI />
+      <div className={inforContext.curentTheme}>
+        {key !== undefined && <MenuVm />}
+        <div className="content_item">
+          <div className="render_ui">
+            <RenderUI />
+          </div>
+          <div className="table_content">{key?.includes('vm') ? <TableVm /> : ''}</div>
         </div>
-        <div className="table_content">{key?.includes('vm') ? <TableVm /> : ''}</div>
       </div>
     </>
   );

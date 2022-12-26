@@ -1,4 +1,3 @@
-
   .render_ui {
     display: flex;
     flex-direction: row;
@@ -13,18 +12,10 @@
     }
   }
     .infoVm {
-      margin-left: 50px;
+      margin-left: 100px;
       line-height: 25px;
       font-size: 14px;
       flex: 1 1 auto;
-      td {
-        padding: 0px 10px;
-      }
-      .iconSumary {
-        margin-right: 5px;
-        padding-top: 3px;
-        // color: rgb(82, 81, 81);
-      }
       .iconInfo {
         font-size: 30px;
         margin-top: 40px;
@@ -48,30 +39,14 @@
  .fs2{
   font-size: 23px;
  }
-  // .light {
-  //   .border {
-  //     border: 1px solid #333;
-  //   }
-  // }
-  .border {
-    border: 1px solid #333;
+  .light {
+    .border {
+      border: 1px solid #333;
+    }
   }
-  // .dark {
-  //   .infoVm {
-  //     .iconSumary {
-  //       // color: #fff;
-  //     }
-  //   }
-  //   .iconUbuntu {
-  //     // color: #fafafa;
-  //   }
-  //   .border {
-  //     border: 1px solid #fafafa;
-  //   }
-  //   .summary{
-  //   .icon_summary{
-  //     font-size: 20px;
-  //     // color: #fafafa;
-  //     }
-  //   }
-  // }
+  .dark{
+    color: #fafafa;
+  .border {
+    border: 1px solid #fafafa;
+  }
+}

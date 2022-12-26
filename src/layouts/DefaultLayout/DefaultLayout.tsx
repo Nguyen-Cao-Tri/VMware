@@ -7,12 +7,11 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import { Allotment } from 'allotment';
 import './layout.scss';
 import 'allotment/dist/style.css';
-import { ConfigProvider, Layout, theme as themeAnt } from 'antd';
+import { ConfigProvider, Layout, theme } from 'antd';
 const HeaderAnt = Layout.Header;
 const ContentAnt = Layout.Content;
 const SiderAnt = Layout.Sider;
 const FooterAnt = Layout.Footer;
-const { useToken } = themeAnt;
 
 export const InformationContext = createContext({});
 
@@ -25,12 +24,12 @@ export default function DefaultLayout() {
   const [vmNetwork, setVmNetwork] = useState<object[]>([]);
   const [vmTools, setVmTools] = useState<object[]>([]);
 
-  const [theme, setTheme] = useState<string>(localStorage.getItem('theme') ?? 'dark');
+  const [curentTheme, setCurrentTheme] = useState<string>(localStorage.getItem('theme') ?? 'dark');
   const [sidebarSize, setSidebarSize] = useState('200');
   const [logSize, setLogSize] = useState('200');
 
   const handleTheme = (value: any) => {
-    setTheme(value);
+    setCurrentTheme(value);
   };
   const onChangeSidebar = (value: any) => {
     const [firstPane] = value;
@@ -59,46 +58,38 @@ export default function DefaultLayout() {
     vm,
     vmPowerState,
     children,
-    theme,
+    curentTheme,
     handleTheme,
     onSelect,
   };
   const lightTheme = {
-    colorPrimary: '#10b7a4',
-    // colorPrimaryBg: '#fafafa',
-    // colorBgBase: '#fafafa',
-    // colorTextBase: '#565656',
+    colorPrimary: '#2997ce',
+    // colorBgBase: '#F4F4F4',
   };
-
   const darkTheme = {
-    colorPrimary: '#10b7a4',
-    colorBgBase: '#44475a',
-    // colorTextBase: '#fafafa',
+    colorPrimary: '#2997ce',
+    colorBgBase: '#252d31',
   };
-  // const { darkAlgorithm, compactAlgorithm } = themeAnt;
-  const { token } = useToken();
-  // const { defaultAlgorithm, defaultSeed } = themeAnt;
-  // console.log('gg', defaultAlgorithm);
-
-  // const mapToken = defaultAlgorithm(defaultSeed);
-
   return (
-    <Layout>
+    <Layout className="layout" style={{ padding: 0 }}>
       <InformationContext.Provider value={value}>
         <ConfigProvider
           theme={{
-            token: theme === 'dark' ? darkTheme : lightTheme,
-            // token: mapToken,
-            // token: { colorPrimary: '#62a51f' },
-            algorithm: theme === 'dark' ? themeAnt.darkAlgorithm : themeAnt.defaultAlgorithm,
-            // algorithm: [darkAlgorithm, compactAlgorithm],
+            token: curentTheme === 'dark' ? darkTheme : lightTheme,
+            algorithm: curentTheme === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
           }}
         >
           <div>
-            <HeaderAnt className="container_header">
+            <HeaderAnt
+              className="container_header"
+              style={{
+                background: '#2997ce',
+              }}
+            >
               <Header />
             </HeaderAnt>
-            <Layout>
+
+            <Layout className="layout_item">
               <div
                 style={{
                   minHeight: 200,
@@ -122,7 +113,6 @@ export default function DefaultLayout() {
                       />
                     </SiderAnt>
                   </Allotment.Pane>
-
                   <Allotment.Pane>
                     <Allotment vertical onChange={onChangeLog}>
                       {/* content */}
