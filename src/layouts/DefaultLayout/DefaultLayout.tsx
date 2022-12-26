@@ -64,7 +64,7 @@ export default function DefaultLayout() {
   };
   const lightTheme = {
     colorPrimary: '#2997ce',
-    // colorBgBase: '#F4F4F4',
+    colorText: '#666666',
   };
   const darkTheme = {
     colorPrimary: '#2997ce',

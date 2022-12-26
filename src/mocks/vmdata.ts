@@ -1,13 +1,5 @@
 export const listDatacenter = [
   {
-    datacenter: 'datacenter-1',
-    name: 'Datacenter 1',
-  },
-  {
-    datacenter: 'datacenter-2',
-    name: 'Datacenter 2',
-  },
-  {
     datacenter: 'datacenter-3',
     name: 'ABC',
   },
@@ -38,7 +30,13 @@ export const listFolder = [
     type: 'VIRTUAL_MACHINE',
   },
 ];
-
+export const folderChildrenDatacenter = [
+  {
+    folder: 'group-v4',
+    name: 'vm',
+    type: 'VIRTUAL_MACHINE',
+  },
+];
 export const listVM = [
   {
     memory_size_MiB: 8192,
@@ -46,7 +44,6 @@ export const listVM = [
     name: 'Windows 11',
     power_state: 'POWERED_OFF',
     cpu_count: 4,
-    parentId: 'group-v23',
   },
   {
     memory_size_MiB: 4096,
@@ -54,6 +51,5 @@ export const listVM = [
     name: 'Ubuntu',
     power_state: 'POWERED_ON',
     cpu_count: 2,
-    parentId: 'group-v24',
   },
 ];
