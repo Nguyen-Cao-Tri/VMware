@@ -1,0 +1,54 @@
+.container_content{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    line-height: 25px;
+  }
+  .layout_content{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    h3{
+        margin-top: 20px;
+    }
+    h3,h4{
+        text-align: center;
+        font-size: 18px;
+    }
+    
+  }
+.light, .dark{
+    height: 100%;
+    width: 100%;
+    .render_summary{
+        display: flex;
+        justify-content: space-between;
+        td {
+            padding: 0px 10px;
+          }
+    }
+    .table_folder{
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+        .item_table{
+            width: 50%;
+
+        }
+    }
+}
+.light{
+    .layout_content
+    {
+        background: url('./imgContent/bgLight.png') no-repeat top center/cover;
+    }
+    
+}
+.dark{
+    .layout_content
+    {
+        background: url('./imgContent/bgDark.png') no-repeat top center/cover;
+       
+    }
+   
+}

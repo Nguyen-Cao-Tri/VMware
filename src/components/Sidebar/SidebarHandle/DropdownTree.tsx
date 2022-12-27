@@ -30,7 +30,7 @@ interface PropsDropdown {
   checkedKeys?: Key[];
   onDragEnter?: (info: any) => void;
   updateTreeDrop: (info: any) => void;
-  theme: string;
+  theme?: string;
 }
 const DropdownTree = ({
   onLoadData,

@@ -6,6 +6,7 @@ import LogProvider, { Handler } from './hooks/logProvider/LogProvider';
 import { url } from './utils/env';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { InfoProvider } from './hooks/infoProvider/InfoProvider';
 
 // import useRequest from './hooks/useRequest/useRequest';
 const App: React.FC = () => {
@@ -16,12 +17,14 @@ const App: React.FC = () => {
   console.log(url);
 
   return (
-    <LogProvider handler={customHandler}>
-      <div className="wrapper">
-        <Router />
-        <ToastContainer />
-      </div>
-    </LogProvider>
+    <InfoProvider>
+      <LogProvider handler={customHandler}>
+        <div className="wrapper">
+          <Router />
+          <ToastContainer />
+        </div>
+      </LogProvider>
+    </InfoProvider>
   );
 };
 export default App;

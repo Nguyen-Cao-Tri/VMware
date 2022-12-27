@@ -6,12 +6,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { LoginOutlined } from '@ant-design/icons';
 import './header.scss';
 import { useNavigate } from 'react-router-dom';
-import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
+import { useInfo } from '../../hooks/infoProvider/InfoProvider';
+// import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
 // interface PropsHeader {
 //   theme: (item: string) => void;
 // }
 const Header = () => {
-  const inforContext: any = useContext(InformationContext);
+  // const inforContext: any = useContext(InformationContext);
+  const { handleTheme } = useInfo();
 
   const navigate = useNavigate();
   const handleOnClick = () => {
@@ -24,12 +26,12 @@ const Header = () => {
     if (!chekedTheme) {
       localStorage.setItem('theme', 'dark');
     }
-    inforContext.handleTheme(theme);
+    if (handleTheme) handleTheme(theme);
   }, []);
   const changeTheme = (value: boolean) => {
     setTheme(value ? 'dark' : 'light');
     localStorage.setItem('theme', value ? 'dark' : 'light');
-    inforContext.handleTheme(value ? 'dark' : 'light');
+    if (handleTheme) handleTheme(value ? 'dark' : 'light');
   };
   return (
     <div className="container">

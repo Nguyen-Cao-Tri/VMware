@@ -5,8 +5,10 @@ import { useLog } from '../../hooks/logProvider/LogProvider';
 import { WarningOutlined, IssuesCloseOutlined, ClearOutlined } from '@ant-design/icons';
 import './footer.scss';
 import { Button, List, Menu, Tooltip } from 'antd';
-import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
-const Footer = (props: any) => {
+import { useInfo } from '../../hooks/infoProvider/InfoProvider';
+// import { useInfo } from '../../layouts/DefaultLayout/DefaultLayout';
+// import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
+const Footer = () => {
   const execuTimeFormat = (time: number) => {
     const date = new Date(time);
     const year = date.getFullYear();
@@ -24,17 +26,13 @@ const Footer = (props: any) => {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
-  const inforContext: any = useContext(InformationContext);
+  // const inforContext: any = useContext(InformationContext);
+  const { curentTheme } = useInfo();
 
   return (
-    <>
-      <div>
-        <Menu
-          className="menu_item"
-          // theme={props.theme}
-          mode="horizontal"
-          defaultSelectedKeys={['log']}
-        >
+    <div className="container_footer">
+      <div className="menu_footer">
+        <Menu className="menu_item" mode="horizontal" defaultSelectedKeys={['log']}>
           <Menu.Item className="log" key="log">
             LOG
           </Menu.Item>
@@ -45,7 +43,7 @@ const Footer = (props: any) => {
           </div>
         </Menu>
       </div>
-      <div className={inforContext.curentTheme}>
+      <div className={curentTheme}>
         <div className="footer">
           {logs.map((log, index) => {
             return (
@@ -67,7 +65,7 @@ const Footer = (props: any) => {
           <div ref={bottomRef} />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

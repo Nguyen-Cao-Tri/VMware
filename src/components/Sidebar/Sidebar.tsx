@@ -22,24 +22,26 @@ import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Action, useLog } from '../../hooks/logProvider/LogProvider';
 import PowerStart from '../IconCustom/PowerStart';
 import { useNavigate } from 'react-router-dom';
-import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
+import { useInfo } from '../../hooks/infoProvider/InfoProvider';
+// import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
 export interface DataNode {
   title: string;
   key: string;
   children?: DataNode[];
   isLeaf?: boolean;
 }
-interface PropsSidebar {
-  propOnSelect?: (info: any) => void;
-  propOnExpand: (info: any) => void;
-  propVmPowerState: (vm: object[]) => void;
-  propChildren: (children: object[]) => void;
-  // propTheme: any;
-  propVm: (vm: any) => void;
-  propTool: (tool: any) => void;
-  propNetwork: (net: any) => void;
-}
-const Sidebar = (props: PropsSidebar) => {
+
+// interface PropsSidebar {
+//   propOnSelect?: (info: any) => void;
+//   propOnExpand: (info: any) => void;
+//   propVmPowerState: (vm: object[]) => void;
+//   propChildren: (children: object[]) => void;
+//   propTheme: any;
+//   propVm: (vm: any) => void;
+//   propTool: (tool: any) => void;
+//   propNetwork: (net: any) => void;
+// }
+const Sidebar = () => {
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [keyDatacenter, setKeyDatacenter] = useState<string>('');
   const [isModalRenameOpen, setIsModalRenameOpen] = useState<boolean>(false);
@@ -50,11 +52,11 @@ const Sidebar = (props: PropsSidebar) => {
   const [isModalCloneOpen, setIsModalCloneOpen] = useState<boolean>(false);
   const [keyRightClick, setKeyRightClick] = useState<string>('');
   const [nameRightClick, setNameRightClick] = useState<string>('');
-  const [inforSelect, setInforSelect] = useState<any>();
+  const [inforSelected, setInforSelected] = useState<any>();
   const [keySelect, setKeySelect] = useState<React.Key>();
   const [renameInput, setRenameInput] = useState<string>('');
   const [keyExpanded, setKeyExpanded] = useState<React.Key[]>([]);
-  const [vm, setVm] = useState<object[]>([]);
+  const [vmKey, setVmKey] = useState<object[]>([]);
   const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<any>([]);
   const { request, isLoading } = useRequest();
@@ -66,7 +68,8 @@ const Sidebar = (props: PropsSidebar) => {
   const navigate = useNavigate();
   const antIcon = <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />;
   const [infoExpanded, setInfoExpanded] = useState<any>('');
-  const inforContext: any = useContext(InformationContext);
+  // const inforContext: any = useContext(InformationContext);
+  const { inforSelect, curentTheme, vm, onSelect, onExpand, VmPowerState, Children, Vm, network, tool } = useInfo();
   useEffect(() => {
     request('/api/vcenter/datacenter', 'GET', {
       action: Action.GET_LIST_DATACENTER,
@@ -78,17 +81,19 @@ const Sidebar = (props: PropsSidebar) => {
     request('/api/vcenter/vm').then((res: any) => {
       setVmApi(res);
       res.map((item: any) => {
-        request(`/api/vcenter/vm/${item.vm}`).then(infoVm => {
-          const obj = { idVm: item.vm, infor: infoVm };
-          props.propVm(obj);
+        request(`/api/vcenter/vm/${item.vmKey}`).then(infoVm => {
+          const obj = { idVm: item.vmKey, infor: infoVm };
+          if (Vm) Vm(obj);
+          console.log('vvv', Vm);
         });
-        request(`/api/vcenter/vm/${item.vm}/tools`).then(vmTool => {
-          const obj = { idVm: item.vm, tool: vmTool };
-          props.propTool(obj);
+        request(`/api/vcenter/vm/${item.vmKey}/tools`).then(vmTool => {
+          const obj = { idVm: item.vmKey, tool: vmTool };
+          if (tool) tool(obj);
+          console.log('ttt', tool);
         });
-        request(`/api/vcenter/vm/${item.vm}/guest/networking`).then(vmNetwork => {
-          const obj = { idVm: item.vm, network: vmNetwork };
-          props.propNetwork(obj);
+        request(`/api/vcenter/vm/${item.vmKey}/guest/networking`).then(vmNetwork => {
+          const obj = { idVm: item.vmKey, network: vmNetwork };
+          if (network) network(obj);
         });
       });
     });
@@ -124,11 +129,11 @@ const Sidebar = (props: PropsSidebar) => {
     })
       .then(async () => {
         vm.forEach((itemVm: any) => {
-          if (itemVm.vm === idVm) {
+          if (itemVm.vmKey === idVm) {
             itemVm.power_state = action;
-            localStorage.setItem(itemVm.vm, action);
+            localStorage.setItem(itemVm.vmKey, action);
           }
-          props.propVmPowerState([...vm]);
+          if (VmPowerState) VmPowerState([...vm]);
         });
         checkUpdateIcon(action, idVm);
       })
@@ -145,8 +150,8 @@ const Sidebar = (props: PropsSidebar) => {
   const item = () => {
     return (
       <Menu
-        items={items(vm, keyRightClick, nameRightClick)}
-        theme={inforContext.theme}
+        items={items(vmKey, keyRightClick, nameRightClick)}
+        // theme={curentTheme}
         onClick={key => {
           switch (key.key) {
             case 'action':
@@ -198,14 +203,15 @@ const Sidebar = (props: PropsSidebar) => {
   const handleOnSelect = (value: any[], info: { node: { title: any; children: any } }) => {
     ['datacenter', 'group', 'vm'].forEach((item: any) => navigateSelect(item, value[0]));
     setKeySelect(value[0]);
-    setInforSelect(info);
-    inforContext.onSelect({
-      title: info.node.title,
-      key: value[0],
-      children: info.node?.children,
-    });
-    props.propOnExpand(value);
-    props.propVmPowerState(vm);
+    setInforSelected(info);
+    if (onSelect)
+      onSelect({
+        title: info.node.title,
+        key: value[0],
+        children: info.node?.children,
+      });
+    if (onExpand) onExpand(value);
+    if (VmPowerState) VmPowerState(vmKey);
   };
   const onLoadData = async ({ key }: any) => {
     if (key.includes('datacenter')) {
@@ -217,37 +223,39 @@ const Sidebar = (props: PropsSidebar) => {
         name: nameChange || datacenterName[0].name,
       }).then(res => {
         setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
-        if (key === keySelect) props.propChildren(res);
+        if (key === keySelect) if (Children) Children(res);
       });
     }
     if (key.includes('group')) {
       const folderName: any = folder?.filter((item: any) => item.folder === key);
-      const vmName: any = vmApi?.filter((item: any) => item.vm === key);
+      const vmName: any = vmApi?.filter((item: any) => item.vmKey === key);
       const param = 'folder';
       await request(`/api/vcenter/${param}?parent_folders=${key}&datacenters=${keyDatacenter}`, 'GET', {
         action: Action.GET_LIST_FOLDER,
         name: nameChange || folderName[0].name,
       }).then((res: any) => {
         if (key === keySelect) {
-          inforContext.onSelect({
-            title: inforSelect.node.title,
-            key,
-            children: res,
-          });
+          if (onSelect)
+            onSelect({
+              title: inforSelect.node.title,
+              key,
+              children: res,
+            });
         }
         setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
       });
       await request(`/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`, 'GET').then((res: any) => {
         if (res.length > 0) {
           if (key === keySelect) {
-            inforContext.onSelect({
-              title: inforSelect.node.title,
-              key,
-              children: res,
-            });
+            if (onSelect)
+              onSelect({
+                title: inforSelect.node.title,
+                key,
+                children: res,
+              });
           }
           setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, 'vm')));
-          setVm(vm.concat(res));
+          setVmKey(vmKey.concat(res));
         }
       });
     }
@@ -255,7 +263,7 @@ const Sidebar = (props: PropsSidebar) => {
   };
   const handleOkClone = (cloneInput: string) => {
     setIsModalCloneOpen(false);
-    const vmName: any = vmApi?.filter((item: any) => item.vm === keyRightClick);
+    const vmName: any = vmApi?.filter((item: any) => item.vmKey === keyRightClick);
     console.log('vmName', vmName);
     request(
       '/api/vcenter/vm?action=clone',
@@ -275,7 +283,7 @@ const Sidebar = (props: PropsSidebar) => {
   return (
     <div className="drop_tree">
       <DropdownTree
-        theme={inforContext.curentTheme}
+        theme={curentTheme}
         onLoadData={onLoadData}
         treeData={treeData}
         items={item}
@@ -285,7 +293,7 @@ const Sidebar = (props: PropsSidebar) => {
         }}
         onSelect={(value, info) => handleOnSelect(value, info)}
         onExpand={(value, info) => {
-          props.propOnExpand(value);
+          if (onExpand) onExpand(value);
           setKeyExpanded(value);
           setInfoExpanded(info);
         }}
@@ -344,7 +352,7 @@ const Sidebar = (props: PropsSidebar) => {
       <ModalClone
         isModalOpen={isModalCloneOpen}
         handleCancel={() => setIsModalCloneOpen(false)}
-        listVm={vm}
+        listVm={vmKey}
         keyRightClick={keyRightClick}
         handleOk={value => handleOkClone(value)}
       />

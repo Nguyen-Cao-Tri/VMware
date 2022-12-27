@@ -1,4 +1,9 @@
-  
+.fs{
+  font-size: 30px;
+ }
+ .fs2{
+  font-size: 23px;
+ }
   .render_ui {
     display: flex;
     flex-direction: row;
@@ -22,24 +27,7 @@
         margin-top: 40px;
       }
     }
-    .summary{
-      line-height: 30px;
-      float: right;
-      td {
-        padding: 0px 10px;
-      }
-      
-      .icon_summary{
-        margin-top: 5px;
-      }
-    }
   }
- .fs{
-  font-size: 30px;
- }
- .fs2{
-  font-size: 23px;
- }
   .light {
     .border {
       border: 1px solid #333;

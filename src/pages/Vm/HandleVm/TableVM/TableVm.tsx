@@ -58,8 +58,8 @@ const TableContent: React.FC = () => {
           </Collapse>
         </div>
         <div className="item_table">
-          <Collapse collapsible="header" defaultActiveKey={['1']}>
-            <Panel header="Compute Policies" key="1">
+          <Collapse collapsible="header" defaultActiveKey={['2']}>
+            <Panel header="Compute Policies" key="2">
               <a href="#">View all policies</a>
             </Panel>
           </Collapse>
@@ -67,15 +67,15 @@ const TableContent: React.FC = () => {
       </div>
       <div className="table_content2">
         <div className="item_table">
-          <Collapse collapsible="header" defaultActiveKey={['1']}>
-            <Panel header="Notes" key="1">
+          <Collapse collapsible="header">
+            <Panel header="Notes" key="3">
               <span style={{ opacity: 0.4 }}>Edit Notes...</span>
             </Panel>
           </Collapse>
         </div>
         <div className="item_table">
-          <Collapse collapsible="header" defaultActiveKey={['1']}>
-            <Panel header="Custom Attributes" key="1">
+          <Collapse collapsible="header" defaultActiveKey={['4']}>
+            <Panel header="Custom Attributes" key="4">
               <p>Edit...</p>
             </Panel>
           </Collapse>

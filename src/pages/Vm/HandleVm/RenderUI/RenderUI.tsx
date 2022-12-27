@@ -1,20 +1,27 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import React, { useContext } from 'react';
-import { InformationContext } from '../../../../layouts/DefaultLayout/DefaultLayout';
+import React from 'react';
+// import { InformationContext } from '../../../../layouts/DefaultLayout/DefaultLayout';
 import { FaChalkboard, FaDigitalTachograph, FaMemory, FaNetworkWired, FaRegWindowMaximize } from 'react-icons/fa';
 import { HiOutlineChip } from 'react-icons/hi';
 import { PlayCircleOutlined, SyncOutlined, PauseOutlined, WindowsOutlined, QqOutlined } from '@ant-design/icons';
 import { MdOutlineDns } from 'react-icons/md';
 import './renderUI.scss';
+import { useInfo } from '../../../../hooks/infoProvider/InfoProvider';
 
 const RenderUI = () => {
-  const inforContext: any = useContext(InformationContext);
-  const key = inforContext?.inforSelect.key;
-  const vmTool = inforContext?.vmTools;
-  const vmNetwork = inforContext?.vmNetwork;
-  const infoVm = inforContext?.vm;
-  const arrayVmPowerState = inforContext?.vmPowerState;
-  const vmPowerState = arrayVmPowerState?.filter((item: any) => item.vm === key);
+  // const inforContext: any = useContext(InformationContext);
+  const { inforSelect, vmTools, vmNetwork, vm, vmPowerState } = useInfo();
+  const key = inforSelect.key;
+  const vmTool = vmTools;
+  const networkVm = vmNetwork;
+  const infoVm = vm;
+  console.log('if', infoVm);
+
+  const arrayVmPowerState = vmPowerState;
+  console.log('stateee', vmPowerState);
+  const vmPowerStates = arrayVmPowerState?.filter((item: any) => item.vm === key);
+  console.log('state', vmPowerStates);
+
   // const currentTheme = inforContext.currentTheme;
   // const isStop = () => {
   //   if (vmPowerState.length > 0) {
@@ -25,8 +32,8 @@ const RenderUI = () => {
   //   }
   // };
   const isStart = () => {
-    if (vmPowerState.length > 0) {
-      return vmPowerState[0].power_state === 'start' || vmPowerState[0].power_state === 'POWERED_ON';
+    if (vmPowerStates.length > 0) {
+      return vmPowerStates[0].power_state === 'start' || vmPowerStates[0].power_state === 'POWERED_ON';
     }
   };
 
@@ -64,7 +71,7 @@ const RenderUI = () => {
                 <MdOutlineDns className="iconSumary" />
               </td>
               <td>DNS Name:</td>
-              <td style={{ padding: '0 10px' }}> {vmNetwork?.dns_values?.host_name}</td>
+              <td style={{ padding: '0 10px' }}> {networkVm.dns_values?.host_name}</td>
             </tr>
             <tr>
               <td>
@@ -74,8 +81,8 @@ const RenderUI = () => {
                 <div style={{ position: 'absolute', top: 0 }}>IP Addresses:</div>
               </td>
               <td style={{ padding: '0 10px' }}>
-                {Boolean(vmNetwork?.dns?.ip_addresses) &&
-                  vmNetwork?.dns?.ip_addresses?.map((item: any, index: any) => <div key={index}>{item}</div>)}
+                {Boolean(networkVm.dns?.ip_addresses) &&
+                  networkVm.dns?.ip_addresses?.map((item: any, index: any) => <div key={index}>{item}</div>)}
               </td>
             </tr>
             <tr>
@@ -99,17 +106,17 @@ const RenderUI = () => {
       <div className="summary">
         <table>
           <tr>
-            <td>
+            <td style={{ paddingRight: '10px' }}>
               <HiOutlineChip className="icon_summary fs" />
             </td>
             <td>
               <div> CPU USAGE</div>
-              <div>{infoVm.cpu?.count}</div>
+              <div>{infoVm.cpu?.count}0</div>
             </td>
           </tr>
           <tr>
             <td>
-              <FaMemory className="icon_summary fs2" style={{ marginLeft: '5px' }} />
+              <FaMemory className="icon_summary fs2" style={{ marginLeft: '3px' }} />
             </td>
             <td className="memory">
               <div> MEMORY USAGE</div>
@@ -120,8 +127,8 @@ const RenderUI = () => {
       </div>
     );
   };
-  if (vmPowerState?.length > 0) {
-    const powerState = vmPowerState[0].power_state;
+  if (vmPowerStates?.length > 0) {
+    const powerState = vmPowerStates[0].power_state;
     if (isStart() ?? false)
       return (
         <>

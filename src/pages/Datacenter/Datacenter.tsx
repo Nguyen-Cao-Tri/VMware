@@ -1,36 +1,23 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import React, { useContext } from 'react';
-import './datacenter.scss';
-import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
-import bgLight from '../../pages/Datacenter/imgContent/bgLight.png';
-import bgDark from '../../pages/Datacenter/imgContent/bgDark.png';
+import React from 'react';
+import { useInfo } from '../../hooks/infoProvider/InfoProvider';
+// import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
 
 const Datacenter = () => {
-  const inforContext: any = useContext(InformationContext);
+  // const inforContext: any = useContext(InformationContext);
+  const { inforSelect } = useInfo();
 
-  console.log('inforSelect', inforContext?.inforSelect);
-  const title = inforContext?.inforSelect.title;
-  const key = inforContext?.inforSelect.key;
-  const curentTheme = inforContext?.curentTheme;
+  console.log('inforSelect', inforSelect);
+  const title = inforSelect.title;
+  const key = inforSelect.key;
 
   return (
     <>
       {key ? (
         <>
           <div className="layout_content">
-            <div className="bg">
-              <h3>Datacenter name: {title}</h3>
-              <h4>Expand to know more information</h4>
-              {curentTheme === 'dark' ? (
-                <div className="bgDark">
-                  <img src={bgDark} alt="" />
-                </div>
-              ) : (
-                <div className="bgLight">
-                  <img src={bgLight} alt="" />
-                </div>
-              )}
-            </div>
+            <h3>Datacenter name: {title}</h3>
+            <h4>Expand to know more information</h4>
           </div>
         </>
       ) : (

@@ -1,33 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useContext } from 'react';
+import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
-import bgLight from '../../pages/Datacenter/imgContent/bgLight.png';
-import bgDark from '../../pages/Datacenter/imgContent/bgDark.png';
+import { useInfo } from '../../hooks/infoProvider/InfoProvider';
+// import { InformationContext, useInfo } from '../../layouts/DefaultLayout/DefaultLayout';
+
 const Content = () => {
-  const inforContext: any = useContext(InformationContext);
+  // const inforContext: any = useContext(InformationContext);
+  const { curentTheme, inforSelect } = useInfo();
+  console.log(curentTheme);
+
   return (
-    // <div className={inforContext.curentTheme}>
-    <div className="content">
-      {inforContext.inforSelect.key === undefined && (
-        <div className="layout_content">
-          <div className="bg">
+    <div className={curentTheme}>
+      <div className="content">
+        {inforSelect.key === undefined && (
+          <div className="layout_content">
             <h3>Chose something or expand to know more information</h3>
-            {inforContext.curentTheme === 'dark' ? (
-              <div className="bgDark">
-                <img src={bgDark} alt="" />
-              </div>
-            ) : (
-              <div className="bgLight">
-                <img src={bgLight} alt="" />
-              </div>
-            )}
           </div>
-        </div>
-      )}
-      <Outlet />
+        )}
+        <Outlet />
+      </div>
     </div>
-    // </div>
   );
 };
 

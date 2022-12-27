@@ -1,21 +1,22 @@
 import { Button, Tooltip } from 'antd';
-import React, { useContext } from 'react';
+import React from 'react';
 import { BsCameraFill, BsCaretRight, BsSquare } from 'react-icons/bs';
 import { FaEdit } from 'react-icons/fa';
 import { DesktopOutlined } from '@ant-design/icons';
-import { InformationContext } from '../../../../layouts/DefaultLayout/DefaultLayout';
+// import { InformationContext } from '../../../../layouts/DefaultLayout/DefaultLayout';
 import './menuVm.scss';
+import { useInfo } from '../../../../hooks/infoProvider/InfoProvider';
 
 const MenuVm = () => {
-  const inforContext: any = useContext(InformationContext);
-
+  // const inforContext: any = useContext(InformationContext);
+  const { inforSelect, vmPowerState } = useInfo();
   return (
     // <div className={inforContext.curentTheme}>
     <div className="nav">
       <div className="title">
-        <span>{inforContext.inforSelect.title}</span>
+        <span>{inforSelect.title}</span>
       </div>
-      {Boolean(inforContext.inforSelect.key?.includes('vm')) && inforContext.vmPowerState.length > 0 && (
+      {Boolean(inforSelect.key?.includes('vm')) && vmPowerState.length > 0 && (
         <div className="nav_item">
           <div className="line ml"></div>
           <div className="icon_item ml">
