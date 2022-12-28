@@ -1,28 +1,39 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../../components/Content/content.scss';
-// import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
 import { LaptopOutlined, FolderOutlined } from '@ant-design/icons';
 import { Collapse } from 'antd';
 import { HiOutlineChip } from 'react-icons/hi';
 import { FaMemory } from 'react-icons/fa';
 import { useInfo } from '../../hooks/infoProvider/InfoProvider';
+import { useNavigate } from 'react-router-dom';
 const { Panel } = Collapse;
 
 const Folder = () => {
-  // const inforContext: any = useContext(InformationContext);
-  const { inforSelect, vm } = useInfo();
+  const { inforSelect, vm, keyExpand, parentId } = useInfo();
 
-  console.log('inforSelect', inforSelect);
   const title = inforSelect.title;
-  const key = inforSelect.key;
-  const infoVm = vm;
+  const keySelect = inforSelect.key;
   const children = inforSelect.children;
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (keySelect || keyExpand.length > 0) {
+      const uniqueChars = parentId?.filter((c: any, index: any) => {
+        return parentId.indexOf(c) === index;
+      });
+      navigate(`/group?selected=${keySelect}&expanded=${uniqueChars?.concat(keySelect).join(',')}`);
+    }
+  }, [keySelect, keyExpand]);
   const RenderUI = () => {
     const totalFolder = children?.filter(
       (itemFolder: any) => itemFolder.folder?.includes('group') || itemFolder.key?.includes('group'),
     );
     const totalVm = children?.filter((itemVm: any) => itemVm.vm?.includes('vm') || itemVm.key?.includes('vm'));
+    console.log('totalVm', totalVm);
+
     return (
       <div style={{ padding: '20px' }}>
         <div className="render_summary">
@@ -31,10 +42,10 @@ const Folder = () => {
             {children?.length >= 0 ? (
               <div>
                 <h4>
-                  <LaptopOutlined />: {totalFolder.length}
+                  <LaptopOutlined />: {totalVm.length}
                 </h4>
                 <h4>
-                  <FolderOutlined />: {totalVm.length}
+                  <FolderOutlined />: {totalFolder.length}
                 </h4>
               </div>
             ) : (
@@ -49,7 +60,7 @@ const Folder = () => {
                 </td>
                 <td>
                   <div> CPU USAGE</div>
-                  <div>{infoVm.cpu?.count}0</div>
+                  <div>{vm.cpu?.count}0</div>
                 </td>
               </tr>
               <tr>
@@ -58,7 +69,7 @@ const Folder = () => {
                 </td>
                 <td className="memory">
                   <div> MEMORY USAGE</div>
-                  <div>{infoVm.memory?.size_MiB} MB</div>
+                  <div>{vm.memory?.size_MiB} MB</div>
                 </td>
               </tr>
             </table>
@@ -85,7 +96,7 @@ const Folder = () => {
   };
   return (
     <>
-      {key && (
+      {keySelect && (
         <>
           <div className="nav">
             <div className="title">

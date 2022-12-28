@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useInfo } from '../../hooks/infoProvider/InfoProvider';
 import { ConfigProvider, Layout, theme } from 'antd';
 import Content from '../../components/Content/Content';
 import Footer from '../../components/Footer/Footer';
@@ -8,7 +8,7 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import './layout.scss';
-import { useInfo } from '../../hooks/infoProvider/InfoProvider';
+
 const HeaderAnt = Layout.Header;
 const ContentAnt = Layout.Content;
 const SiderAnt = Layout.Sider;
@@ -25,7 +25,7 @@ export default function DefaultLayout() {
     localStorage.setItem('sizeSidebar', firstPane);
   };
   const onChangeLog = (value: any) => {
-    const [firstPane, secondPane] = value;
+    const [, secondPane] = value;
     localStorage.setItem('sizeLog', secondPane);
   };
   useEffect(() => {

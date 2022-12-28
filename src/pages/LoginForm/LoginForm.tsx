@@ -55,7 +55,7 @@ const LoginForm: React.FC = () => {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: '#71A73B',
+          colorPrimary: '#2997ce',
         },
       }}
     >

@@ -4,43 +4,31 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useContext, useEffect, useState } from 'react';
-import { Menu, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Action, useLog } from '../../hooks/logProvider/LogProvider';
+import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
+import { PushRequestData } from './SidebarHandle/PushRequestData';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useInfo } from '../../hooks/infoProvider/InfoProvider';
 import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
+import ModalRename, { findRename } from '../Modal/ModalRename';
 import { InitTreeData } from './SidebarHandle/InitTreeData';
 import useRequest from '../../hooks/useRequest/useRequest';
-import { PushRequestData } from './SidebarHandle/PushRequestData';
-import { items } from '../../utils/items';
 import DropdownTree from './SidebarHandle/DropdownTree';
-import ModalRename, { findRename } from '../Modal/ModalRename';
-import ModalGetfile from '../Modal/ModalGetfile';
 import ModalUserLogin from '../Modal/ModalUserLogin';
 import ModalCopyfile from '../Modal/ModalCopyfile';
+import PowerStart from '../IconCustom/PowerStart';
+import ModalGetfile from '../Modal/ModalGetfile';
 import ModalProcess from '../Modal/ModalProcess';
 import ModalClone from '../Modal/ModalClone';
-import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Action, useLog } from '../../hooks/logProvider/LogProvider';
-import PowerStart from '../IconCustom/PowerStart';
-import { useNavigate } from 'react-router-dom';
-import { useInfo } from '../../hooks/infoProvider/InfoProvider';
-// import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
+import { items } from '../../utils/items';
+import { Menu, Spin } from 'antd';
 export interface DataNode {
   title: string;
   key: string;
   children?: DataNode[];
   isLeaf?: boolean;
 }
-
-// interface PropsSidebar {
-//   propOnSelect?: (info: any) => void;
-//   propOnExpand: (info: any) => void;
-//   propVmPowerState: (vm: object[]) => void;
-//   propChildren: (children: object[]) => void;
-//   propTheme: any;
-//   propVm: (vm: any) => void;
-//   propTool: (tool: any) => void;
-//   propNetwork: (net: any) => void;
-// }
 const Sidebar = () => {
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [keyDatacenter, setKeyDatacenter] = useState<string>('');
@@ -53,7 +41,7 @@ const Sidebar = () => {
   const [keyRightClick, setKeyRightClick] = useState<string>('');
   const [nameRightClick, setNameRightClick] = useState<string>('');
   const [inforSelected, setInforSelected] = useState<any>();
-  const [keySelect, setKeySelect] = useState<React.Key>();
+  const [keySelect, setKeySelect] = useState<React.Key[]>();
   const [renameInput, setRenameInput] = useState<string>('');
   const [keyExpanded, setKeyExpanded] = useState<React.Key[]>([]);
   const [vmKey, setVmKey] = useState<object[]>([]);
@@ -68,9 +56,23 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const antIcon = <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />;
   const [infoExpanded, setInfoExpanded] = useState<any>('');
-  // const inforContext: any = useContext(InformationContext);
-  const { inforSelect, curentTheme, vm, onSelect, onExpand, VmPowerState, Children, Vm, network, tool } = useInfo();
+  const [searchParams] = useSearchParams();
+  const {
+    inforSelect,
+    vm,
+    curentTheme,
+    setOnSelect,
+    setOnExpand,
+    setVmPowerStates,
+    setChildrens,
+    setVms,
+    setNetwork,
+    setParentKey,
+    setTool,
+  } = useInfo();
   useEffect(() => {
+    const keySelectParam: any = searchParams.get('selected')?.split(',');
+    const keyExpandParam: any = searchParams.get('expanded')?.split(',');
     request('/api/vcenter/datacenter', 'GET', {
       action: Action.GET_LIST_DATACENTER,
     }).then((res: any) => {
@@ -81,22 +83,22 @@ const Sidebar = () => {
     request('/api/vcenter/vm').then((res: any) => {
       setVmApi(res);
       res.map((item: any) => {
-        request(`/api/vcenter/vm/${item.vmKey}`).then(infoVm => {
-          const obj = { idVm: item.vmKey, infor: infoVm };
-          if (Vm) Vm(obj);
-          console.log('vvv', Vm);
+        request(`/api/vcenter/vm/${item.vm}`).then(infoVm => {
+          const obj = { idVm: item.vm, infor: infoVm };
+          if (setVms) setVms(obj);
         });
-        request(`/api/vcenter/vm/${item.vmKey}/tools`).then(vmTool => {
-          const obj = { idVm: item.vmKey, tool: vmTool };
-          if (tool) tool(obj);
-          console.log('ttt', tool);
+        request(`/api/vcenter/vm/${item.vm}/tools`).then(vmTool => {
+          const obj = { idVm: item.vm, tool: vmTool };
+          if (setTool) setTool(obj);
         });
-        request(`/api/vcenter/vm/${item.vmKey}/guest/networking`).then(vmNetwork => {
-          const obj = { idVm: item.vmKey, network: vmNetwork };
-          if (network) network(obj);
+        request(`/api/vcenter/vm/${item.vm}/guest/networking`).then(vmNetwork => {
+          const obj = { idVm: item.vm, network: vmNetwork };
+          if (setNetwork) setNetwork(obj);
         });
       });
     });
+    setKeyExpanded(keyExpandParam);
+    setKeySelect(keySelectParam);
   }, []);
   const checkUpdateIcon = (action: string, idVm: string) => {
     if (action === 'start') {
@@ -133,7 +135,7 @@ const Sidebar = () => {
             itemVm.power_state = action;
             localStorage.setItem(itemVm.vmKey, action);
           }
-          if (VmPowerState) VmPowerState([...vm]);
+          if (setVmPowerStates) setVmPowerStates([...vm]);
         });
         checkUpdateIcon(action, idVm);
       })
@@ -163,7 +165,6 @@ const Sidebar = () => {
             case 'refresh':
               request('/api/vcenter/datacenter', 'GET', {
                 action: Action.REFRESH,
-                // name: nameRightClick,
               }).then((res: DataNode[]) => {
                 setTreeData(InitTreeData(res));
               });
@@ -200,18 +201,34 @@ const Sidebar = () => {
       navigate(`/${param}?${param}_id=${value}`);
     }
   };
+  const findNodeTreeData = (list: DataNode[], nodeKey: string, arr: string[], keySelected: string) => {
+    console.log('treeData list', list);
+
+    list?.map((itemTreeData: any) => {
+      if (itemTreeData.key === nodeKey) {
+        const checkNode = JSON.stringify(itemTreeData.children)?.indexOf(keySelected);
+        if (checkNode !== -1) {
+          return arr.push(itemTreeData.key);
+        } else findNodeTreeData(itemTreeData.children, nodeKey, arr, keySelected);
+      } else findNodeTreeData(itemTreeData.children, nodeKey, arr, keySelected);
+    });
+    return arr;
+  };
   const handleOnSelect = (value: any[], info: { node: { title: any; children: any } }) => {
+    const arr: string[] = [];
+    keyExpanded?.map((item: any) => {
+      if (setParentKey) setParentKey(findNodeTreeData(treeData, item, arr, value[0]));
+    });
     ['datacenter', 'group', 'vm'].forEach((item: any) => navigateSelect(item, value[0]));
-    setKeySelect(value[0]);
+    setKeySelect(value);
     setInforSelected(info);
-    if (onSelect)
-      onSelect({
+    if (setOnSelect)
+      setOnSelect({
         title: info.node.title,
         key: value[0],
         children: info.node?.children,
       });
-    if (onExpand) onExpand(value);
-    if (VmPowerState) VmPowerState(vmKey);
+    if (setVmPowerStates) setVmPowerStates(vmKey);
   };
   const onLoadData = async ({ key }: any) => {
     if (key.includes('datacenter')) {
@@ -223,7 +240,7 @@ const Sidebar = () => {
         name: nameChange || datacenterName[0].name,
       }).then(res => {
         setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
-        if (key === keySelect) if (Children) Children(res);
+        if (key === keySelect) if (setChildrens) setChildrens(res);
       });
     }
     if (key.includes('group')) {
@@ -235,8 +252,8 @@ const Sidebar = () => {
         name: nameChange || folderName[0].name,
       }).then((res: any) => {
         if (key === keySelect) {
-          if (onSelect)
-            onSelect({
+          if (setOnSelect)
+            setOnSelect({
               title: inforSelect.node.title,
               key,
               children: res,
@@ -247,8 +264,8 @@ const Sidebar = () => {
       await request(`/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`, 'GET').then((res: any) => {
         if (res.length > 0) {
           if (key === keySelect) {
-            if (onSelect)
-              onSelect({
+            if (setOnSelect)
+              setOnSelect({
                 title: inforSelect.node.title,
                 key,
                 children: res,
@@ -293,7 +310,7 @@ const Sidebar = () => {
         }}
         onSelect={(value, info) => handleOnSelect(value, info)}
         onExpand={(value, info) => {
-          if (onExpand) onExpand(value);
+          if (setOnExpand) setOnExpand(value);
           setKeyExpanded(value);
           setInfoExpanded(info);
         }}

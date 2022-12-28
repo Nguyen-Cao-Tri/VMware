@@ -1,10 +1,8 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { useInfo } from '../../hooks/infoProvider/InfoProvider';
-// import { InformationContext, useInfo } from '../../layouts/DefaultLayout/DefaultLayout';
 
 const Content = () => {
-  // const inforContext: any = useContext(InformationContext);
   const { curentTheme, inforSelect } = useInfo();
   console.log(curentTheme);
 

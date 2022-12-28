@@ -1,19 +1,28 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useInfo } from '../../hooks/infoProvider/InfoProvider';
-// import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
 
 const Datacenter = () => {
-  // const inforContext: any = useContext(InformationContext);
-  const { inforSelect } = useInfo();
+  const { inforSelect, keyExpand, parentId } = useInfo();
 
-  console.log('inforSelect', inforSelect);
   const title = inforSelect.title;
-  const key = inforSelect.key;
+  const keySelect = inforSelect.key;
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (keySelect || keyExpand.length > 0) {
+      const uniqueChars = parentId?.filter((c: any, index: any) => {
+        return parentId.indexOf(c) === index;
+      });
+      console.log('key', uniqueChars);
+      navigate(`/datacenter?selected=${keySelect}&expanded=${uniqueChars?.concat(keySelect).join(',')}`);
+    }
+  }, [keySelect, keyExpand]);
 
   return (
     <>
-      {key ? (
+      {keySelect ? (
         <>
           <div className="layout_content">
             <h3>Datacenter name: {title}</h3>

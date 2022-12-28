@@ -9,14 +9,16 @@ export interface IInfoContext {
   vmNetwork?: any;
   vmTools?: any;
   curentTheme?: string;
+  parentId?: string[];
   handleTheme?: (value: string) => void;
-  onSelect?: (value: any) => void;
-  onExpand?: (value: any) => void;
-  VmPowerState?: (value: object) => void;
-  Children?: (value: object[]) => void;
-  Vm?: (value: object) => void;
-  network?: (value: object) => void;
-  tool?: (value: object) => void;
+  setOnSelect?: (value: any) => void;
+  setOnExpand?: (value: any) => void;
+  setVmPowerStates?: (value: object) => void;
+  setChildrens?: (value: object[]) => void;
+  setVms?: (value: object) => void;
+  setNetwork?: (value: object) => void;
+  setTool?: (value: object) => void;
+  setParentKey?: (value: string[]) => void;
 }
 
 export const InforContext = createContext<IInfoContext>({
@@ -28,14 +30,16 @@ export const InforContext = createContext<IInfoContext>({
   vmNetwork: [{}],
   vmPowerState: [],
   curentTheme: '',
+  parentId: [''],
   handleTheme: () => {},
-  onSelect: () => {},
-  onExpand: () => {},
-  VmPowerState: () => {},
-  Children: () => {},
-  Vm: () => {},
-  network: () => {},
-  tool: () => {},
+  setOnSelect: () => {},
+  setOnExpand: () => {},
+  setVmPowerStates: () => {},
+  setChildrens: () => {},
+  setVms: () => {},
+  setNetwork: () => {},
+  setTool: () => {},
+  setParentKey: () => {},
 });
 
 export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
@@ -43,6 +47,7 @@ export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
   const [keyExpand, setKeyExpand] = useState<any>([]);
   const [vmPowerState, setVmPowerState] = useState<object[]>([]);
   const [vm, setVm] = useState<object[]>([]);
+  const [parentId, setParentId] = useState<string[]>([]);
   console.log('vmm', vm);
 
   const [children, setChildren] = useState<object[]>([]);
@@ -53,30 +58,33 @@ export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
   const handleTheme = (value: string) => {
     setCurrentTheme(value);
   };
-  const onSelect = (value: any) => {
+  const setOnSelect = (value: any) => {
     setInforSelect(value);
     console.log('aaa', value);
   };
-  const onExpand = (value: any) => {
+  const setOnExpand = (value: any) => {
     setKeyExpand(value);
   };
-  const VmPowerState = (value: any) => {
+  const setVmPowerStates = (value: any) => {
     setVmPowerState(value);
   };
-  const Children = (value: object[]) => {
+  const setChildrens = (value: object[]) => {
     setChildren(value);
   };
-  const Vm = (value: any) => {
+  const setVms = (value: any) => {
     setVm(prev => [...prev, value]);
   };
-  const network = (value: any) => {
+  const setNetwork = (value: any) => {
     setVmNetwork(prev => [...prev, value]);
   };
-  const tool = (value: any) => {
+  const setTool = (value: any) => {
     setVmTools(prev => [...prev, value]);
   };
-
+  const setParentKey = (value: string[]) => {
+    setParentId(value);
+  };
   const value = {
+    parentId,
     inforSelect,
     keyExpand,
     vmTools,
@@ -86,21 +94,15 @@ export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
     children,
     curentTheme,
     handleTheme,
-    onSelect,
-    onExpand,
-    VmPowerState,
-    Children,
-    Vm,
-    network,
-    tool,
+    setOnSelect,
+    setOnExpand,
+    setVmPowerStates,
+    setChildrens,
+    setVms,
+    setNetwork,
+    setParentKey,
+    setTool,
   };
   return <InforContext.Provider value={value}>{props.children} </InforContext.Provider>;
 };
 export const useInfo = (): IInfoContext => useContext(InforContext);
-// import React from 'react';
-
-// const InfoProvider = () => {
-//   return <div>InfoProvider</div>;
-// };
-
-// export default InfoProvider;
