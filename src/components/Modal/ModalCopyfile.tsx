@@ -1,38 +1,34 @@
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Input, Modal } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
 import { Action } from '../../hooks/logProvider/LogProvider';
-interface PropsModal {
-  isModalopen: boolean;
-  handleCancel: () => void;
-  keyRightClick: string;
-  nameRightClick: string;
-}
-const ModalCopyfile = ({
-  isModalopen,
-  handleCancel,
-  keyRightClick,
-  nameRightClick,
-}: PropsModal) => {
+import { SidebarContext } from '../Sidebar/Sidebar';
+
+const ModalCopyfile = () => {
+  const Context: any = useContext(SidebarContext);
+  const handleCancel = () => {
+    Context.setIsModalProcessOpen(false);
+  };
   const [pathInput, setPathInput] = useState<string>('');
   const [fileInput, setFileInput] = useState<string>('');
   const [selectFile, setSelectFile] = useState<string>('');
   const { request, isLoading } = useRequest();
   const handleChangeFile = (e: any) => {
-    // console.log(e.target.file[0]);
     setSelectFile(e.target.files[0]);
   };
 
   const handleOk = async () => {
-    const vmUsername = localStorage.getItem(`username ${keyRightClick}`);
-    const vmPassword = localStorage.getItem(`password ${keyRightClick}`);
-    if (keyRightClick.includes('vm')) {
+    const vmUsername = localStorage.getItem(`username ${Context.keyRightClick}`);
+    const vmPassword = localStorage.getItem(`password ${Context.keyRightClick}`);
+    if (Context.keyRightClick.includes('vm')) {
       await request(
-        `/api/vcenter/vm/${keyRightClick}/guest/filesystem?action=create`,
+        `/api/vcenter/vm/${Context.keyRightClick}/guest/filesystem?action=create`,
         'POST',
-        { action: Action.COPY_FILE, name: nameRightClick },
+        { action: Action.COPY_FILE, name: Context.nameRightClick },
         false,
         {
           credentials: {
@@ -54,7 +50,7 @@ const ModalCopyfile = ({
           request(
             response,
             'PUT',
-            { action: Action.PUT_COPY_FILE, name: nameRightClick },
+            { action: Action.PUT_COPY_FILE, name: Context.nameRightClick },
             true,
             {
               body: formData,
@@ -81,7 +77,7 @@ const ModalCopyfile = ({
   return (
     <Modal
       title="CopyFile"
-      open={isModalopen}
+      open={Context.isModalCopyfileOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}
@@ -89,14 +85,11 @@ const ModalCopyfile = ({
       <div className="inputCopyfile">
         <div className="path">
           <span>Path:</span>
-          <Input
-            placeholder="Enter ..."
-            onChange={(e) => setPathInput(e.target.value)}
-          />
+          <Input placeholder="Enter ..." onChange={e => setPathInput(e.target.value)} />
         </div>
         <div>
           <span>File:</span>
-          <Input type="file" onChange={(e) => setFileInput(e.target.value)} />
+          <Input type="file" onChange={e => setFileInput(e.target.value)} />
         </div>
       </div>
     </Modal>

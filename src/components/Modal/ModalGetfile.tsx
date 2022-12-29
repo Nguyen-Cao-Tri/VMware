@@ -1,25 +1,15 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Input, Modal } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
 import { Action, useLog } from '../../hooks/logProvider/LogProvider';
-interface PropModal {
-  isModalOpen?: boolean;
-  vmId?: string;
-  valueGetFile?: string;
-  handleCancel: () => void;
-  checkedKeys: string[];
-  keyRightClick: string;
-  nameRightClick: string;
-}
+import { SidebarContext } from '../Sidebar/Sidebar';
 
-const ModalGetfile = ({
-  isModalOpen = false,
-  handleCancel,
-  checkedKeys,
-  keyRightClick,
-  nameRightClick,
-}: PropModal) => {
+const ModalGetfile = () => {
+  const Context: any = useContext(SidebarContext);
+  const handleCancel = () => {
+    Context.setIsModalGetfileOpen(false);
+  };
   const [getfileInput, setGetfileInput] = useState<string>('');
   const { request, isLoading } = useRequest();
   const { vmLog } = useLog();
@@ -29,7 +19,7 @@ const ModalGetfile = ({
     await request(
       `/api/vcenter/vm/${idVm}/guest/filesystem?action=create`,
       'POST',
-      { action: Action.GET_FILE, name: nameRightClick },
+      { action: Action.GET_FILE, name: Context.nameRightClick },
       false,
       {
         credentials: {
@@ -51,18 +41,10 @@ const ModalGetfile = ({
         if (vmLog !== undefined) {
           vmLog({
             executeTime: Date.now(),
-            name: nameRightClick,
+            name: Context.nameRightClick,
             action: 'Open file new tab',
           });
         }
-        // if (response) {
-        //   void request(
-        //     response,
-        //     'GET',
-        //     { action: Action.OPEN_FILE_NEWTAB, name: nameRightClick },
-        //     true,
-        //   );
-        // }
         handleCancel();
       })
       .catch((error: any) => {
@@ -71,18 +53,18 @@ const ModalGetfile = ({
       });
   };
   const handleOk = () => {
-    const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
+    const vmCheckKeys = Context.checkedKeys.filter((item: any) => item.includes('vm'));
     if (vmCheckKeys.length > 0) {
       vmCheckKeys.map((item: any) => {
         void handleGetfile(item);
       });
-    } else void handleGetfile(keyRightClick);
+    } else void handleGetfile(Context.keyRightClick);
     setGetfileInput('');
   };
   return (
     <Modal
       title="Getfile"
-      open={isModalOpen}
+      open={Context.isModalGetfileOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}

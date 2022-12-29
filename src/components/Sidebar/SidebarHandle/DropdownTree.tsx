@@ -1,55 +1,35 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { Key, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Dropdown, Tree, TreeProps } from 'antd';
-import { DataNode } from '../Sidebar';
-import type { MenuProps } from 'antd';
-import { DirectoryTreeProps } from 'antd/es/tree';
+import { DataNode, SidebarContext } from '../Sidebar';
 import './sidebar.scss';
-interface PropsDropdown {
-  onLoadData: ({ key }: any) => Promise<void>;
-  treeData: DataNode[];
-  items: any;
-  onRightClick: ({ info }: any) => void;
-  onSelect: (selectedKeysValue: React.Key[], info: any) => void;
-  onExpand?: (expandedKeysValue: React.Key[], info: any) => void;
-  expandedKeys?: React.Key[];
-  onCheck?:
-    | ((
-        checked:
-          | Key[]
-          | {
-              checked: Key[];
-              halfChecked: Key[];
-            },
-        info: any,
-      ) => void)
-    | undefined;
-  loadedKeys?: Key[];
-  checkedKeys?: Key[];
-  onDragEnter?: (info: any) => void;
-  updateTreeDrop: (info: any) => void;
-  theme?: string;
-}
-const DropdownTree = ({
-  onLoadData,
-  treeData,
-  items,
-  onRightClick,
-  onSelect,
-  onExpand,
-  expandedKeys,
-  onCheck,
-  loadedKeys,
-  checkedKeys,
-  onDragEnter,
-  updateTreeDrop,
-  theme,
-}: PropsDropdown) => {
+import { useInfo } from '../../../hooks/infoProvider/InfoProvider';
+import Item from './Item';
+
+const DropdownTree = () => {
+  const { setOnExpand } = useInfo();
+  const Context: any = useContext(SidebarContext);
+
   const [infoDrop, setInfoDrop] = useState<any>({});
+  const onRightClick = (value: any) => {
+    Context.setKeyRightClick(value.node.key);
+    Context.setNameRightClick(value.node.title);
+  };
+  const onExpand = (value: React.Key[], info: any) => {
+    if (setOnExpand != null) setOnExpand(value);
+    Context.setKeyExpanded(value);
+    Context.setInfoExpanded(info);
+  };
+  const onCheck = (value: any) => {
+    Context.setKeyExpanded(value);
+  };
+  const updateTreeDrop = (info: any) => {
+    Context.setTreeData(info);
+  };
+
   const onDrop: TreeProps['onDrop'] = info => {
-    console.log('info drop', info);
     const dropKey = info?.node?.key;
     const dragKey = info?.dragNode?.key;
     const dropPos = info?.node?.pos.split('-');
@@ -69,7 +49,7 @@ const DropdownTree = ({
           }
         }
       };
-      const data = [...treeData];
+      const data = [...Context.treeData];
       // Find dragObject
       let dragObj: DataNode;
       loop(data, dragKey, (item, index, arr) => {
@@ -113,36 +93,28 @@ const DropdownTree = ({
     }
   };
 
+  const onSelect = (value: any, info: any) => Context.handleOnSelect(value, info);
+
   return (
     <>
-      <Dropdown autoFocus overlay={items} trigger={['contextMenu']}>
-        <div
-          className="site-dropdown-context-menu"
-          // style={{
-          //   textAlign: 'center',
-          //   height: '100%',
-          //   lineHeight: '200px',
-          //   width: '100%',
-          // }}
-        >
+      <Dropdown autoFocus overlay={<Item />} trigger={['contextMenu']}>
+        <div className="site-dropdown-context-menu">
           <Tree
-            // className={`${theme}`}
             className="tree"
             checkable
             draggable
             showIcon={true}
-            defaultExpandParent={true}
-            loadData={onLoadData}
-            loadedKeys={loadedKeys}
-            treeData={treeData}
             showLine={true}
             onCheck={onCheck}
-            checkedKeys={checkedKeys}
-            onRightClick={onRightClick}
             onSelect={onSelect}
             onExpand={onExpand}
-            expandedKeys={expandedKeys}
-            onDragEnter={onDragEnter}
+            defaultExpandParent={true}
+            treeData={Context.treeData}
+            loadData={Context.onLoadData}
+            loadedKeys={Context.loadedKeys}
+            checkedKeys={Context.checkedKeys}
+            expandedKeys={Context.keyExpanded}
+            onRightClick={Context.onRightClick}
             onDrop={info => {
               onDrop(info);
               setInfoDrop(info);

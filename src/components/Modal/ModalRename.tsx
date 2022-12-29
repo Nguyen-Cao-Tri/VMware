@@ -1,30 +1,38 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import React, { useEffect, useState } from 'react';
 import { Input, Modal } from 'antd';
-import { DataNode } from '../Sidebar/Sidebar';
-interface PropModal {
-  isModalOpen?: boolean;
-  handleOk: (value: string) => void;
-  handleCancel: () => void;
-  keyRightClick: string;
-  nameRightClick: string;
-}
+import React, { useContext, useEffect, useState } from 'react';
+import { useLog } from '../../hooks/logProvider/LogProvider';
+import { DataNode, SidebarContext } from '../Sidebar/Sidebar';
 
-const ModalRename = ({
-  isModalOpen = false,
-  handleOk,
-  handleCancel,
-  nameRightClick,
-}: PropModal) => {
+const ModalRename = () => {
+  const { vmLog } = useLog();
+  const Context: any = useContext(SidebarContext);
+  const handleCancel = () => {
+    Context.setIsModalRenameOpen(false);
+  };
+  const handleOk = (value: any) => {
+    Context.setNameChange(value);
+    if (vmLog !== undefined) {
+      vmLog({
+        executeTime: Date.now(),
+        name: Context.nameRightClick,
+        action: `Changed name to ${value}`,
+      });
+    }
+    Context.setTreeData([...findRename(Context.treeData, Context.keyRightClick, value)]);
+    Context.setIsModalRenameOpen(false);
+  };
   const [renameInput, setRenameInput] = useState<string>('');
+
   useEffect(() => {
-    setRenameInput(nameRightClick);
-  }, [nameRightClick]);
+    setRenameInput(Context.nameRightClick);
+  }, [Context.nameRightClick]);
 
   return (
     <Modal
       title="Rename"
-      open={isModalOpen}
+      open={Context.isModalRenameOpen}
       onOk={() => {
         handleOk(renameInput);
         setRenameInput('');
@@ -42,11 +50,7 @@ const ModalRename = ({
 };
 export default ModalRename;
 
-export const findRename = (
-  list: DataNode[],
-  keyRightClick: string,
-  value: string,
-) => {
+export const findRename = (list: DataNode[], keyRightClick: string, value: string) => {
   list.forEach((item: any) => {
     if (item.key === keyRightClick) {
       item.title = value;

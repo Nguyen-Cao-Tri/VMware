@@ -1,25 +1,5 @@
 import React, { createContext, PropsWithChildren, useContext, useState } from 'react';
-
-export interface IInfoContext {
-  inforSelect?: any;
-  keyExpand?: any;
-  vmPowerState?: any;
-  vm?: any;
-  children?: object;
-  vmNetwork?: any;
-  vmTools?: any;
-  curentTheme?: string;
-  parentId?: string[];
-  handleTheme?: (value: string) => void;
-  setOnSelect?: (value: any) => void;
-  setOnExpand?: (value: any) => void;
-  setVmPowerStates?: (value: object) => void;
-  setChildrens?: (value: object[]) => void;
-  setVms?: (value: object) => void;
-  setNetwork?: (value: object) => void;
-  setTool?: (value: object) => void;
-  setParentKey?: (value: string[]) => void;
-}
+import { IInfoContext } from './TypeInfo';
 
 export const InforContext = createContext<IInfoContext>({
   inforSelect: {},
@@ -48,8 +28,6 @@ export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
   const [vmPowerState, setVmPowerState] = useState<object[]>([]);
   const [vm, setVm] = useState<object[]>([]);
   const [parentId, setParentId] = useState<string[]>([]);
-  console.log('vmm', vm);
-
   const [children, setChildren] = useState<object[]>([]);
   const [vmNetwork, setVmNetwork] = useState<object[]>([]);
   const [vmTools, setVmTools] = useState<object[]>([]);
@@ -60,7 +38,6 @@ export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
   };
   const setOnSelect = (value: any) => {
     setInforSelect(value);
-    console.log('aaa', value);
   };
   const setOnExpand = (value: any) => {
     setKeyExpand(value);

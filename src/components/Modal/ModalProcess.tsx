@@ -1,30 +1,26 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Input, Modal, notification } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
 import { Action } from '../../hooks/logProvider/LogProvider';
-interface PropsMadal {
-  isModalOpen: boolean;
-  handleCancel: () => void;
-  keyRightClick: string;
-  nameRightClick: string;
-}
-const ModalProcess = ({
-  isModalOpen,
-  handleCancel,
-  keyRightClick,
-  nameRightClick,
-}: PropsMadal) => {
+import { SidebarContext } from '../Sidebar/Sidebar';
+
+const ModalProcess = () => {
+  const Context: any = useContext(SidebarContext);
+  const handleCancel = () => {
+    Context.setIsModalProcessOpen(false);
+  };
   const [pathInput, setPathInput] = useState<string>('');
   const { request, isLoading } = useRequest();
   const handleOk = async () => {
-    const username = localStorage.getItem(`username ${keyRightClick}`);
-    const password = localStorage.getItem(`password ${keyRightClick}`);
+    const username = localStorage.getItem(`username ${Context.keyRightClick}`);
+    const password = localStorage.getItem(`password ${Context.keyRightClick}`);
     await request(
-      `/api/vcenter/vm/${keyRightClick}/guest/processes?action=create`,
+      `/api/vcenter/vm/${Context.keyRightClick}/guest/processes?action=create`,
       'POST',
-      { action: Action.RUN_PROCCESS, name: nameRightClick },
+      { action: Action.RUN_PROCCESS, name: Context.nameRightClick },
       false,
       {
         credentials: {
@@ -53,18 +49,14 @@ const ModalProcess = ({
   return (
     <Modal
       title="Process"
-      open={isModalOpen}
+      open={Context.isModalProcessOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}
     >
       <div className="inputProcess">
         <span>Path:</span>
-        <Input
-          value={pathInput}
-          placeholder="Enter ..."
-          onChange={(e) => setPathInput(e.target.value)}
-        />
+        <Input value={pathInput} placeholder="Enter ..." onChange={e => setPathInput(e.target.value)} />
       </div>
     </Modal>
   );

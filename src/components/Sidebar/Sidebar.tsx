@@ -4,14 +4,13 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
-import { Action, useLog } from '../../hooks/logProvider/LogProvider';
+import React, { createContext, useEffect, useState } from 'react';
 import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
 import { PushRequestData } from './SidebarHandle/PushRequestData';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useInfo } from '../../hooks/infoProvider/InfoProvider';
 import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
-import ModalRename, { findRename } from '../Modal/ModalRename';
+import { Action } from '../../hooks/logProvider/LogProvider';
 import { InitTreeData } from './SidebarHandle/InitTreeData';
 import useRequest from '../../hooks/useRequest/useRequest';
 import DropdownTree from './SidebarHandle/DropdownTree';
@@ -20,56 +19,47 @@ import ModalCopyfile from '../Modal/ModalCopyfile';
 import PowerStart from '../IconCustom/PowerStart';
 import ModalGetfile from '../Modal/ModalGetfile';
 import ModalProcess from '../Modal/ModalProcess';
+import ModalRename from '../Modal/ModalRename';
 import ModalClone from '../Modal/ModalClone';
-import { items } from '../../utils/items';
-import { Menu, Spin } from 'antd';
+import { Spin } from 'antd';
 export interface DataNode {
   title: string;
   key: string;
   children?: DataNode[];
   isLeaf?: boolean;
 }
-const Sidebar = () => {
-  const [treeData, setTreeData] = useState<DataNode[]>([]);
-  const [keyDatacenter, setKeyDatacenter] = useState<string>('');
-  const [isModalRenameOpen, setIsModalRenameOpen] = useState<boolean>(false);
-  const [isModalGetfileOpen, setIsModalGetfileOpen] = useState<boolean>(false);
+export const SidebarContext = createContext({});
+export const Sidebar = () => {
   const [isModalUserLoginOpen, setIsModalUserLoginOpen] = useState<boolean>(false);
   const [isModalCopyfileOpen, setIsModalCopyfileOpen] = useState<boolean>(false);
+  const [isModalGetfileOpen, setIsModalGetfileOpen] = useState<boolean>(false);
   const [isModalProcessOpen, setIsModalProcessOpen] = useState<boolean>(false);
+  const [isModalRenameOpen, setIsModalRenameOpen] = useState<boolean>(false);
   const [isModalCloneOpen, setIsModalCloneOpen] = useState<boolean>(false);
-  const [keyRightClick, setKeyRightClick] = useState<string>('');
   const [nameRightClick, setNameRightClick] = useState<string>('');
+  const [keyExpanded, setKeyExpanded] = useState<React.Key[]>([]);
+  const [keyDatacenter, setKeyDatacenter] = useState<string>('');
+  const [keyRightClick, setKeyRightClick] = useState<string>('');
+  const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
+  const [renameInput, setRenameInput] = useState<string>('');
+  const [infoExpanded, setInfoExpanded] = useState<any>('');
   const [inforSelected, setInforSelected] = useState<any>();
   const [keySelect, setKeySelect] = useState<React.Key[]>();
-  const [renameInput, setRenameInput] = useState<string>('');
-  const [keyExpanded, setKeyExpanded] = useState<React.Key[]>([]);
-  const [vmKey, setVmKey] = useState<object[]>([]);
-  const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
-  const [checkedKeys, setCheckedKeys] = useState<any>([]);
-  const { request, isLoading } = useRequest();
   const [datacenter, setDatacenter] = useState<object[]>();
+  const [treeData, setTreeData] = useState<DataNode[]>([]);
+  const [nameChange, setNameChange] = useState<string>('');
+  const [checkedKeys, setCheckedKeys] = useState<any>([]);
+  const [vmKey, setVmKey] = useState<object[]>([]);
   const [folder, setFolder] = useState<object[]>();
   const [vmApi, setVmApi] = useState<object[]>();
-  const { vmLog } = useLog();
-  const [nameChange, setNameChange] = useState<string>('');
-  const navigate = useNavigate();
-  const antIcon = <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />;
-  const [infoExpanded, setInfoExpanded] = useState<any>('');
+  const { request, isLoading } = useRequest();
   const [searchParams] = useSearchParams();
-  const {
-    inforSelect,
-    vm,
-    curentTheme,
-    setOnSelect,
-    setOnExpand,
-    setVmPowerStates,
-    setChildrens,
-    setVms,
-    setNetwork,
-    setParentKey,
-    setTool,
-  } = useInfo();
+  const navigate = useNavigate();
+
+  const antIcon = <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />;
+
+  const { inforSelect, vm, setOnSelect, setVmPowerStates, setChildrens, setVms, setNetwork, setParentKey, setTool } =
+    useInfo();
   useEffect(() => {
     const keySelectParam: any = searchParams.get('selected')?.split(',');
     const keyExpandParam: any = searchParams.get('expanded')?.split(',');
@@ -148,52 +138,6 @@ const Sidebar = () => {
     if (vmCheckKeys?.length > 0) {
       vmCheckKeys.map(async (item: any) => await callApiPowerState(item, action));
     } else await callApiPowerState(idVm, action);
-  };
-  const item = () => {
-    return (
-      <Menu
-        items={items(vmKey, keyRightClick, nameRightClick)}
-        // theme={curentTheme}
-        onClick={key => {
-          switch (key.key) {
-            case 'action':
-              break;
-            case 'rename':
-              setIsModalRenameOpen(true);
-              setRenameInput(keyRightClick);
-              break;
-            case 'refresh':
-              request('/api/vcenter/datacenter', 'GET', {
-                action: Action.REFRESH,
-              }).then((res: DataNode[]) => {
-                setTreeData(InitTreeData(res));
-              });
-              setKeyExpanded([]);
-              setLoadedKeys([]);
-              setCheckedKeys([]);
-              break;
-            case 'login':
-              setIsModalUserLoginOpen(true);
-              break;
-            case 'clone':
-              setIsModalCloneOpen(true);
-              break;
-            case 'getfile':
-              setIsModalGetfileOpen(true);
-              break;
-            case 'copyfile':
-              setIsModalCopyfileOpen(true);
-              break;
-            case 'process':
-              setIsModalProcessOpen(true);
-              break;
-            case key.key:
-              void handlePowerState(keyRightClick, key.key);
-              break;
-          }
-        }}
-      />
-    );
   };
 
   const navigateSelect = (param: string, value: string) => {
@@ -278,103 +222,50 @@ const Sidebar = () => {
     }
     setLoadedKeys(loadedKeys.concat([key]));
   };
-  const handleOkClone = (cloneInput: string) => {
-    setIsModalCloneOpen(false);
-    const vmName: any = vmApi?.filter((item: any) => item.vmKey === keyRightClick);
-    console.log('vmName', vmName);
-    request(
-      '/api/vcenter/vm?action=clone',
-      'POST',
-      {
-        action: Action.CLONE_VM,
-        name: vmName[0].name,
-      },
-      false,
-      {
-        name: cloneInput,
-        source: keyRightClick,
-      },
-    );
-  };
 
+  const value = {
+    vmKey,
+    treeData,
+    loadedKeys,
+    keyExpanded,
+    checkedKeys,
+    keyRightClick,
+    nameRightClick,
+    isModalCloneOpen,
+    isModalRenameOpen,
+    isModalGetfileOpen,
+    isModalProcessOpen,
+    isModalCopyfileOpen,
+    isModalUserLoginOpen,
+    onLoadData,
+    setTreeData,
+    setLoadedKeys,
+    setRenameInput,
+    handleOnSelect,
+    setCheckedKeys,
+    setKeyExpanded,
+    setInfoExpanded,
+    setKeyRightClick,
+    handlePowerState,
+    setNameRightClick,
+    setIsModalCloneOpen,
+    setIsModalRenameOpen,
+    setIsModalProcessOpen,
+    setIsModalGetfileOpen,
+    setIsModalCopyfileOpen,
+    setIsModalUserLoginOpen,
+  };
   return (
-    <div className="drop_tree">
-      <DropdownTree
-        theme={curentTheme}
-        onLoadData={onLoadData}
-        treeData={treeData}
-        items={item}
-        onRightClick={value => {
-          setKeyRightClick(value.node.key);
-          setNameRightClick(value.node.title);
-        }}
-        onSelect={(value, info) => handleOnSelect(value, info)}
-        onExpand={(value, info) => {
-          if (setOnExpand) setOnExpand(value);
-          setKeyExpanded(value);
-          setInfoExpanded(info);
-        }}
-        checkedKeys={checkedKeys}
-        expandedKeys={keyExpanded}
-        onCheck={(value, info) => {
-          setCheckedKeys(value);
-        }}
-        loadedKeys={loadedKeys}
-        updateTreeDrop={(info: any) => setTreeData(info)}
-      ></DropdownTree>
-      <ModalRename
-        isModalOpen={isModalRenameOpen}
-        handleOk={value => {
-          setNameChange(value);
-          if (vmLog !== undefined) {
-            vmLog({
-              executeTime: Date.now(),
-              name: nameRightClick,
-              action: `Changed name to ${value}`,
-            });
-          }
-          setTreeData([...findRename(treeData, keyRightClick, value)]);
-          setIsModalRenameOpen(false);
-        }}
-        handleCancel={() => setIsModalRenameOpen(false)}
-        keyRightClick={keyRightClick}
-        nameRightClick={nameRightClick}
-      />
-      <ModalGetfile
-        nameRightClick={nameRightClick}
-        isModalOpen={isModalGetfileOpen}
-        handleCancel={() => setIsModalGetfileOpen(false)}
-        keyRightClick={keyRightClick}
-        checkedKeys={checkedKeys}
-      />
-      <ModalUserLogin
-        nameRightClick={nameRightClick}
-        isModalOpen={isModalUserLoginOpen}
-        keyRightClick={keyRightClick}
-        checkedKeys={checkedKeys}
-        handleCancel={() => setIsModalUserLoginOpen(false)}
-      />
-      <ModalCopyfile
-        nameRightClick={nameRightClick}
-        isModalopen={isModalCopyfileOpen}
-        handleCancel={() => setIsModalCopyfileOpen(false)}
-        keyRightClick={keyRightClick}
-      />
-      <ModalProcess
-        nameRightClick={nameRightClick}
-        isModalOpen={isModalProcessOpen}
-        handleCancel={() => setIsModalProcessOpen(false)}
-        keyRightClick={keyRightClick}
-      />
-      <ModalClone
-        isModalOpen={isModalCloneOpen}
-        handleCancel={() => setIsModalCloneOpen(false)}
-        listVm={vmKey}
-        keyRightClick={keyRightClick}
-        handleOk={value => handleOkClone(value)}
-      />
-    </div>
+    <SidebarContext.Provider value={value}>
+      <div className="drop_tree">
+        <DropdownTree />
+        <ModalRename />
+        <ModalGetfile />
+        <ModalUserLogin />
+        <ModalCopyfile />
+        <ModalProcess />
+        <ModalClone />
+      </div>
+    </SidebarContext.Provider>
   );
 };
-
-export default Sidebar;
