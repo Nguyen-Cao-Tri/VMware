@@ -21,7 +21,7 @@ import ModalGetfile from '../Modal/ModalGetfile';
 import ModalProcess from '../Modal/ModalProcess';
 import ModalRename from '../Modal/ModalRename';
 import ModalClone from '../Modal/ModalClone';
-import { Spin } from 'antd';
+import { Spin, Input } from 'antd';
 export interface DataNode {
   title: string;
   key: string;
@@ -222,7 +222,8 @@ export const Sidebar = () => {
     }
     setLoadedKeys(loadedKeys.concat([key]));
   };
-
+  const { Search } = Input;
+  const onSearch = (value: string) => console.log(value);
   const value = {
     vmKey,
     treeData,
@@ -257,15 +258,20 @@ export const Sidebar = () => {
   };
   return (
     <SidebarContext.Provider value={value}>
-      <div className="drop_tree">
-        <DropdownTree />
-        <ModalRename />
-        <ModalGetfile />
-        <ModalUserLogin />
-        <ModalCopyfile />
-        <ModalProcess />
-        <ModalClone />
-      </div>
+      <>
+        <div className="search">
+          <Search placeholder="Search" onSearch={onSearch} bordered={false} />
+        </div>
+        <div className="drop_tree">
+          <DropdownTree />
+          <ModalRename />
+          <ModalGetfile />
+          <ModalUserLogin />
+          <ModalCopyfile />
+          <ModalProcess />
+          <ModalClone />
+        </div>
+      </>
     </SidebarContext.Provider>
   );
 };

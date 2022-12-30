@@ -1,0 +1,142 @@
+.container_loading{
+   padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100vh;
+  background: radial-gradient(#a6e3f5, #4fb1db, #2997ce);
+}
+.wrap {
+  width: 600px;
+  height: 60px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  .item_loading {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: icon 5s 1s linear forwards;
+    .circle {
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      border-radius: 50%;
+      background-color: #fff;
+      left: -10%;
+      transform-origin: 50%;
+      animation: circle_item 0.5s alternate infinite ease;
+    }
+
+    @keyframes circle_item {
+      0% {
+        top: 60px;
+        height: 5px;
+        border-radius: 50px 50px 25px 25px;
+        transform: scaleX(1.7);
+      }
+      40% {
+        height: 20px;
+        border-radius: 50%;
+        transform: scaleX(1);
+      }
+      100% {
+        top: 0%;
+      }
+    }
+    .circle:nth-child(2) {
+      left: 0%;
+      animation-delay: 0.2s;
+    }
+    .circle:nth-child(3) {
+      left: 10%;
+      //   right: 15%;
+      animation-delay: 0.3s;
+    }
+    .shadow {
+      width: 20px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.5);
+      position: absolute;
+      top: 62px;
+      transform-origin: 50%;
+      z-index: -1;
+        left: -10%;
+      filter: blur(1px);
+      animation: shadow 0.5s alternate infinite ease;
+    }
+
+    @keyframes shadow {
+      0% {
+        transform: scaleX(1.5);
+      }
+      40% {
+        transform: scaleX(1);
+        opacity: 0.7;
+      }
+      100% {
+        transform: scaleX(0.2);
+        opacity: 0.4;
+      }
+    }
+    .shadow:nth-child(4) {
+      left: 0%;
+      animation-delay: 0.2s;
+    }
+    .shadow:nth-child(5) {
+      left: 10%;
+      animation-delay: 0.3s;
+    }
+  }
+  .text_loading {
+    position: absolute;
+    top: 75px;
+    font-family: 'Lato';
+    font-size: 20px;
+    letter-spacing: 12px;
+    color: #fff;
+    margin-left: -10%;
+    opacity: 0;
+    animation: loading 5s 1s linear forwards;
+  }
+  @keyframes loading {
+    0% {
+      left: 0;
+      opacity: 0;
+    }
+    25% {
+      left: 25%;
+      opacity: 1;
+    }
+    50% {
+      left: 45%;
+      opacity: 1;
+    }
+
+    100% {
+      left: 50%;
+      opacity: 1;
+    }
+  }
+}
+@keyframes icon {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  25% {
+    left: 25%;
+    opacity: 1;
+  }
+  50% {
+    left: 45%;
+    opacity: 1;
+  }
+
+  100% {
+    left: 50%;
+    opacity: 1;
+  }
+}

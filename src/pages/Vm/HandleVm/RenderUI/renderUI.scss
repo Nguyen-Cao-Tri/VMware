@@ -15,6 +15,8 @@
       align-items: center;
       justify-content: center;
       margin-top: 10px;
+      border: 1px solid #2997ce;
+
     }
   }
     .infoVm {
@@ -29,15 +31,14 @@
     }
   }
   .light {
-    .border {
-      border: 1px solid #333;
-    }
+    // .border {
+    // }
     color: #666666;
     font-weight: 400;
   }
   .dark{
     color: rgba(255, 255, 255, 0.85);
-  .border {
-    border: 1px solid #fafafa;
-  }
+  // .border {
+  //   border: 1px solid #4aaddf;
+  // }
 }

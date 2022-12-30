@@ -1,10 +1,13 @@
 .nav {
   display: flex;
   align-items: center;
+  // justify-content:space-between;
   height: 50px;
   width: 100%;
   padding: 20px;
-  
+  // align-self: self-start;
+  // position: relative;
+
   .title {
     span {
       font-size: 20px;
@@ -55,6 +58,7 @@
       }
     }
   }
+  
 }
 
 .dark {
@@ -62,10 +66,8 @@
     background-color: #374248;
   }
 }
-.light{
-  
-    .nav {
-      background-color: #fff;
-    }
-  
+.light {
+  .nav {
+    background-color: #f4f4f4;
+  }
 }

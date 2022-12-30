@@ -14,8 +14,10 @@ const Content = () => {
           </div>
         )}
         <Outlet />
-        <div className="circle">
-          <span>VM</span>
+        <div className="animation">
+          <div className="circle">
+            <span>VM</span>
+          </div>
         </div>
       </div>
     </div>
