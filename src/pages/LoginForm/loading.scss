@@ -3,7 +3,8 @@
   margin: 0;
   width: 100%;
   height: 100vh;
-  background: radial-gradient(#a6e3f5, #4fb1db, #2997ce);
+  // background: linear-gradient(to top left #a6e3f5 0%, #4fb1db 100%);
+  background: linear-gradient(to top left, #a6e3f5 0%, #ffff 100%);
 }
 .wrap {
   width: 600px;
@@ -23,7 +24,7 @@
       height: 20px;
       position: absolute;
       border-radius: 50%;
-      background-color: #fff;
+      background-color: #2997ce;
       left: -10%;
       transform-origin: 50%;
       animation: circle_item 0.5s alternate infinite ease;
@@ -58,7 +59,7 @@
       width: 20px;
       height: 4px;
       border-radius: 50%;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: #a6e3f5;
       position: absolute;
       top: 62px;
       transform-origin: 50%;
@@ -94,9 +95,9 @@
     position: absolute;
     top: 75px;
     font-family: 'Lato';
-    font-size: 20px;
+    font-size: 25px;
     letter-spacing: 12px;
-    color: #fff;
+    color: #2997ce;
     margin-left: -10%;
     opacity: 0;
     animation: loading 5s 1s linear forwards;
@@ -128,11 +129,11 @@
   }
   25% {
     left: 25%;
-    opacity: 1;
+    opacity: 0;
   }
   50% {
     left: 45%;
-    opacity: 1;
+    opacity: 0;
   }
 
   100% {

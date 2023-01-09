@@ -1,18 +1,13 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Button, Switch } from 'antd';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useInfo } from 'hooks/infoProvider/InfoProvider';
 import { LoginOutlined } from '@ant-design/icons';
-import './header.scss';
+import logo from 'assets/images/logo_white.png';
 import { useNavigate } from 'react-router-dom';
-import { useInfo } from '../../hooks/infoProvider/InfoProvider';
-// import { InformationContext } from '../../layouts/DefaultLayout/DefaultLayout';
-// interface PropsHeader {
-//   theme: (item: string) => void;
-// }
+import { Button, Switch } from 'antd';
+import './header.scss';
+
 const Header = () => {
-  // const inforContext: any = useContext(InformationContext);
   const { handleTheme } = useInfo();
 
   const navigate = useNavigate();
@@ -36,7 +31,10 @@ const Header = () => {
   return (
     <div className="container">
       <div className="header">
-        <div className="header_left">VMware Manager</div>
+        <div className="header_left">
+          <img src={logo} alt="" />
+          VMware Manager
+        </div>
         <div className="header_right">
           <Switch checked={theme === 'dark'} onChange={changeTheme} checkedChildren="Dark" unCheckedChildren="Light" />
           <Button style={{ borderRadius: 15, display: 'flex', marginLeft: 10 }} onClick={handleOnClick}>

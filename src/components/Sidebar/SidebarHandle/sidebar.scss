@@ -22,7 +22,7 @@
   }}
   .search {
     margin-left: auto;
-    background-color: #f6f6f6;
+    // background-color: #f6f6f6;
     padding-top: 10px;
     button {
       border: none;
@@ -34,45 +34,15 @@
   }
 }
 
-// .light{
+.light{
+  .search{
+    background-color: #f6f6f6;
+  }
 
-//    .ant-tree-node-selected {
-//       background-color: #71A73B;
-//       color: #fff;
-//       .loading{
-//         color: #fff;
-//       }
-//     }
 
-// }
-// .dark{
-
-//     .ant-tree-list {
-//       background-color: red;
-//       color: white;
-//        .ant-tree-node-content-wrapper:hover{
-//         // background-color: #52556c;
-//       }
-
-//     }
-//     .ant-tree-switcher {
-//       background: #343746 !important;
-//     }
-//     .ant-tree-checkbox-inner {
-//       background-color: #52556c;
-//       border: 1px solid #343746;
-//     }
-
-//   #dropTree{
-//       .loading{
-//         color: #fff;
-//       }
-//     .ant-tree-node-selected {
-//       background-color: #fff;
-//       color: black;
-//       .loading{
-//         color: black;
-//       }
-//     }
-//   }
-// }
+}
+.dark{
+    .search{
+      background-color: #374248;
+    }
+}

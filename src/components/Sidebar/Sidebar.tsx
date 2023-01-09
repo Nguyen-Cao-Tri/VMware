@@ -5,22 +5,22 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { createContext, useEffect, useState } from 'react';
+import { PushRequestData } from 'components/Sidebar/SidebarHandle/PushRequestData';
+import { UpdateTreeData } from 'components/Sidebar/SidebarHandle/UpdateTreeData';
+import { InitTreeData } from 'components/Sidebar/SidebarHandle/InitTreeData';
+import DropdownTree from 'components/Sidebar/SidebarHandle/DropdownTree';
 import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
-import { PushRequestData } from './SidebarHandle/PushRequestData';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useInfo } from '../../hooks/infoProvider/InfoProvider';
-import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
-import { Action } from '../../hooks/logProvider/LogProvider';
-import { InitTreeData } from './SidebarHandle/InitTreeData';
-import useRequest from '../../hooks/useRequest/useRequest';
-import DropdownTree from './SidebarHandle/DropdownTree';
-import ModalUserLogin from '../Modal/ModalUserLogin';
-import ModalCopyfile from '../Modal/ModalCopyfile';
-import PowerStart from '../IconCustom/PowerStart';
-import ModalGetfile from '../Modal/ModalGetfile';
-import ModalProcess from '../Modal/ModalProcess';
-import ModalRename from '../Modal/ModalRename';
-import ModalClone from '../Modal/ModalClone';
+import ModalUserLogin from 'components/Modal/ModalUserLogin';
+import ModalCopyfile from 'components/Modal/ModalCopyfile';
+import PowerStart from 'components/IconCustom/PowerStart';
+import { useInfo } from 'hooks/infoProvider/InfoProvider';
+import ModalGetfile from 'components/Modal/ModalGetfile';
+import ModalProcess from 'components/Modal/ModalProcess';
+import ModalRename from 'components/Modal/ModalRename';
+import { Action } from 'hooks/logProvider/LogProvider';
+import ModalClone from 'components/Modal/ModalClone';
+import useRequest from 'hooks/useRequest/useRequest';
 import { Spin, Input } from 'antd';
 export interface DataNode {
   title: string;
@@ -30,12 +30,15 @@ export interface DataNode {
 }
 export const SidebarContext = createContext({});
 export const Sidebar = () => {
-  const [isModalUserLoginOpen, setIsModalUserLoginOpen] = useState<boolean>(false);
-  const [isModalCopyfileOpen, setIsModalCopyfileOpen] = useState<boolean>(false);
-  const [isModalGetfileOpen, setIsModalGetfileOpen] = useState<boolean>(false);
-  const [isModalProcessOpen, setIsModalProcessOpen] = useState<boolean>(false);
-  const [isModalRenameOpen, setIsModalRenameOpen] = useState<boolean>(false);
-  const [isModalCloneOpen, setIsModalCloneOpen] = useState<boolean>(false);
+  const [isModal, setIsModal] = useState({
+    UserLoginOpen: false,
+    CopyfileOpen: false,
+    GetfileOpen: false,
+    ProcessOpen: false,
+    RenameOpen: false,
+    CloneOpen: false,
+  });
+  const [alternativeTreeData, setAlternativeTreeData] = useState<DataNode[]>([]);
   const [nameRightClick, setNameRightClick] = useState<string>('');
   const [keyExpanded, setKeyExpanded] = useState<React.Key[]>([]);
   const [keyDatacenter, setKeyDatacenter] = useState<string>('');
@@ -58,8 +61,18 @@ export const Sidebar = () => {
 
   const antIcon = <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />;
 
-  const { inforSelect, vm, setOnSelect, setVmPowerStates, setChildrens, setVms, setNetwork, setParentKey, setTool } =
-    useInfo();
+  const {
+    inforSelect,
+    vm,
+    curentTheme,
+    setOnSelect,
+    setVmPowerStates,
+    setChildrens,
+    setVms,
+    setNetwork,
+    setParentKey,
+    setTool,
+  } = useInfo();
   useEffect(() => {
     const keySelectParam: any = searchParams.get('selected')?.split(',');
     const keyExpandParam: any = searchParams.get('expanded')?.split(',');
@@ -184,7 +197,10 @@ export const Sidebar = () => {
         name: nameChange || datacenterName[0].name,
       }).then(res => {
         setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
-        if (key === keySelect) if (setChildrens) setChildrens(res);
+        setAlternativeTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
+        if (key === keySelect) {
+          if (setChildrens) setChildrens(res);
+        }
       });
     }
     if (key.includes('group')) {
@@ -195,35 +211,48 @@ export const Sidebar = () => {
         action: Action.GET_LIST_FOLDER,
         name: nameChange || folderName[0].name,
       }).then((res: any) => {
-        if (key === keySelect) {
-          if (setOnSelect)
+        if (keySelect !== undefined && key === keySelect[0].toString())
+          if (setOnSelect) {
             setOnSelect({
-              title: inforSelect.node.title,
+              title: inforSelect.title,
               key,
               children: res,
             });
-        }
+          }
         setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
+        setAlternativeTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
       });
       await request(`/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`, 'GET').then((res: any) => {
         if (res.length > 0) {
-          if (key === keySelect) {
-            if (setOnSelect)
+          if (keySelect !== undefined && key === keySelect[0].toString()) {
+            if (setOnSelect) {
               setOnSelect({
-                title: inforSelect.node.title,
+                title: inforSelect.title,
                 key,
                 children: res,
               });
+            }
           }
           setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, 'vm')));
+          setAlternativeTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, 'vm')));
           setVmKey(vmKey.concat(res));
         }
       });
     }
     setLoadedKeys(loadedKeys.concat([key]));
   };
-  const { Search } = Input;
-  const onSearch = (value: string) => console.log(value);
+  const searchTree = (list: DataNode[], value: string) => {
+    list.map((itemList: any) => {
+      if (itemList.title.toLocaleLowerCase().includes(value)) return setTreeData([itemList]);
+      else if (itemList.children) searchTree(itemList.children, value);
+    });
+  };
+  const handleOnChange = (value: string) => {
+    console.log('alternativeTreeData', alternativeTreeData);
+    const inputValue = value.toLocaleLowerCase();
+    searchTree(alternativeTreeData, inputValue);
+  };
+
   const value = {
     vmKey,
     treeData,
@@ -232,12 +261,7 @@ export const Sidebar = () => {
     checkedKeys,
     keyRightClick,
     nameRightClick,
-    isModalCloneOpen,
-    isModalRenameOpen,
-    isModalGetfileOpen,
-    isModalProcessOpen,
-    isModalCopyfileOpen,
-    isModalUserLoginOpen,
+    isModal,
     onLoadData,
     setTreeData,
     setLoadedKeys,
@@ -249,18 +273,13 @@ export const Sidebar = () => {
     setKeyRightClick,
     handlePowerState,
     setNameRightClick,
-    setIsModalCloneOpen,
-    setIsModalRenameOpen,
-    setIsModalProcessOpen,
-    setIsModalGetfileOpen,
-    setIsModalCopyfileOpen,
-    setIsModalUserLoginOpen,
+    setIsModal,
   };
   return (
     <SidebarContext.Provider value={value}>
-      <>
+      <div className={curentTheme}>
         <div className="search">
-          <Search placeholder="Search" onSearch={onSearch} bordered={false} />
+          <Input.Search placeholder="Search" bordered={false} onChange={e => handleOnChange(e.target.value)} />
         </div>
         <div className="drop_tree">
           <DropdownTree />
@@ -271,7 +290,7 @@ export const Sidebar = () => {
           <ModalProcess />
           <ModalClone />
         </div>
-      </>
+      </div>
     </SidebarContext.Provider>
   );
 };

@@ -11,7 +11,7 @@ import { SidebarContext } from '../Sidebar/Sidebar';
 const ModalCopyfile = () => {
   const Context: any = useContext(SidebarContext);
   const handleCancel = () => {
-    Context.setIsModalProcessOpen(false);
+    Context.setIsModal({ ProcessOpen: false });
   };
   const [pathInput, setPathInput] = useState<string>('');
   const [fileInput, setFileInput] = useState<string>('');
@@ -77,7 +77,7 @@ const ModalCopyfile = () => {
   return (
     <Modal
       title="CopyFile"
-      open={Context.isModalCopyfileOpen}
+      open={Context.isModal.CopyfileOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}

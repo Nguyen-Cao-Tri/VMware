@@ -60,7 +60,7 @@ const TableContent: React.FC = () => {
         <div className="item_table">
           <Collapse collapsible="header" defaultActiveKey={['2']}>
             <Panel header="Compute Policies" key="2">
-              <a href="#">View all policies</a>
+              <a href="*">View all policies</a>
             </Panel>
           </Collapse>
         </div>

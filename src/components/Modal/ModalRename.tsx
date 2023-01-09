@@ -9,7 +9,7 @@ const ModalRename = () => {
   const { vmLog } = useLog();
   const Context: any = useContext(SidebarContext);
   const handleCancel = () => {
-    Context.setIsModalRenameOpen(false);
+    Context.setIsModal({ RenameOpen: false });
   };
   const handleOk = (value: any) => {
     Context.setNameChange(value);
@@ -21,7 +21,7 @@ const ModalRename = () => {
       });
     }
     Context.setTreeData([...findRename(Context.treeData, Context.keyRightClick, value)]);
-    Context.setIsModalRenameOpen(false);
+    Context.setIsModal({ RenameOpen: false });
   };
   const [renameInput, setRenameInput] = useState<string>('');
 
@@ -32,7 +32,7 @@ const ModalRename = () => {
   return (
     <Modal
       title="Rename"
-      open={Context.isModalRenameOpen}
+      open={Context.isModal.RenameOpen}
       onOk={() => {
         handleOk(renameInput);
         setRenameInput('');

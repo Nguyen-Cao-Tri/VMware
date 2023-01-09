@@ -7,7 +7,7 @@ import { SidebarContext } from '../Sidebar/Sidebar';
 const ModalUserLogin = () => {
   const Context: any = useContext(SidebarContext);
   const handleCancel = () => {
-    Context.setIsModalUserLoginOpen(false);
+    Context.setIsModal({ UserLoginOpen: false });
   };
 
   const [userName, setUserName] = useState<string>('');
@@ -45,7 +45,7 @@ const ModalUserLogin = () => {
   return (
     <Modal
       title="User login"
-      open={Context.isModalUserLoginOpen}
+      open={Context.isModal.UserLoginOpen}
       onOk={() => handleOk(userName, password)}
       onCancel={handleCancel}
     >

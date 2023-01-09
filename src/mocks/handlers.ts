@@ -7,14 +7,15 @@ const delay = async (time: number) => {
 };
 
 export const handlers = [
-  rest.post('/login', async (req, res, ctx) => {
-    await delay(3000);
-
+  rest.post('/api/session', async (req, res, ctx) => {
     const validAccounts = {
       username: 'admin',
       password: 'admin',
     };
-    const { username, password } = await req.json();
+    const body = await req.json();
+    const { username, password } = body.body;
+    console.log('password', password);
+
     if (username !== validAccounts.username && password !== validAccounts.password) {
       return await res(ctx.status(401), ctx.json({ message: 'Invalid username or password' }));
     }

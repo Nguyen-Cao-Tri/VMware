@@ -98,7 +98,7 @@ const DropdownTree = () => {
 
   return (
     <>
-      <Dropdown autoFocus overlay={<Item />} trigger={['contextMenu']}>
+      <Dropdown overlay={<Item />} trigger={['contextMenu']}>
         <div className="site-dropdown-context-menu">
           <Tree
             className="tree"

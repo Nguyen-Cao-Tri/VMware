@@ -10,7 +10,7 @@ import { SidebarContext } from '../Sidebar/Sidebar';
 const ModalProcess = () => {
   const Context: any = useContext(SidebarContext);
   const handleCancel = () => {
-    Context.setIsModalProcessOpen(false);
+    Context.setIsModal({ ProcessOpen: false });
   };
   const [pathInput, setPathInput] = useState<string>('');
   const { request, isLoading } = useRequest();
@@ -49,7 +49,7 @@ const ModalProcess = () => {
   return (
     <Modal
       title="Process"
-      open={Context.isModalProcessOpen}
+      open={Context.isModal.ProcessOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}

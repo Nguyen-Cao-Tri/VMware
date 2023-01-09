@@ -16,7 +16,6 @@ const FooterAnt = Layout.Footer;
 
 export default function DefaultLayout() {
   const { curentTheme } = useInfo();
-
   const [sidebarSize, setSidebarSize] = useState('200');
   const [logSize, setLogSize] = useState('200');
 
