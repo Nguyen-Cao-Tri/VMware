@@ -9,10 +9,10 @@ const ModalClone = () => {
   const { request } = useRequest();
   const Context: any = useContext(SidebarContext);
   const handleCancel = () => {
-    Context.setIsModalCloneOpen(false);
+    Context.setIsModal({ CloneOpen: false });
   };
   const handleOkClone = (cloneInput: string) => {
-    Context.setIsModalCloneOpen(false);
+    Context.setIsModal({ CloneOpen: false });
     const vmName: any = Context.vmApi?.filter((item: any) => item.vmKey === Context.keyRightClick);
     console.log('vmName', vmName);
     void request(

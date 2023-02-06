@@ -10,7 +10,7 @@ import { vcenterAPI } from 'api/vcenterAPI';
 const ModalGetfile = () => {
   const Context: any = useContext(SidebarContext);
   const handleCancel = () => {
-    Context.setIsModalGetfileOpen(false);
+    Context.setIsModal({ GetfileOpen: false });
   };
   const [getfileInput, setGetfileInput] = useState<string>('');
   const { request, isLoading } = useRequest();
@@ -45,7 +45,7 @@ const ModalGetfile = () => {
   return (
     <Modal
       title="Getfile"
-      open={Context.isModalGetfileOpen}
+      open={Context.isModal.GetfileOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}

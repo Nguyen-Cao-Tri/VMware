@@ -57,7 +57,10 @@ const Header = () => {
   return (
     <div className="container">
       <div className="header">
-        <div className="header_left">VMware Manager</div>
+        <div className="header_left">
+          <img src={logo} alt="" />
+          VMware Manager
+        </div>
         <div className="header_right">
           <Dropdown.Button menu={menuProps} placement="bottom" icon={<UserOutlined />}>
             <Tooltip title="Click on left button">

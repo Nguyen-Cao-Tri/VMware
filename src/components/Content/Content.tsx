@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { useInfo } from '../../hooks/infoProvider/InfoProvider';
-
 const Content = () => {
   const { curentTheme, inforSelect } = useInfo();
   return (
@@ -13,6 +12,11 @@ const Content = () => {
           </div>
         )}
         <Outlet />
+        <div className="animation">
+          <div className="circle">
+            <span>VM</span>
+          </div>
+        </div>
       </div>
     </div>
   );

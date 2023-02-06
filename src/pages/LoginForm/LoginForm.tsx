@@ -1,18 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import { Button, ConfigProvider, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import React, { useEffect } from 'react';
-
+import useRequestLogin from 'hooks/useRequest/useRequestLogin';
+import { Button, ConfigProvider, Form, Input } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './login.scss';
 import { encode } from 'base-64';
-import useRequestLogin from '../../hooks/useRequest/useRequestLogin';
 import { toast } from 'react-toastify';
+import Logo from 'assets/images/logo.svg';
+// const [loadings, setLoadings] = useState<boolean[]>([]);
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const { requestLogin } = useRequestLogin();
+  // rtf6
 
   const onFinish = (values: Record<string, string>) => {
     const { username, password } = values;
@@ -22,14 +24,22 @@ const LoginForm: React.FC = () => {
     requestLogin(
       '/api/session',
       'POST',
-      {},
+      { body: { username, password } },
       {
         Authorization: `Basic ${base64Credential}`,
       },
     )
       .then((data: any) => {
+<<<<<<< HEAD
         console.log('res', data);
         localStorage.setItem('sessionId', data);
+=======
+        // console.log('res', data);
+        console.log('data', data);
+
+        const sessionId = data;
+        localStorage.setItem('sessionId', sessionId);
+>>>>>>> 25b04a83b316a7da17a90899433bbe4ad564ac4d
         toast.success('🦄 Logged in successfully!');
         navigate('/');
       })
@@ -60,6 +70,9 @@ const LoginForm: React.FC = () => {
     >
       <div className="login">
         <div className="item_login">
+          <div className="logo_login">
+            <img src={Logo} alt="logo" />
+          </div>
           <Form
             name="basic"
             initialValues={{ remember: true }}
@@ -83,7 +96,13 @@ const LoginForm: React.FC = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" htmlType="submit" className="login-form-button">
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="login-form-button"
+                // loading={loadings[1]}
+                // onClick={() => enterLoading(1)}
+              >
                 Log in
               </Button>
             </Form.Item>

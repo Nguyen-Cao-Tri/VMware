@@ -91,7 +91,7 @@ const ModalProcess = () => {
   return (
     <Modal
       title="Process"
-      open={Context.isModalProcessOpen}
+      open={Context.isModal.ProcessOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}

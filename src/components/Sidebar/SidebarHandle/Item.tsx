@@ -37,19 +37,19 @@ const Item = () => {
             Context.setCheckedKeys((prev: string[]) => [...prev]);
             break;
           case 'login':
-            Context.setIsModalUserLoginOpen(true);
+            Context.setIsModal({ UserLoginOpen: true });
             break;
           case 'clone':
-            Context.setIsModalCloneOpen(true);
+            Context.setIsModal({ CloneOpen: true });
             break;
           case 'getfile':
-            Context.setIsModalGetfileOpen(true);
+            Context.setIsModal({ GetfileOpen: true });
             break;
           case 'copyfile':
-            Context.setIsModalCopyfileOpen(true);
+            Context.setIsModal({ CopyfileOpen: true });
             break;
           case 'process':
-            Context.setIsModalProcessOpen(true);
+            Context.setIsModal({ ProcessOpen: true });
             break;
           case key.key:
             void Context.handlePowerState(Context.keyRightClick, key.key);

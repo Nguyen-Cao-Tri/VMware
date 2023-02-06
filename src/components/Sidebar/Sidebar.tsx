@@ -5,15 +5,13 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { createContext, useEffect, useState } from 'react';
+import { PushRequestData } from 'components/Sidebar/SidebarHandle/PushRequestData';
+import { UpdateTreeData } from 'components/Sidebar/SidebarHandle/UpdateTreeData';
+import { InitTreeData } from 'components/Sidebar/SidebarHandle/InitTreeData';
+import DropdownTree from 'components/Sidebar/SidebarHandle/DropdownTree';
 import { LaptopOutlined, LoadingOutlined } from '@ant-design/icons';
-import { PushRequestData } from './SidebarHandle/PushRequestData';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useInfo } from '../../hooks/infoProvider/InfoProvider';
-import { UpdateTreeData } from './SidebarHandle/UpdateTreeData';
-import { Action } from '../../hooks/logProvider/LogProvider';
-import { InitTreeData } from './SidebarHandle/InitTreeData';
-import useRequest from '../../hooks/useRequest/useRequest';
-import DropdownTree from './SidebarHandle/DropdownTree';
 import ModalUserLogin from '../Modal/ModalUserLogin';
 import ModalCopyfile from '../Modal/ModalCopyfile';
 import PowerStart from '../IconCustom/PowerStart';
@@ -35,12 +33,15 @@ export interface DataNode {
 }
 export const SidebarContext = createContext({});
 export const Sidebar = () => {
-  const [isModalUserLoginOpen, setIsModalUserLoginOpen] = useState<boolean>(false);
-  const [isModalCopyfileOpen, setIsModalCopyfileOpen] = useState<boolean>(false);
-  const [isModalGetfileOpen, setIsModalGetfileOpen] = useState<boolean>(false);
-  const [isModalProcessOpen, setIsModalProcessOpen] = useState<boolean>(false);
-  const [isModalRenameOpen, setIsModalRenameOpen] = useState<boolean>(false);
-  const [isModalCloneOpen, setIsModalCloneOpen] = useState<boolean>(false);
+  const [isModal, setIsModal] = useState({
+    UserLoginOpen: false,
+    CopyfileOpen: false,
+    GetfileOpen: false,
+    ProcessOpen: false,
+    RenameOpen: false,
+    CloneOpen: false,
+  });
+  const [alternativeTreeData, setAlternativeTreeData] = useState<DataNode[]>([]);
   const [nameRightClick, setNameRightClick] = useState<string>('');
   const [keyExpanded, setKeyExpanded] = useState<React.Key[]>([]);
   const [keyDatacenter, setKeyDatacenter] = useState<string>('');
@@ -49,7 +50,6 @@ export const Sidebar = () => {
   const [keySelected, setKeySelected] = useState<React.Key[]>([]);
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<any>([]);
-  const [alternativeTreeData, setAlternativeTreeData] = useState<DataNode[]>([]);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -214,12 +214,7 @@ export const Sidebar = () => {
     checkedKeys,
     keyRightClick,
     nameRightClick,
-    isModalCloneOpen,
-    isModalRenameOpen,
-    isModalGetfileOpen,
-    isModalProcessOpen,
-    isModalCopyfileOpen,
-    isModalUserLoginOpen,
+    isModal,
     onLoadData,
     setTreeData,
     setLoadedKeys,
@@ -229,12 +224,7 @@ export const Sidebar = () => {
     setKeyRightClick,
     handlePowerState,
     setNameRightClick,
-    setIsModalCloneOpen,
-    setIsModalRenameOpen,
-    setIsModalProcessOpen,
-    setIsModalGetfileOpen,
-    setIsModalCopyfileOpen,
-    setIsModalUserLoginOpen,
+    setIsModal,
   };
   return (
     <SidebarContext.Provider value={value}>

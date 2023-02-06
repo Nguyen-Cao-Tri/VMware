@@ -40,7 +40,7 @@ const ModalUserLogin = () => {
   const decryptPlainText = (encryptedText: string) => AES.decrypt(encryptedText, privateKey).toString(enc.Utf8);
 
   const handleCancel = () => {
-    Context.setIsModalUserLoginOpen(false);
+    Context.setIsModal({ UserLoginOpen: false });
   };
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);

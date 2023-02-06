@@ -5,12 +5,13 @@ import DefaultLayout from '../../layouts/DefaultLayout/DefaultLayout';
 // import DemoPage from '../../pages/DemoPage/DemoPage';
 import LoginForm from '../../pages/LoginForm/LoginForm';
 import Demo from '../../pages/DemoPage/DemoPage';
-import Test from '../../pages/TestLogic/Test';
+// import Test from '../../pages/TestLogic/Test';
 import MoveToFolder from '../../components/Sidebar/SidebarHandle/MoveToFolder';
 import PowerStart from '../../components/IconCustom/PowerStart';
 import Datacenter from '../../pages/Datacenter/Datacenter';
 import Folder from '../../pages/Folder/Folder';
 import Vm from '../../pages/Vm/Vm';
+import Loading from '../../pages/LoginForm/Loading';
 const routes = [
   {
     path: '/',
@@ -30,7 +31,7 @@ const routes = [
 
   {
     path: '/test',
-    element: <Test />,
+    element: <Loading />,
   },
   {
     path: '/move',

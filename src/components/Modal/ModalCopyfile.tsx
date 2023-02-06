@@ -78,7 +78,7 @@ const ModalCopyfile = () => {
   return (
     <Modal
       title="CopyFile"
-      open={Context.isModalCopyfileOpen}
+      open={Context.isModal.CopyfileOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}
