@@ -20,13 +20,18 @@ import PowerStart from '../IconCustom/PowerStart';
 import ModalGetfile from '../Modal/ModalGetfile';
 import ModalProcess from '../Modal/ModalProcess';
 import ModalRename from '../Modal/ModalRename';
-import ModalClone from '../Modal/ModalClone';
-import { Spin } from 'antd';
+import ModalClone from 'components/Modal/ModalClone';
+import { Input, Spin } from 'antd';
+import { vcenterAPI } from 'api/vcenterAPI';
+import { useAPI } from 'hooks/useAPI/useAPI';
+
 export interface DataNode {
   title: string;
   key: string;
   children?: DataNode[];
   isLeaf?: boolean;
+  username?: string;
+  password?: string;
 }
 export const SidebarContext = createContext({});
 export const Sidebar = () => {
@@ -41,54 +46,24 @@ export const Sidebar = () => {
   const [keyDatacenter, setKeyDatacenter] = useState<string>('');
   const [keyRightClick, setKeyRightClick] = useState<string>('');
   const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
-  const [renameInput, setRenameInput] = useState<string>('');
-  const [infoExpanded, setInfoExpanded] = useState<any>('');
-  const [inforSelected, setInforSelected] = useState<any>();
-  const [keySelect, setKeySelect] = useState<React.Key[]>();
-  const [datacenter, setDatacenter] = useState<object[]>();
+  const [keySelected, setKeySelected] = useState<React.Key[]>([]);
   const [treeData, setTreeData] = useState<DataNode[]>([]);
-  const [nameChange, setNameChange] = useState<string>('');
   const [checkedKeys, setCheckedKeys] = useState<any>([]);
-  const [vmKey, setVmKey] = useState<object[]>([]);
-  const [folder, setFolder] = useState<object[]>();
-  const [vmApi, setVmApi] = useState<object[]>();
-  const { request, isLoading } = useRequest();
+  const [alternativeTreeData, setAlternativeTreeData] = useState<DataNode[]>([]);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const antIcon = <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />;
 
-  const { inforSelect, vm, setOnSelect, setVmPowerStates, setChildrens, setVms, setNetwork, setParentKey, setTool } =
-    useInfo();
+  const { inforSelect, curentTheme, setOnSelect, setVmPowerStates, setChildrens, setArrayTreeData } = useInfo();
   useEffect(() => {
+    vcenterAPI.getDatacenters().then((datacenter: any) => {
+      setTreeData(InitTreeData(datacenter));
+    });
     const keySelectParam: any = searchParams.get('selected')?.split(',');
     const keyExpandParam: any = searchParams.get('expanded')?.split(',');
-    request('/api/vcenter/datacenter', 'GET', {
-      action: Action.GET_LIST_DATACENTER,
-    }).then((res: any) => {
-      setDatacenter(res);
-      setTreeData(InitTreeData(res));
-    });
-    request('/api/vcenter/folder').then((res: any) => setFolder(res));
-    request('/api/vcenter/vm').then((res: any) => {
-      setVmApi(res);
-      res.map((item: any) => {
-        request(`/api/vcenter/vm/${item.vm}`).then(infoVm => {
-          const obj = { idVm: item.vm, infor: infoVm };
-          if (setVms) setVms(obj);
-        });
-        request(`/api/vcenter/vm/${item.vm}/tools`).then(vmTool => {
-          const obj = { idVm: item.vm, tool: vmTool };
-          if (setTool) setTool(obj);
-        });
-        request(`/api/vcenter/vm/${item.vm}/guest/networking`).then(vmNetwork => {
-          const obj = { idVm: item.vm, network: vmNetwork };
-          if (setNetwork) setNetwork(obj);
-        });
-      });
-    });
     setKeyExpanded(keyExpandParam);
-    setKeySelect(keySelectParam);
+    setKeySelected(keySelectParam);
   }, []);
   const checkUpdateIcon = (action: string, idVm: string) => {
     if (action === 'start') {
@@ -110,28 +85,22 @@ export const Sidebar = () => {
     return list;
   };
   const callApiPowerState = async (idVm: string, action: string) => {
-    if (isLoading) {
-      // if (action === 'start') {
-      setTreeData([...updateIconStart(treeData, <Spin indicator={antIcon} />, idVm)]);
-      // }
-    }
-    await request(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST', {
-      action: `Power ${action}`,
-      name: nameRightClick,
-    })
+    setTreeData([...updateIconStart(treeData, <Spin indicator={antIcon} />, idVm)]);
+    await vcenterAPI
+      .postPower(idVm, action)
       .then(async () => {
-        vm.forEach((itemVm: any) => {
-          if (itemVm.vmKey === idVm) {
-            itemVm.power_state = action;
-            localStorage.setItem(itemVm.vmKey, action);
-          }
-          if (setVmPowerStates) setVmPowerStates([...vm]);
-        });
         checkUpdateIcon(action, idVm);
       })
       .catch((err: any) => {
         `${err}`.includes('Failed to fetch') ? setTreeData([...treeData]) : checkUpdateIcon(action, idVm);
       });
+    await vcenterAPI.getPower(idVm).then(powerState => {
+      const obj = {
+        idVm,
+        powerState,
+      };
+      if (setVmPowerStates) setVmPowerStates(obj);
+    });
   };
   const handlePowerState = async (idVm: string, action: string) => {
     const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
@@ -139,95 +108,109 @@ export const Sidebar = () => {
       vmCheckKeys.map(async (item: any) => await callApiPowerState(item, action));
     } else await callApiPowerState(idVm, action);
   };
-
   const navigateSelect = (param: string, value: string) => {
     if (value?.includes(param)) {
       navigate(`/${param}?${param}_id=${value}`);
     }
   };
-  const findNodeTreeData = (list: DataNode[], nodeKey: string, arr: string[], keySelected: string) => {
-    console.log('treeData list', list);
-
-    list?.map((itemTreeData: any) => {
-      if (itemTreeData.key === nodeKey) {
-        const checkNode = JSON.stringify(itemTreeData.children)?.indexOf(keySelected);
-        if (checkNode !== -1) {
-          return arr.push(itemTreeData.key);
-        } else findNodeTreeData(itemTreeData.children, nodeKey, arr, keySelected);
-      } else findNodeTreeData(itemTreeData.children, nodeKey, arr, keySelected);
+  const formatTreeData = (list: DataNode[], arr: object[], idParent: string) => {
+    let id = 0;
+    list.forEach((itemTreeData: any) => {
+      id++;
+      const obj = {
+        key: itemTreeData.key,
+        idParent: `${idParent}-${id}`,
+      };
+      arr.push([obj]);
+      if (itemTreeData.children) formatTreeData(itemTreeData.children, arr, `${idParent}-${id}`);
     });
+    localStorage.setItem('idParent', JSON.stringify(arr));
     return arr;
   };
-  const handleOnSelect = (value: any[], info: { node: { title: any; children: any } }) => {
-    const arr: string[] = [];
-    keyExpanded?.map((item: any) => {
-      if (setParentKey) setParentKey(findNodeTreeData(treeData, item, arr, value[0]));
-    });
-    ['datacenter', 'group', 'vm'].forEach((item: any) => navigateSelect(item, value[0]));
-    setKeySelect(value);
-    setInforSelected(info);
-    if (setOnSelect)
-      setOnSelect({
+  const handleOnSelect = async (value: any[], info: { node: { title: any; children: any } }) => {
+    if (value[0] !== undefined) {
+      await vcenterAPI.getPower(value[0]).then(powerState => {
+        const obj = {
+          idVm: value[0],
+          powerState,
+        };
+        if (setVmPowerStates) setVmPowerStates(obj);
+      });
+      if (setArrayTreeData) setArrayTreeData(formatTreeData(treeData, [], '1'));
+      ['datacenter', 'group', 'vm'].forEach((item: any) => navigateSelect(item, value[0]));
+      setKeySelected(value);
+      localStorage.setItem('keySelect', JSON.stringify(value));
+      const obj = {
         title: info.node.title,
         key: value[0],
         children: info.node?.children,
-      });
-    if (setVmPowerStates) setVmPowerStates(vmKey);
+      };
+      if (setOnSelect) setOnSelect(obj);
+      localStorage.setItem('setOnSelect', JSON.stringify(obj));
+    }
+  };
+  const updateTreeOnLoadData = (list: DataNode[], key: string, data: any, param: string) => {
+    setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(data, param)));
+    sessionStorage.setItem('treeData', JSON.stringify(UpdateTreeData(treeData, key, PushRequestData(data, param))));
+    sessionStorage.setItem('sessionLogin', JSON.stringify(UpdateTreeData(treeData, key, PushRequestData(data, param))));
+    localStorage.setItem('localLogin', JSON.stringify(UpdateTreeData(treeData, key, PushRequestData(data, param))));
+    setAlternativeTreeData(() => UpdateTreeData(treeData, key, PushRequestData(data, param)));
   };
   const onLoadData = async ({ key }: any) => {
     if (key.includes('datacenter')) {
-      const datacenterName: any = datacenter?.filter((item: any) => item.datacenter === key);
-      const param = 'folder';
       setKeyDatacenter(key);
-      await request(`/api/vcenter/${param}?names=vm&datacenters=${key}`, 'GET', {
-        action: Action.GET_LIST_FOLDER,
-        name: nameChange || datacenterName[0].name,
-      }).then(res => {
-        setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
-        if (key === keySelect) if (setChildrens) setChildrens(res);
+      await vcenterAPI.getFoldersByIdParent(key, '').then(folder => {
+        updateTreeOnLoadData(treeData, key, folder, 'folder');
+        if (key === keySelected) {
+          if (setChildrens) setChildrens(folder);
+        }
       });
     }
     if (key.includes('group')) {
-      const folderName: any = folder?.filter((item: any) => item.folder === key);
-      const vmName: any = vmApi?.filter((item: any) => item.vmKey === key);
-      const param = 'folder';
-      await request(`/api/vcenter/${param}?parent_folders=${key}&datacenters=${keyDatacenter}`, 'GET', {
-        action: Action.GET_LIST_FOLDER,
-        name: nameChange || folderName[0].name,
-      }).then((res: any) => {
-        if (key === keySelect) {
-          if (setOnSelect)
+      await vcenterAPI.getFoldersByIdParent(keyDatacenter, key).then(folder => {
+        if (keySelected !== undefined && key === keySelected[0].toString())
+          if (setOnSelect) {
             setOnSelect({
-              title: inforSelect.node.title,
+              title: inforSelect.title,
               key,
-              children: res,
+              children: folder,
             });
-        }
-        setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, param)));
-      });
-      await request(`/api/vcenter/vm?folders=${key}&datacenters=${keyDatacenter}`, 'GET').then((res: any) => {
-        if (res.length > 0) {
-          if (key === keySelect) {
-            if (setOnSelect)
-              setOnSelect({
-                title: inforSelect.node.title,
-                key,
-                children: res,
-              });
           }
-          setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(res, 'vm')));
-          setVmKey(vmKey.concat(res));
+        updateTreeOnLoadData(treeData, key, folder, 'folder');
+      });
+      await vcenterAPI.getVmsByIdParent(key, keyDatacenter).then(vm => {
+        if (vm.length > 0) {
+          if (keySelected !== undefined && key === keySelected[0].toString()) {
+            if (setOnSelect) {
+              setOnSelect({
+                title: inforSelect.title,
+                key,
+                children: vm,
+              });
+            }
+          }
+          updateTreeOnLoadData(treeData, key, vm, 'vm');
         }
       });
     }
     setLoadedKeys(loadedKeys.concat([key]));
   };
-
+  const searchTree = (list: DataNode[], value: string) => {
+    list.map((itemList: any) => {
+      if (itemList.title.toLocaleLowerCase().includes(value)) return setTreeData([itemList]);
+      else if (itemList.children) searchTree(itemList.children, value);
+    });
+  };
+  const handleOnChange = (value: string) => {
+    console.log('alternativeTreeData', alternativeTreeData);
+    const inputValue = value.toLocaleLowerCase();
+    searchTree(alternativeTreeData, inputValue);
+  };
   const value = {
-    vmKey,
     treeData,
     loadedKeys,
     keyExpanded,
+    keySelected,
     checkedKeys,
     keyRightClick,
     nameRightClick,
@@ -240,11 +223,9 @@ export const Sidebar = () => {
     onLoadData,
     setTreeData,
     setLoadedKeys,
-    setRenameInput,
     handleOnSelect,
     setCheckedKeys,
     setKeyExpanded,
-    setInfoExpanded,
     setKeyRightClick,
     handlePowerState,
     setNameRightClick,
@@ -257,14 +238,19 @@ export const Sidebar = () => {
   };
   return (
     <SidebarContext.Provider value={value}>
-      <div className="drop_tree">
-        <DropdownTree />
-        <ModalRename />
-        <ModalGetfile />
-        <ModalUserLogin />
-        <ModalCopyfile />
-        <ModalProcess />
-        <ModalClone />
+      <div className={curentTheme}>
+        <div className="search">
+          <Input.Search placeholder="Search" bordered={false} onChange={e => handleOnChange(e.target.value)} />
+        </div>
+        <div className="drop_tree">
+          <DropdownTree />
+          {/* <ModalRename /> */}
+          <ModalGetfile />
+          <ModalUserLogin />
+          <ModalCopyfile />
+          <ModalProcess />
+          <ModalClone />
+        </div>
       </div>
     </SidebarContext.Provider>
   );

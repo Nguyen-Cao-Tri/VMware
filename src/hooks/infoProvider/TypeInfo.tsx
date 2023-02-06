@@ -8,6 +8,7 @@ export interface IInfoContext {
   vmTools?: any;
   curentTheme?: string;
   parentId?: string[];
+  arrayFormatTreeData?: object[];
   handleTheme?: (value: string) => void;
   setOnSelect?: (value: any) => void;
   setOnExpand?: (value: any) => void;
@@ -17,4 +18,5 @@ export interface IInfoContext {
   setNetwork?: (value: object) => void;
   setTool?: (value: object) => void;
   setParentKey?: (value: string[]) => void;
+  setArrayTreeData?: (value: any) => void;
 }

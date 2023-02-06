@@ -1,35 +1,64 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useInfo } from '../../hooks/infoProvider/InfoProvider';
 import MenuVm from './HandleVm/MenuVM/MenuVm';
 import TableVm from './HandleVm/TableVM/TableVm';
 import { useNavigate } from 'react-router-dom';
+import { vcenterAPI } from 'api/vcenterAPI';
 import RenderUI from './HandleVm/RenderUI/RenderUI';
 import './vm.scss';
 
+interface IVm {
+  memory_size_MiB: number;
+  vm: string;
+  name: string;
+  power_state: string;
+  cpu_count: number;
+}
 const Vm = () => {
-  const { inforSelect, keyExpand, parentId } = useInfo();
-
-  const key = inforSelect.key;
+  const [inforVm, setInforVm] = useState<IVm>({ memory_size_MiB: 0, vm: '', name: '', power_state: '', cpu_count: 0 });
+  const { inforSelect, keyExpand, arrayFormatTreeData } = useInfo();
+  const keySelect = inforSelect.key;
   const navigate = useNavigate();
   useEffect(() => {
-    if (key || keyExpand.length > 0) {
-      const uniqueChars = parentId?.filter((c: any, index: any) => {
-        return parentId.indexOf(c) === index;
+    void vcenterAPI.getVms(keySelect).then(inforVm => setInforVm(inforVm[0]));
+    const idParentStorage: any = localStorage.getItem('idParent');
+    if (arrayFormatTreeData?.length === 0) {
+      JSON.parse(idParentStorage)?.map((item: any) => {
+        arrayFormatTreeData.push(item);
       });
-      navigate(`/vm?selected=${key}&expanded=${uniqueChars?.concat(key).join(',')}`);
     }
-    // else if (key === undefined) navigate('/vm');
-  }, [key, keyExpand]);
+    if (keySelect || keyExpand.length > 0) {
+      const idParent: string[] = [];
+      const keyParent: string[] = [];
+      arrayFormatTreeData?.map((item: any) => {
+        if (item[0].key === keySelect) {
+          idParent.push(item[0].idParent);
+        }
+      });
+      arrayFormatTreeData?.map((item: any) => {
+        if (idParent[0].length > item[0].idParent.length) {
+          if (idParent[0]?.slice(0, item[0].idParent.length).includes(item[0].idParent)) {
+            keyParent.push(item[0].key);
+          }
+        } else {
+          if (idParent[0]?.includes(item[0].idParent)) {
+            keyParent.push(item[0].key);
+          }
+        }
+      });
+      navigate(`/vm?selected=${keySelect}&expanded=${keyParent.join(',')}`);
+    }
+  }, [keySelect, keyExpand]);
   return (
     <>
-      {key !== undefined && <MenuVm />}
+      <MenuVm prop={inforVm} />
       <div className="content_item">
         <div className="render_ui">
-          <RenderUI />
+          <RenderUI prop={keySelect} />
         </div>
-        <div className="table_content">{key?.includes('vm') ? <TableVm /> : ''}</div>
+        <div className="table_content">{keySelect?.includes('vm') ? <TableVm /> : ''}</div>
       </div>
     </>
   );

@@ -8,9 +8,10 @@ export const InforContext = createContext<IInfoContext>({
   vmTools: [{}],
   vm: [{}],
   vmNetwork: [{}],
-  vmPowerState: [],
+  vmPowerState: {},
   curentTheme: '',
   parentId: [''],
+  arrayFormatTreeData: [{}],
   handleTheme: () => {},
   setOnSelect: () => {},
   setOnExpand: () => {},
@@ -20,19 +21,24 @@ export const InforContext = createContext<IInfoContext>({
   setNetwork: () => {},
   setTool: () => {},
   setParentKey: () => {},
+  setArrayTreeData: () => {},
 });
 
 export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
   const [inforSelect, setInforSelect] = useState<any>({});
   const [keyExpand, setKeyExpand] = useState<any>([]);
-  const [vmPowerState, setVmPowerState] = useState<object[]>([]);
+  const [vmPowerState, setVmPowerState] = useState({});
   const [vm, setVm] = useState<object[]>([]);
   const [parentId, setParentId] = useState<string[]>([]);
   const [children, setChildren] = useState<object[]>([]);
   const [vmNetwork, setVmNetwork] = useState<object[]>([]);
   const [vmTools, setVmTools] = useState<object[]>([]);
   const [curentTheme, setCurrentTheme] = useState<string>(localStorage.getItem('theme') ?? 'dark');
-
+  const [inforLogin, setInforLogin] = useState<string[]>([]);
+  const [arrayFormatTreeData, setArrayFormatTreeData] = useState<object[]>([]);
+  const setInforLoginModal = (value: string[]) => {
+    setInforLogin(value);
+  };
   const handleTheme = (value: string) => {
     setCurrentTheme(value);
   };
@@ -57,10 +63,14 @@ export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
   const setTool = (value: any) => {
     setVmTools(prev => [...prev, value]);
   };
-  const setParentKey = (value: string[]) => {
-    setParentId(value);
+  const setParentKey = (value: any) => {
+    setParentId(parentId.concat(value));
+  };
+  const setArrayTreeData = (value: any) => {
+    setArrayFormatTreeData(value);
   };
   const value = {
+    inforLogin,
     parentId,
     inforSelect,
     keyExpand,
@@ -70,6 +80,8 @@ export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
     vmPowerState,
     children,
     curentTheme,
+    arrayFormatTreeData,
+    setInforLoginModal,
     handleTheme,
     setOnSelect,
     setOnExpand,
@@ -79,6 +91,7 @@ export const InfoProvider = (props: PropsWithChildren<IInfoContext>) => {
     setNetwork,
     setParentKey,
     setTool,
+    setArrayTreeData,
   };
   return <InforContext.Provider value={value}>{props.children} </InforContext.Provider>;
 };

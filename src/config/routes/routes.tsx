@@ -46,10 +46,7 @@ const routes = [
   },
 ];
 
-export default function Router(): React.ReactElement<
-  any,
-  string | React.JSXElementConstructor<any>
-> | null {
+export default function Router(): React.ReactElement<any, string | React.JSXElementConstructor<any>> | null {
   const element = useRoutes(routes);
   return element;
 }

@@ -19,7 +19,6 @@ export default function DefaultLayout() {
 
   const [sidebarSize, setSidebarSize] = useState('200');
   const [logSize, setLogSize] = useState('200');
-
   const onChangeSidebar = (value: any) => {
     const [firstPane] = value;
     localStorage.setItem('sizeSidebar', firstPane);
@@ -38,6 +37,7 @@ export default function DefaultLayout() {
   const lightTheme = {
     colorPrimary: '#2997ce',
     colorText: '#666666',
+    colorBgBase: '#f6f6f6',
   };
   const darkTheme = {
     colorPrimary: '#2997ce',
@@ -60,7 +60,6 @@ export default function DefaultLayout() {
           >
             <Header />
           </HeaderAnt>
-
           <Layout className="layout_item">
             <div
               style={{
@@ -71,7 +70,6 @@ export default function DefaultLayout() {
               }}
             >
               <Allotment minSize={100} onChange={onChangeSidebar}>
-                {/* sidebar */}
                 <Allotment.Pane preferredSize={sidebarSize}>
                   <SiderAnt className="container_sidebar">
                     <Sidebar />
@@ -79,13 +77,11 @@ export default function DefaultLayout() {
                 </Allotment.Pane>
                 <Allotment.Pane>
                   <Allotment vertical onChange={onChangeLog}>
-                    \{/* content */}
                     <Allotment.Pane>
                       <ContentAnt className="container_content">
                         <Content />
                       </ContentAnt>
                     </Allotment.Pane>
-                    {/* footer */}
                     <Allotment.Pane preferredSize={logSize}>
                       <FooterAnt id="container_footer">
                         <Footer />

@@ -28,9 +28,8 @@ const LoginForm: React.FC = () => {
       },
     )
       .then((data: any) => {
-        // console.log('res', data);
-        const sessionId = data;
-        localStorage.setItem('sessionId', sessionId);
+        console.log('res', data);
+        localStorage.setItem('sessionId', data);
         toast.success('🦄 Logged in successfully!');
         navigate('/');
       })

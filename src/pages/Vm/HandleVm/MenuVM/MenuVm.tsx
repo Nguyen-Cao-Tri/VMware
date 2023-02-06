@@ -1,18 +1,25 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Tooltip } from 'antd';
-import React from 'react';
+import React, { useContext } from 'react';
 import { BsCameraFill, BsCaretRight, BsSquare } from 'react-icons/bs';
 import { useInfo } from '../../../../hooks/infoProvider/InfoProvider';
 import { FaEdit } from 'react-icons/fa';
 import { DesktopOutlined } from '@ant-design/icons';
 import './menuVm.scss';
-
-const MenuVm = () => {
+import { SidebarContext } from 'components/Sidebar/Sidebar';
+const MenuVm = ({ prop }: any) => {
   const { inforSelect } = useInfo();
-
+  const Context: any = useContext(SidebarContext);
+  const setOnSelectStorage: any = localStorage.getItem('setOnSelect');
+  const inforSelectStorage = JSON.parse(setOnSelectStorage);
+  if (Object.getOwnPropertyNames(inforSelect).length === 0) {
+    inforSelect.title = inforSelectStorage?.title;
+    inforSelect.key = inforSelectStorage?.key;
+  }
   return (
     <div className="nav">
       <div className="title">
-        <span>{inforSelect.title}</span>
+        <span>{prop?.name}</span>
       </div>
       {Boolean(inforSelect.key?.includes('vm')) && (
         <div className="nav_item">
@@ -20,7 +27,7 @@ const MenuVm = () => {
           <div className="icon_item ml">
             <div className="item">
               <Tooltip placement="bottom" title={'Power On'}>
-                <Button type="text" icon={<BsCaretRight className="start" />} />
+                <Button type="text" icon={<BsCaretRight className="start" />} onClick={() => {}} />
               </Tooltip>
               <Tooltip placement="bottom" title={'Power Off'}>
                 <Button type="text" icon={<BsSquare className="stop" />} />
@@ -40,7 +47,6 @@ const MenuVm = () => {
         </div>
       )}
     </div>
-    // </div>
   );
 };
 

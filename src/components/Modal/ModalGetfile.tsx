@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import React, { useContext, useState } from 'react';
 import { Input, Modal } from 'antd';
-import useRequest from '../../hooks/useRequest/useRequest';
 import { Action, useLog } from '../../hooks/logProvider/LogProvider';
 import { SidebarContext } from '../Sidebar/Sidebar';
+import useRequest from '../../hooks/useRequest/useRequest';
+import { vcenterAPI } from 'api/vcenterAPI';
 
 const ModalGetfile = () => {
   const Context: any = useContext(SidebarContext);
@@ -16,41 +18,19 @@ const ModalGetfile = () => {
   const handleGetfile = async (idVm: string) => {
     const vmUsername = localStorage.getItem(`username ${idVm}`);
     const vmPassword = localStorage.getItem(`password ${idVm}`);
-    await request(
-      `/api/vcenter/vm/${idVm}/guest/filesystem?action=create`,
-      'POST',
-      { action: Action.GET_FILE, name: Context.nameRightClick },
-      false,
-      {
+    await vcenterAPI
+      .postTransferFile(idVm, {
         credentials: {
           interactive_session: false,
-          user_name: vmUsername,
-          password: vmPassword,
+          user_name: 'home',
+          password: 'zxcasdqwe~123456789',
           type: 'USERNAME_PASSWORD',
         },
         spec: {
           path: getfileInput,
         },
-      },
-      {},
-      false,
-    )
-      .then((response: any) => {
-        console.log('response.link', response);
-        window.open(response, '_blank', 'noopener,noreferrer');
-        if (vmLog !== undefined) {
-          vmLog({
-            executeTime: Date.now(),
-            name: Context.nameRightClick,
-            action: 'Open file new tab',
-          });
-        }
-        handleCancel();
       })
-      .catch((error: any) => {
-        console.log('Oops errors!', error);
-        handleCancel();
-      });
+      .then(res => window.open(res));
   };
   const handleOk = () => {
     const vmCheckKeys = Context.checkedKeys.filter((item: any) => item.includes('vm'));
@@ -60,6 +40,7 @@ const ModalGetfile = () => {
       });
     } else void handleGetfile(Context.keyRightClick);
     setGetfileInput('');
+    handleCancel();
   };
   return (
     <Modal

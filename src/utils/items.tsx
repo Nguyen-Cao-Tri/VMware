@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   PoweroffOutlined,
   ReloadOutlined,
@@ -18,21 +18,16 @@ import {
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 import { FaEdit } from 'react-icons/fa';
 import PowerOn from './customIconStart/PowerOn';
-
-export const items = (
-  vm: object[],
-  keyRightClick: string,
-  title: string,
-): ItemType[] => {
-  const vmItem: any = vm.filter((itemVm: any) => itemVm.vm === keyRightClick);
-  const powerState = vmItem[0]?.power_state;
+import { vcenterAPI } from 'api/vcenterAPI';
+export const items = (vm: object[], keyRightClick: string, title: string): ItemType[] => {
+  const [powerState, setPowerState] = useState<string>('');
+  void vcenterAPI.getPower(keyRightClick).then(powerState => setPowerState(powerState.state));
   const iconRightclick = () => {
     if (keyRightClick.includes('datacenter')) return <DatabaseOutlined />;
     if (keyRightClick.includes('group')) return <FolderOutlined />;
     if (keyRightClick.includes('vm')) return <LaptopOutlined />;
   };
-  const isDisable =
-    keyRightClick.includes('datacenter') || keyRightClick.includes('group');
+  const isDisable = keyRightClick.includes('datacenter') || keyRightClick.includes('group');
   return [
     {
       label: `Action - ${title} `,
@@ -61,10 +56,7 @@ export const items = (
           label: 'Power On',
           key: 'start',
           icon: <PlayCircleOutlined />,
-          disabled:
-            powerState === 'start' ||
-            powerState === 'POWERED_ON' ||
-            powerState === 'reset',
+          disabled: powerState === 'POWERED_ON' || powerState === 'reset',
         },
         {
           label: 'Power Off',
@@ -76,10 +68,7 @@ export const items = (
           label: 'Suspend',
           key: 'suspend',
           icon: <PauseCircleOutlined />,
-          disabled:
-            powerState === 'suspend' ||
-            powerState === 'POWERED_OFF' ||
-            powerState === 'stop',
+          disabled: powerState === 'suspend' || powerState === 'POWERED_OFF' || powerState === 'stop',
         },
         {
           label: 'Reset',
@@ -94,7 +83,6 @@ export const items = (
         },
       ],
     },
-
     {
       label: 'Guest OS',
       key: 'guestos',
@@ -150,8 +138,7 @@ export const items = (
       label: 'Clone',
       key: 'clone',
       icon: <CopyOutlined style={{ opacity: '0' }} />,
-      disabled:
-        isDisable || powerState === 'start' || powerState === 'POWERED_ON',
+      disabled: isDisable || powerState === 'start' || powerState === 'POWERED_ON',
     },
 
     {

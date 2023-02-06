@@ -11,8 +11,6 @@ import Item from './Item';
 const DropdownTree = () => {
   const { setOnExpand } = useInfo();
   const Context: any = useContext(SidebarContext);
-
-  const [infoDrop, setInfoDrop] = useState<any>({});
   const onRightClick = (value: any) => {
     Context.setKeyRightClick(value.node.key);
     Context.setNameRightClick(value.node.title);
@@ -20,15 +18,13 @@ const DropdownTree = () => {
   const onExpand = (value: React.Key[], info: any) => {
     if (setOnExpand != null) setOnExpand(value);
     Context.setKeyExpanded(value);
-    Context.setInfoExpanded(info);
   };
   const onCheck = (value: any) => {
-    Context.setKeyExpanded(value);
+    Context.setCheckedKeys(value);
   };
   const updateTreeDrop = (info: any) => {
     Context.setTreeData(info);
   };
-
   const onDrop: TreeProps['onDrop'] = info => {
     const dropKey = info?.node?.key;
     const dragKey = info?.dragNode?.key;
@@ -50,31 +46,20 @@ const DropdownTree = () => {
         }
       };
       const data = [...Context.treeData];
-      // Find dragObject
       let dragObj: DataNode;
       loop(data, dragKey, (item, index, arr) => {
         arr.splice(index, 1);
         dragObj = item;
       });
-
       if (!info.dropToGap) {
-        // Drop on the content
         loop(data, dropKey, item => {
           item.children = item.children ?? [];
-          // where to insert 示例添加到头部，可以是随意位置
           item.children.unshift(dragObj);
         });
-      } else if (
-        (info.node.children ?? []).length > 0 && // Has children
-        info.node.expanded && // Is expanded
-        dropPosition === 1 // On the bottom gap
-      ) {
+      } else if ((info.node.children ?? []).length > 0 && info.node.expanded && dropPosition === 1) {
         loop(data, dropKey, item => {
           item.children = item.children ?? [];
-          // where to insert 示例添加到头部，可以是随意位置
           item.children.unshift(dragObj);
-          // in previous version, we use item.children.push(dragObj) to insert the
-          // item to the tail of the children
         });
       } else {
         let ar: DataNode[] = [];
@@ -97,7 +82,7 @@ const DropdownTree = () => {
 
   return (
     <>
-      <Dropdown autoFocus overlay={<Item />} trigger={['contextMenu']}>
+      <Dropdown overlay={<Item />} trigger={['contextMenu']}>
         <div className="site-dropdown-context-menu">
           <Tree
             className="tree"
@@ -114,10 +99,10 @@ const DropdownTree = () => {
             loadedKeys={Context.loadedKeys}
             checkedKeys={Context.checkedKeys}
             expandedKeys={Context.keyExpanded}
-            onRightClick={Context.onRightClick}
+            selectedKeys={Context.keySelected}
+            onRightClick={onRightClick}
             onDrop={info => {
               onDrop(info);
-              setInfoDrop(info);
             }}
           />
         </div>

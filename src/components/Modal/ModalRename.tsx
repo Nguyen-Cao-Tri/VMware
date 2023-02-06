@@ -8,11 +8,12 @@ import { DataNode, SidebarContext } from '../Sidebar/Sidebar';
 const ModalRename = () => {
   const { vmLog } = useLog();
   const Context: any = useContext(SidebarContext);
+  console.log('context', Context);
+
   const handleCancel = () => {
     Context.setIsModalRenameOpen(false);
   };
   const handleOk = (value: any) => {
-    Context.setNameChange(value);
     if (vmLog !== undefined) {
       vmLog({
         executeTime: Date.now(),

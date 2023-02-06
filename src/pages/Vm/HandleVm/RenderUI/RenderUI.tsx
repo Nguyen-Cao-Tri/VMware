@@ -1,23 +1,37 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaChalkboard, FaDigitalTachograph, FaMemory, FaNetworkWired, FaRegWindowMaximize } from 'react-icons/fa';
 import { useInfo } from '../../../../hooks/infoProvider/InfoProvider';
 import { PlayCircleOutlined, SyncOutlined, PauseOutlined, WindowsOutlined, QqOutlined } from '@ant-design/icons';
 import { HiOutlineChip } from 'react-icons/hi';
 import { MdOutlineDns } from 'react-icons/md';
+import { useSearchParams } from 'react-router-dom';
 import './renderUI.scss';
+import { vcenterAPI } from 'api/vcenterAPI';
+interface IPowerState {
+  state: string;
+}
+const RenderUI = ({ prop }: any) => {
+  const { inforSelect, vmTools, vmNetwork, vm } = useInfo();
+  const [vmPowerState, setVmPowerState] = useState<string>('');
+  const [searchParams] = useSearchParams();
 
-const RenderUI = () => {
-  const { inforSelect, vmTools, vmNetwork, vm, vmPowerState } = useInfo();
-  const key = inforSelect.key;
-  const vmPowerStates = vmPowerState?.filter((item: any) => item.vm === key);
+  useEffect(() => {
+    console.log('keySelect', prop?.keySelect);
+    void vcenterAPI.getPower(prop?.keySelect).then(powerState => {
+      setVmPowerState(powerState?.state);
+      console.log('powerState', powerState.state);
+    });
+  }, [prop?.keySelect]);
 
-  const isStart = () => {
-    if (vmPowerStates.length > 0) {
-      return vmPowerStates[0].power_state === 'start' || vmPowerStates[0].power_state === 'POWERED_ON';
-    }
-  };
-
+  // const vmPowerStates = vmPowerState?.filter((item: any) => item.vm === key);
+  const setOnSelectStorage: any = localStorage.getItem('setOnSelect');
+  const inforSelectStorage = JSON.parse(setOnSelectStorage);
+  if (Object.getOwnPropertyNames(inforSelect).length === 0) {
+    inforSelect.title = inforSelectStorage.title;
+    inforSelect.key = inforSelectStorage.key;
+  }
   const RenderInforVm = () => {
     return (
       <div className="infoVm">
@@ -108,68 +122,66 @@ const RenderUI = () => {
       </div>
     );
   };
-  if (vmPowerStates?.length > 0) {
-    const powerState = vmPowerStates[0].power_state;
-    if (isStart() ?? false)
-      return (
-        <>
-          <div>
-            <div className="vm">
-              <div className="border">
-                <PlayCircleOutlined style={{ marginRight: '10px' }} />
-                <div>Power On</div>
-              </div>
-            </div>
-            <div style={{ marginTop: 20, color: '#4EADCC' }}>LAUNCH WEB CONSOLE</div>
-          </div>
 
-          <RenderInforVm />
-          <RenderSummaryVm />
-        </>
-      );
-    if (powerState === 'stop' || powerState === 'POWERED_OFF')
-      return (
-        <>
+  if (vmPowerState === 'POWERED_ON')
+    return (
+      <>
+        <div>
           <div className="vm">
             <div className="border">
               <PlayCircleOutlined style={{ marginRight: '10px' }} />
-              <div>Power Off</div>
+              <div>Power On</div>
             </div>
           </div>
-          <RenderInforVm />
-          <RenderSummaryVm />
-        </>
-      );
-    if (powerState === 'suspend' || powerState === 'SUSPENDED')
-      return (
-        <>
-          <div className="vm">
-            <div className="border">
-              <PauseOutlined style={{ marginRight: '10px' }} />
-              <div>Power Suspend</div>
-            </div>
-          </div>
-          <RenderInforVm />
-          <RenderSummaryVm />
-        </>
-      );
-    if (powerState === 'reset')
-      return (
-        <>
-          <div className="vm">
-            <div className="border">
-              <SyncOutlined style={{ marginRight: '10px' }} />
-              <div>Power Reset</div>
-            </div>
-          </div>
+          <div style={{ marginTop: 20, color: '#4EADCC' }}>LAUNCH WEB CONSOLE</div>
+        </div>
 
-          <RenderInforVm />
-          <RenderSummaryVm />
-        </>
-      );
-  }
+        <RenderInforVm />
+        <RenderSummaryVm />
+      </>
+    );
+  if (vmPowerState === 'POWERED_OFF')
+    return (
+      <>
+        <div className="vm">
+          <div className="border">
+            <PlayCircleOutlined style={{ marginRight: '10px' }} />
+            <div>Power Off</div>
+          </div>
+        </div>
+        <RenderInforVm />
+        <RenderSummaryVm />
+      </>
+    );
+  if (vmPowerState === 'SUSPENDED')
+    return (
+      <>
+        <div className="vm">
+          <div className="border">
+            <PauseOutlined style={{ marginRight: '10px' }} />
+            <div>Power Suspend</div>
+          </div>
+        </div>
+        <RenderInforVm />
+        <RenderSummaryVm />
+      </>
+    );
+  if (vmPowerState === 'reset')
+    return (
+      <>
+        <div className="vm">
+          <div className="border">
+            <SyncOutlined style={{ marginRight: '10px' }} />
+            <div>Power Reset</div>
+          </div>
+        </div>
 
-  return <div></div>;
+        <RenderInforVm />
+        <RenderSummaryVm />
+      </>
+    );
+
+  return <></>;
 };
 
 export default RenderUI;

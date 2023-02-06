@@ -4,8 +4,6 @@ import { useInfo } from '../../hooks/infoProvider/InfoProvider';
 
 const Content = () => {
   const { curentTheme, inforSelect } = useInfo();
-  console.log(curentTheme);
-
   return (
     <div className={curentTheme}>
       <div className="content">

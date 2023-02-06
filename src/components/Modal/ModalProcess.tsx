@@ -1,50 +1,92 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import React, { useContext, useState } from 'react';
-import { Input, Modal, notification } from 'antd';
+import { Form, Input, Modal, notification, Select } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
-import { Action } from '../../hooks/logProvider/LogProvider';
-import { SidebarContext } from '../Sidebar/Sidebar';
-
+import { Action, useLog } from '../../hooks/logProvider/LogProvider';
+import { DataNode, SidebarContext } from '../Sidebar/Sidebar';
+import { InforLogin } from './InforLoginModal';
+import { vcenterAPI } from 'api/vcenterAPI';
 const ModalProcess = () => {
+  const [form] = Form.useForm();
+  const { vmLog } = useLog();
   const Context: any = useContext(SidebarContext);
-  const handleCancel = () => {
+  const handleCancel: any = () => {
     Context.setIsModalProcessOpen(false);
   };
-  const [pathInput, setPathInput] = useState<string>('');
   const { request, isLoading } = useRequest();
+  InforLogin();
+
   const handleOk = async () => {
-    const username = localStorage.getItem(`username ${Context.keyRightClick}`);
-    const password = localStorage.getItem(`password ${Context.keyRightClick}`);
-    await request(
-      `/api/vcenter/vm/${Context.keyRightClick}/guest/processes?action=create`,
-      'POST',
-      { action: Action.RUN_PROCCESS, name: Context.nameRightClick },
-      false,
-      {
+    await vcenterAPI
+      .postCreateProcessFile(Context.keyRightClick, {
         credentials: {
           interactive_session: false,
-          user_name: username,
-          password,
+          password: 'zxcasdqwe~123456789',
           type: 'USERNAME_PASSWORD',
+          user_name: 'home',
         },
         spec: {
-          path: pathInput,
+          arguments: form.getFieldValue('arguments'),
+          environment_variables: {},
+          path: form.getFieldValue('path'),
+          start_minimized: false,
+          working_directory: form.getFieldValue('working_directory'),
         },
-      },
-      {},
-      false,
-    )
-      .then((response: any) => {
-        console.log(response);
-        handleCancel();
       })
-      .catch(() => {
-        handleCancel();
-      });
-    setPathInput('');
+      .then(idProcess => {
+        if (vmLog !== undefined) {
+          vmLog({
+            executeTime: Date.now(),
+            name: Context.nameRightClick,
+            action: `: Run process successfully with id: ${idProcess}`,
+          });
+        }
+      })
+      .catch(err => console.log('error', err));
+    form.setFieldsValue({ arguments: '', path: '', minimized: 'false', working_directory: '' });
+    handleCancel();
   };
+  const ProcessForm = () => (
+    <Form
+      form={form}
+      labelCol={{ span: 7 }}
+      wrapperCol={{ span: 14 }}
+      layout="horizontal"
+      style={{ maxWidth: 600 }}
+      initialValues={{ minimized: 'false' }}
+    >
+      <Form.Item name="arguments" label="Arguments">
+        <Input />
+      </Form.Item>
+      <Form.Item name="environment" label="Environment variable">
+        <Input />
+      </Form.Item>
+      <Form.Item
+        name="path"
+        label="Path"
+        rules={[
+          {
+            required: true,
+            message: 'Please input your path!',
+          },
+        ]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item name="minimized" label="Start minimized">
+        <Select>
+          <Select.Option value="true">Yes</Select.Option>
+          <Select.Option value="false">No</Select.Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="working_directory" label="Working directory">
+        <Input />
+      </Form.Item>
+    </Form>
+  );
 
   return (
     <Modal
@@ -55,8 +97,7 @@ const ModalProcess = () => {
       confirmLoading={isLoading}
     >
       <div className="inputProcess">
-        <span>Path:</span>
-        <Input value={pathInput} placeholder="Enter ..." onChange={e => setPathInput(e.target.value)} />
+        <ProcessForm />
       </div>
     </Modal>
   );
