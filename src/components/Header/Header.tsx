@@ -2,14 +2,16 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Button, Dropdown, MenuTheme, Space, Switch, Tooltip } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { LoginOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
+import React, { useEffect } from 'react';
+import { Dropdown, Tooltip } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import './header.scss';
 import { useNavigate } from 'react-router-dom';
 import { MdDarkMode, MdLightMode, MdOutlineLogout } from 'react-icons/md';
 import { useInfo } from '../../hooks/infoProvider/InfoProvider';
+import logo from 'assets/images/logo_white.png';
+
 interface PropsHeader {
   theme: (item: string) => void;
 }

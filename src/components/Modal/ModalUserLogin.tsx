@@ -5,8 +5,10 @@
 import { Input, Modal, Form, Checkbox } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
 import { useLog } from '../../hooks/logProvider/LogProvider';
-import { DataNode, SidebarContext } from '../Sidebar/Sidebar';
+import { SidebarContext } from '../Sidebar/Sidebar';
 import { AES, enc } from 'crypto-js';
+import { DataNode } from 'hooks/infoProvider/TypeInfo';
+import { useInfo } from 'hooks/infoProvider/InfoProvider';
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -28,19 +30,20 @@ const ModalUserLogin = () => {
   const sessionLogin = JSON.parse(sessionStorageLogin);
   const localStorageLogin: any = localStorage.getItem('localLogin');
   const localLogin = JSON.parse(localStorageLogin);
-  const Context: any = useContext(SidebarContext);
+  // const Context: any = useContext(SidebarContext);
+  const { isModal, nameRightClick, keyRightClick, checkedKeys, setIsModal } = useInfo();
 
   const privateKey = process.env.REACT_APP_PRIVATE_KEY ?? '';
   useEffect(() => {
-    findInforLogin(sessionLogin, Context.keyRightClick);
-  }, [Context.keyRightClick, Context.isModalUserLoginOpen]);
+    if (keyRightClick) findInforLogin(sessionLogin, keyRightClick);
+  }, [keyRightClick, isModal?.UserLoginOpen]);
 
   const encryptPlainText = (plainText: string) => AES.encrypt(plainText, privateKey).toString();
 
   const decryptPlainText = (encryptedText: string) => AES.decrypt(encryptedText, privateKey).toString(enc.Utf8);
 
   const handleCancel = () => {
-    Context.setIsModal({ UserLoginOpen: false });
+    if (setIsModal) setIsModal({ UserLoginOpen: false });
   };
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
@@ -160,46 +163,47 @@ const ModalUserLogin = () => {
     );
   };
   const handleOk = () => {
-    if (isCheckAccount) {
-      if (form.getFieldValue('savepassword')) {
-        localStorage.setItem(
-          'localLogin',
+    if (keyRightClick)
+      if (isCheckAccount) {
+        if (form.getFieldValue('savepassword')) {
+          localStorage.setItem(
+            'localLogin',
+            JSON.stringify(
+              setLoginTreeData(
+                localLogin,
+                keyRightClick,
+                encryptPlainText(username),
+                encryptPlainText(form.getFieldValue('password')),
+              ),
+            ),
+          );
+        }
+      } else {
+        setPassword(form.getFieldValue('password'));
+        sessionStorage.setItem(
+          'sessionLogin',
           JSON.stringify(
             setLoginTreeData(
-              localLogin,
-              Context.keyRightClick,
-              encryptPlainText(username),
+              sessionLogin,
+              keyRightClick,
+              encryptPlainText(form.getFieldValue('username')),
               encryptPlainText(form.getFieldValue('password')),
             ),
           ),
         );
+        vmLog?.({
+          executeTime: Date.now(),
+          name: nameRightClick,
+          action: 'Set user login success',
+        });
       }
-    } else {
-      setPassword(form.getFieldValue('password'));
-      sessionStorage.setItem(
-        'sessionLogin',
-        JSON.stringify(
-          setLoginTreeData(
-            sessionLogin,
-            Context.keyRightClick,
-            encryptPlainText(form.getFieldValue('username')),
-            encryptPlainText(form.getFieldValue('password')),
-          ),
-        ),
-      );
-      vmLog?.({
-        executeTime: Date.now(),
-        name: Context.nameRightClick,
-        action: 'Set user login success',
-      });
-    }
     form.setFieldsValue({ username: '', password: '', confirm: '' });
     handleCancel();
   };
   return (
     <Modal
-      title={Context.nameRightClick}
-      open={Context.isModalUserLoginOpen}
+      title={nameRightClick}
+      open={isModal?.UserLoginOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       okButtonProps={{ disabled: isDisabled }}

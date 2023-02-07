@@ -2,18 +2,15 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import React, { useState } from 'react';
 import { Tree } from 'antd';
-import type { DataNode, TreeProps } from 'antd/es/tree';
+import type { TreeProps } from 'antd/es/tree';
+import { DataNode } from 'hooks/infoProvider/TypeInfo';
 
 const x = 3;
 const y = 2;
 const z = 1;
 const defaultData: DataNode[] = [];
 
-const generateData = (
-  _level: number,
-  _preKey?: React.Key,
-  _tns?: DataNode[],
-) => {
+const generateData = (_level: number, _preKey?: React.Key, _tns?: DataNode[]) => {
   const preKey = _preKey ?? '0';
   const tns = _tns ?? defaultData;
 
@@ -40,19 +37,18 @@ const App: React.FC = () => {
   const [gData, setGData] = useState(defaultData);
   const [expandedKeys] = useState(['0-0', '0-0-0', '0-0-0-0']);
 
-  const onDragEnter: TreeProps['onDragEnter'] = (info) => {
+  const onDragEnter: TreeProps['onDragEnter'] = info => {
     console.log('info drag', info);
     // expandedKeys 需要受控时设置
     // setExpandedKeys(info.expandedKeys)
   };
 
-  const onDrop: TreeProps['onDrop'] = (info) => {
+  const onDrop: TreeProps['onDrop'] = info => {
     console.log('info drop', info);
     const dropKey = info.node.key;
     const dragKey = info.dragNode.key;
     const dropPos = info.node.pos.split('-');
-    const dropPosition =
-      info.dropPosition - Number(dropPos[dropPos.length - 1]);
+    const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
 
     const loop = (
       data: DataNode[],
@@ -79,7 +75,7 @@ const App: React.FC = () => {
 
     if (!info.dropToGap) {
       // Drop on the content
-      loop(data, dropKey, (item) => {
+      loop(data, dropKey, item => {
         item.children = item.children ?? [];
         // where to insert 示例添加到头部，可以是随意位置
         item.children.unshift(dragObj);
@@ -89,7 +85,7 @@ const App: React.FC = () => {
       (info.node as any).props.expanded && // Is expanded
       dropPosition === 1 // On the bottom gap
     ) {
-      loop(data, dropKey, (item) => {
+      loop(data, dropKey, item => {
         item.children = item.children ?? [];
         // where to insert 示例添加到头部，可以是随意位置
         item.children.unshift(dragObj);

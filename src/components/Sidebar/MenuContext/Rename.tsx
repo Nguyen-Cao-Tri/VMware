@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Input, Modal } from 'antd';
 import React, { useState, useContext } from 'react';
-import { DataNode, SidebarContext } from '../Sidebar';
+import { SidebarContext } from '../Sidebar';
 import { useLog } from '../../../hooks/logProvider/LogProvider';
 const Rename = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(true);

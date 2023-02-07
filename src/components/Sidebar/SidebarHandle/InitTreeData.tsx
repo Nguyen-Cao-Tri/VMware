@@ -1,6 +1,6 @@
 import React from 'react';
-import { DataNode } from '../Sidebar';
 import { DatabaseOutlined } from '@ant-design/icons';
+import { DataNode } from 'hooks/infoProvider/TypeInfo';
 
 export const InitTreeData = (data: DataNode[]) => {
   const newData: DataNode[] = [];

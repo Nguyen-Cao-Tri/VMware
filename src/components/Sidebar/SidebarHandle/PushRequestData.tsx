@@ -1,7 +1,7 @@
 import React from 'react';
-import { DataNode } from '../Sidebar';
 import { FolderOutlined, LaptopOutlined } from '@ant-design/icons';
 import PowerStart from '../../IconCustom/PowerStart';
+import { DataNode } from 'hooks/infoProvider/TypeInfo';
 export const PushRequestData = (data: object[], param: string) => {
   const children: DataNode[] = [];
   data.forEach((itemData: any) => {
@@ -9,12 +9,7 @@ export const PushRequestData = (data: object[], param: string) => {
       const obj = {
         title: itemData.name,
         key: itemData[param],
-        icon:
-          itemData.power_state === 'POWERED_ON' ? (
-            <PowerStart />
-          ) : (
-            <LaptopOutlined />
-          ),
+        icon: itemData.power_state === 'POWERED_ON' ? <PowerStart /> : <LaptopOutlined />,
         isLeaf: true,
       };
       children.push(obj);

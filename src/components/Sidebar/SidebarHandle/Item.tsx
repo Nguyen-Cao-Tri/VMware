@@ -2,61 +2,70 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Menu } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
-import { Action } from 'hooks/logProvider/LogProvider';
-import useRequest from '../../../hooks/useRequest/useRequest';
 import { items } from '../../../utils/items';
-import { DataNode, SidebarContext } from '../Sidebar';
-import { InitTreeData } from './InitTreeData';
+import { SidebarContext } from '../Sidebar';
 import ModalRename from '../../Modal/ModalRename';
+import { useInfo } from 'hooks/infoProvider/InfoProvider';
 const Item = () => {
   const [key, setKey] = useState<string>('');
-  const { request } = useRequest();
   const Context: any = useContext(SidebarContext);
-  useEffect(() => {
-    if (key === 'rename') {
-      ModalRename();
-      Context.setIsModalRenameOpen(true);
-    }
-  }, [key]);
-  return (
-    <Menu
-      items={items(Context.vmKey, Context.keyRightClick, Context.nameRightClick)}
-      onClick={key => {
-        setKey(key.key);
-        switch (key.key) {
-          case 'action':
-            break;
-          case 'refresh':
-            // void request('/api/vcenter/datacenter', 'GET', {
-            //   action: Action.REFRESH,
-            // }).then((res: DataNode[]) => {
-            //   Context.setTreeData(InitTreeData(res));
-            // });
-            Context.setKeyExpanded((prev: string[]) => [...prev]);
-            Context.setLoadedKeys((prev: string[]) => [...prev]);
-            Context.setCheckedKeys((prev: string[]) => [...prev]);
-            break;
-          case 'login':
-            Context.setIsModal({ UserLoginOpen: true });
-            break;
-          case 'clone':
-            Context.setIsModal({ CloneOpen: true });
-            break;
-          case 'getfile':
-            Context.setIsModal({ GetfileOpen: true });
-            break;
-          case 'copyfile':
-            Context.setIsModal({ CopyfileOpen: true });
-            break;
-          case 'process':
-            Context.setIsModal({ ProcessOpen: true });
-            break;
-          case key.key:
-            void Context.handlePowerState(Context.keyRightClick, key.key);
-            break;
-        }
-      }}
-    />
-  );
+  const { nameRightClick, keyRightClick, setIsModal, setTreeDatas, setOnExpand, setLoadedKey, setCheckedKey } =
+    useInfo();
+
+  // useEffect(() => {
+  //   if (key === 'rename' && setIsModal !== undefined) {
+  //     ModalRename();
+  //     setIsModal({ RenameOpen: true });
+  //   }
+  // }, [key]);
+  if (
+    keyRightClick !== undefined &&
+    nameRightClick !== undefined &&
+    setIsModal !== undefined &&
+    setTreeDatas !== undefined &&
+    setOnExpand !== undefined &&
+    setLoadedKey !== undefined &&
+    setCheckedKey !== undefined
+  )
+    return (
+      <Menu
+        style={{ width: '250px' }}
+        items={items(keyRightClick, nameRightClick)}
+        onClick={key => {
+          setKey(key.key);
+          switch (key.key) {
+            case 'action':
+              break;
+            case 'rename':
+              setIsModal({ RenameOpen: true });
+              break;
+            case 'refresh':
+              setOnExpand([]);
+              setLoadedKey([]);
+              setCheckedKey([]);
+              break;
+            case 'login':
+              setIsModal({ UserLoginOpen: true });
+              break;
+            case 'clone':
+              setIsModal({ CloneOpen: true });
+              break;
+            case 'getfile':
+              setIsModal({ GetfileOpen: true });
+              break;
+            case 'copyfile':
+              setIsModal({ CopyfileOpen: true });
+              break;
+            case 'process':
+              setIsModal({ ProcessOpen: true });
+              break;
+            case key.key:
+              void Context.handlePowerState(keyRightClick, key.key);
+              break;
+          }
+        }}
+      />
+    );
+  return <></>;
 };
 export default Item;

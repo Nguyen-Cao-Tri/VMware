@@ -19,9 +19,12 @@ import { ItemType } from 'antd/lib/menu/hooks/useItems';
 import { FaEdit } from 'react-icons/fa';
 import PowerOn from './customIconStart/PowerOn';
 import { vcenterAPI } from 'api/vcenterAPI';
-export const items = (vm: object[], keyRightClick: string, title: string): ItemType[] => {
+
+export const items = (keyRightClick: string, title: string): ItemType[] => {
   const [powerState, setPowerState] = useState<string>('');
+
   void vcenterAPI.getPower(keyRightClick).then(powerState => setPowerState(powerState.state));
+
   const iconRightclick = () => {
     if (keyRightClick.includes('datacenter')) return <DatabaseOutlined />;
     if (keyRightClick.includes('group')) return <FolderOutlined />;
@@ -56,29 +59,28 @@ export const items = (vm: object[], keyRightClick: string, title: string): ItemT
           label: 'Power On',
           key: 'start',
           icon: <PlayCircleOutlined />,
-          disabled: powerState === 'POWERED_ON' || powerState === 'reset',
+          disabled: powerState === 'POWERED_ON' || powerState === 'RESET',
         },
         {
           label: 'Power Off',
           icon: <StopOutlined />,
           key: 'stop',
-          disabled: powerState === 'stop' || powerState === 'POWERED_OFF',
+          disabled: powerState === 'POWERED_OFF',
         },
         {
           label: 'Suspend',
           key: 'suspend',
           icon: <PauseCircleOutlined />,
-          disabled: powerState === 'suspend' || powerState === 'POWERED_OFF' || powerState === 'stop',
+          disabled: powerState === 'SUSPEND' || powerState === 'POWERED_OFF',
         },
         {
           label: 'Reset',
           key: 'reset',
           icon: <RedoOutlined />,
           disabled:
-            powerState === 'reset' ||
+            powerState === 'RESET' ||
             powerState === 'POWERED_OFF' ||
-            powerState === 'stop' ||
-            powerState === 'suspend' ||
+            powerState === 'POWERED_ON' ||
             powerState === 'SUSPEND',
         },
       ],

@@ -2,27 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-invalid-void-type */
 /* eslint-disable @typescript-eslint/no-redeclare */
-import Datacenter from 'pages/Datacenter/Datacenter';
-export interface Datacenter {
-  name: string;
-  datacenter: string;
-}
-export interface Folder {
-  folder: string;
-  name: string;
-  type: string;
-}
-export interface Vm {
-  memory_size_MiB: number;
-  vm: string;
-  name: string;
-  power_state: string;
-  cpu_count: number;
-}
-interface Power {
-  setPowerState: string;
-  state: string;
-}
+import { ICpu, IDatacenter, IFolder, IGetPower, IGuest, IMemory, INetwork, ITools, IVm } from './TypeAPI';
 
 const baseURL = process.env.REACT_APP_API_URL;
 
@@ -44,35 +24,50 @@ const fetchAPI = <T>(url: string, method?: string, body?: Record<string, unknown
 };
 
 export const vcenterAPI = {
-  getDatacenters: (): Promise<Datacenter[]> => {
-    return fetchAPI<Datacenter[]>(`/api/vcenter/datacenter`);
+  getDatacenters: (): Promise<IDatacenter[]> => {
+    return fetchAPI<IDatacenter[]>(`/api/vcenter/datacenter`);
   },
-  getFoldersByIdParent: (datacenterID: string, parentFolder: string): Promise<Folder[]> => {
+  getFoldersByIdParent: (datacenterID?: string, parentFolder?: string): Promise<IFolder[]> => {
     if (parentFolder?.length === 0) {
-      return fetchAPI<Folder[]>(`/api/vcenter/folder?names=vm&datacenters=${datacenterID}`);
+      return fetchAPI<IFolder[]>(`/api/vcenter/folder?names=vm&datacenters=${datacenterID}`);
     }
-    return fetchAPI<Folder[]>(`/api/vcenter/folder?datacenters=${datacenterID}&parent_folders=${parentFolder}`);
+    return fetchAPI<IFolder[]>(`/api/vcenter/folder?datacenters=${datacenterID}&parent_folders=${parentFolder}`);
   },
-  getFolders: (idFolder: string): Promise<Folder[]> => {
-    return fetchAPI<Folder[]>(`/api/vcenter/folder?folders=${idFolder}`);
+  getFolders: (idFolder: string): Promise<IFolder[]> => {
+    return fetchAPI<IFolder[]>(`/api/vcenter/folder?folders=${idFolder}`);
   },
-  getVmsByIdParent: (folderID: string, datacenterID: string): Promise<Vm[]> => {
-    return fetchAPI<Vm[]>(`/api/vcenter/vm?folders=${folderID}&datacenters=${datacenterID}`);
+  getVmsByIdParent: (folderID?: string, datacenterID?: string): Promise<IVm[]> => {
+    return fetchAPI<IVm[]>(`/api/vcenter/vm?folders=${folderID}&datacenters=${datacenterID}`);
   },
-  getVms: (idVm: string): Promise<Vm[]> => {
-    return fetchAPI<Vm[]>(`/api/vcenter/vm?vms=${idVm}`);
+  getVms: (idVm: string): Promise<IVm[]> => {
+    return fetchAPI<IVm[]>(`/api/vcenter/vm?vms=${idVm}`);
   },
   postPower: (idVm?: string, action?: string): Promise<any> => {
     console.log('action', action);
     return fetchAPI(`/api/vcenter/vm/${idVm}/power?action=${action}`, 'POST');
   },
-  getPower: (idVm: string): Promise<Power> => {
-    return fetchAPI<Power>(`/api/vcenter/vm/${idVm}/power`);
+  getPower: (idVm: string): Promise<IGetPower> => {
+    return fetchAPI<IGetPower>(`/api/vcenter/vm/${idVm}/power`);
   },
   postTransferFile: (idVm: string, body: Record<string, unknown> | FormData): Promise<string> => {
     return fetchAPI<string>(`/api/vcenter/vm/${idVm}/guest/filesystem?action=create`, 'POST', body);
   },
   postCreateProcessFile: (idVm: string, body: Record<string, unknown> | FormData): Promise<string> => {
     return fetchAPI<string>(`/api/vcenter/vm/${idVm}/guest/processes?action=create`, 'POST', body);
+  },
+  getGuestOS: (idVm?: string): Promise<IGuest> => {
+    return fetchAPI(`/api/vcenter/vm/${idVm}/guest/identity`);
+  },
+  getTools: (idVm?: string): Promise<ITools> => {
+    return fetchAPI(`/api/vcenter/vm/${idVm}/tools`);
+  },
+  getNetWork: (idVm?: string): Promise<INetwork[]> => {
+    return fetchAPI(`/api/vcenter/vm/${idVm}/guest/networking/interfaces`);
+  },
+  getMemory: (idVm?: string): Promise<IMemory> => {
+    return fetchAPI(`/api/vcenter/vm/${idVm}/hardware/memory`);
+  },
+  getCpu: (idVm?: string): Promise<ICpu> => {
+    return fetchAPI(`/api/vcenter/vm/${idVm}/hardware/cpu`);
   },
 };

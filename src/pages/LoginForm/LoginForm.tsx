@@ -9,12 +9,12 @@ import './login.scss';
 import { encode } from 'base-64';
 import { toast } from 'react-toastify';
 import Logo from 'assets/images/logo.svg';
+import Bg from 'assets/images/img_login.jpg';
 // const [loadings, setLoadings] = useState<boolean[]>([]);
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const { requestLogin } = useRequestLogin();
-  // rtf6
 
   const onFinish = (values: Record<string, string>) => {
     const { username, password } = values;
@@ -24,22 +24,15 @@ const LoginForm: React.FC = () => {
     requestLogin(
       '/api/session',
       'POST',
-      { body: { username, password } },
+      {},
       {
         Authorization: `Basic ${base64Credential}`,
       },
     )
       .then((data: any) => {
-<<<<<<< HEAD
-        console.log('res', data);
-        localStorage.setItem('sessionId', data);
-=======
         // console.log('res', data);
-        console.log('data', data);
-
         const sessionId = data;
         localStorage.setItem('sessionId', sessionId);
->>>>>>> 25b04a83b316a7da17a90899433bbe4ad564ac4d
         toast.success('🦄 Logged in successfully!');
         navigate('/');
       })
@@ -59,7 +52,6 @@ const LoginForm: React.FC = () => {
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
   };
-
   return (
     <ConfigProvider
       theme={{
@@ -69,6 +61,10 @@ const LoginForm: React.FC = () => {
       }}
     >
       <div className="login">
+        {/* <div className="left_login">
+         
+        </div> */}
+        <img src={Bg} alt="image login" className="bg_login" />
         <div className="item_login">
           <div className="logo_login">
             <img src={Logo} alt="logo" />

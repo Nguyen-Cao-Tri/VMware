@@ -5,23 +5,23 @@ import React, { useEffect, useState } from 'react';
 import '../../components/Content/content.scss';
 import { LaptopOutlined, FolderOutlined } from '@ant-design/icons';
 import { Collapse } from 'antd';
-import { HiOutlineChip } from 'react-icons/hi';
-import { FaMemory } from 'react-icons/fa';
-import { useInfo } from '../../hooks/infoProvider/InfoProvider';
+import { useInfo } from 'hooks/infoProvider/InfoProvider';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { vcenterAPI } from 'api/vcenterAPI';
+import cpu from 'assets/images/cpu.png';
+import memory from 'assets/images/memory.png';
+import storage from 'assets/images/storage.png';
+import { IFolder } from 'api/TypeAPI';
 const { Panel } = Collapse;
-interface IFolder {
-  folder: string;
-  name: string;
-  type: string;
-}
+
 const Folder = () => {
   const [searchParams] = useSearchParams();
   const [inforFolder, setInforFolder] = useState<IFolder>({ folder: '', name: '', type: '' });
   const { inforSelect, vm, keyExpand, arrayFormatTreeData } = useInfo();
   const keySelect = inforSelect.key;
   const children = inforSelect.children;
+  const title = inforSelect.title;
+
   const navigate = useNavigate();
   useEffect(() => {
     void vcenterAPI.getFolders(keySelect).then(res => setInforFolder(res[0]));
@@ -64,7 +64,7 @@ const Folder = () => {
       <div style={{ padding: '20px' }}>
         <div className="render_summary">
           <div>
-            <h3>Folder name: {inforFolder?.name}</h3>
+            <h3>Folder name: {title}</h3>
             {children?.length >= 0 ? (
               <div>
                 <h4>
@@ -78,11 +78,11 @@ const Folder = () => {
               <h4>Expand to know more information</h4>
             )}
           </div>
-          <div className="summary">
+          <div className="summaryFolder">
             <table>
               <tr>
                 <td>
-                  <HiOutlineChip className="icon_summary fs" />
+                  <img style={{ marginLeft: '3px', height: '40px', width: '40px' }} src={cpu} alt="cpu" />
                 </td>
                 <td>
                   <div> CPU USAGE</div>
@@ -91,10 +91,19 @@ const Folder = () => {
               </tr>
               <tr>
                 <td>
-                  <FaMemory className="icon_summary fs2 " style={{ marginLeft: '3px' }} />
+                  <img style={{ marginLeft: '3px', height: '40px', width: '40px' }} src={memory} alt="memory" />
                 </td>
                 <td className="memory">
                   <div> MEMORY USAGE</div>
+                  <div>{vm.memory?.size_MiB} MB</div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <img style={{ marginLeft: '3px', height: '40px', width: '40px' }} src={storage} alt="memory" />
+                </td>
+                <td className="memory">
+                  <div> STORAGE USAGE</div>
                   <div>{vm.memory?.size_MiB} MB</div>
                 </td>
               </tr>
@@ -105,7 +114,7 @@ const Folder = () => {
           <div className="item_table" style={{ marginRight: '20px' }}>
             <Collapse collapsible="header" defaultActiveKey={['1']}>
               <Panel header="Compute Policies" key="1">
-                <a href="#">View all policies</a>
+                <a href="*">View all policies</a>
               </Panel>
             </Collapse>
           </div>
@@ -124,7 +133,7 @@ const Folder = () => {
     <>
       <div className="nav">
         <div className="title">
-          <span>{inforFolder?.name}</span>
+          <span>{title}</span>
         </div>
       </div>
       <RenderUI />

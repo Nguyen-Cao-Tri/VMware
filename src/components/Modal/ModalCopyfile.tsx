@@ -6,12 +6,13 @@ import React, { useContext, useState } from 'react';
 import { Input, Modal } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
 import { Action } from '../../hooks/logProvider/LogProvider';
-import { SidebarContext } from '../Sidebar/Sidebar';
-import { vcenterAPI } from 'api/vcenterAPI';
+
+import { useInfo } from 'hooks/infoProvider/InfoProvider';
 const ModalCopyfile = () => {
-  const Context: any = useContext(SidebarContext);
+  const { isModal, keyRightClick, nameRightClick, setIsModal } = useInfo();
+
   const handleCancel = () => {
-    Context.setIsModalCopyfileOpen(false);
+    if (setIsModal !== undefined) setIsModal({ ProcessOpen: false });
   };
   const [pathInput, setPathInput] = useState<string>('');
   const [fileInput, setFileInput] = useState<string>('');
@@ -22,13 +23,13 @@ const ModalCopyfile = () => {
   };
 
   const handleOk = async () => {
-    const vmUsername = localStorage.getItem(`username ${Context.keyRightClick}`);
-    const vmPassword = localStorage.getItem(`password ${Context.keyRightClick}`);
+    const vmUsername = localStorage.getItem(`username ${keyRightClick}`);
+    const vmPassword = localStorage.getItem(`password ${keyRightClick}`);
 
     await request(
       `/api/vcenter/vm/vm-376065/guest/filesystem?action=create`,
       'POST',
-      { action: Action.COPY_FILE, name: Context.nameRightClick },
+      { action: Action.COPY_FILE, name: nameRightClick },
       false,
       {
         credentials: {
@@ -51,7 +52,7 @@ const ModalCopyfile = () => {
         request(
           response,
           'PUT',
-          { action: Action.PUT_COPY_FILE, name: Context.nameRightClick },
+          { action: Action.PUT_COPY_FILE, name: nameRightClick },
           true,
           {
             body: formData,
@@ -78,7 +79,7 @@ const ModalCopyfile = () => {
   return (
     <Modal
       title="CopyFile"
-      open={Context.isModal.CopyfileOpen}
+      open={isModal?.CopyfileOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}

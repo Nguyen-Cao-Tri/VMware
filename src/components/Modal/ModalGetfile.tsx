@@ -3,14 +3,14 @@
 import React, { useContext, useState } from 'react';
 import { Input, Modal } from 'antd';
 import { Action, useLog } from '../../hooks/logProvider/LogProvider';
-import { SidebarContext } from '../Sidebar/Sidebar';
 import useRequest from '../../hooks/useRequest/useRequest';
 import { vcenterAPI } from 'api/vcenterAPI';
+import { useInfo } from 'hooks/infoProvider/InfoProvider';
 
 const ModalGetfile = () => {
-  const Context: any = useContext(SidebarContext);
+  const { isModal, nameRightClick, keyRightClick, checkedKeys, setIsModal } = useInfo();
   const handleCancel = () => {
-    Context.setIsModal({ GetfileOpen: false });
+    if (setIsModal !== undefined) setIsModal({ GetfileOpen: false });
   };
   const [getfileInput, setGetfileInput] = useState<string>('');
   const { request, isLoading } = useRequest();
@@ -33,19 +33,21 @@ const ModalGetfile = () => {
       .then(res => window.open(res));
   };
   const handleOk = () => {
-    const vmCheckKeys = Context.checkedKeys.filter((item: any) => item.includes('vm'));
-    if (vmCheckKeys.length > 0) {
-      vmCheckKeys.map((item: any) => {
-        void handleGetfile(item);
-      });
-    } else void handleGetfile(Context.keyRightClick);
-    setGetfileInput('');
-    handleCancel();
+    if (keyRightClick) {
+      const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
+      if (vmCheckKeys.length > 0) {
+        vmCheckKeys.map((item: any) => {
+          void handleGetfile(item);
+        });
+      } else void handleGetfile(keyRightClick);
+      setGetfileInput('');
+      handleCancel();
+    }
   };
   return (
     <Modal
       title="Getfile"
-      open={Context.isModal.GetfileOpen}
+      open={isModal?.GetfileOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}

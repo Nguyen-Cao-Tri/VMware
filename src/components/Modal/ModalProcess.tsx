@@ -6,46 +6,49 @@ import React, { useContext, useState } from 'react';
 import { Form, Input, Modal, notification, Select } from 'antd';
 import useRequest from '../../hooks/useRequest/useRequest';
 import { Action, useLog } from '../../hooks/logProvider/LogProvider';
-import { DataNode, SidebarContext } from '../Sidebar/Sidebar';
+import { SidebarContext } from '../Sidebar/Sidebar';
 import { InforLogin } from './InforLoginModal';
 import { vcenterAPI } from 'api/vcenterAPI';
+import { useInfo } from 'hooks/infoProvider/InfoProvider';
 const ModalProcess = () => {
   const [form] = Form.useForm();
   const { vmLog } = useLog();
-  const Context: any = useContext(SidebarContext);
-  const handleCancel: any = () => {
-    Context.setIsModalProcessOpen(false);
+  const { isModal, nameRightClick, keyRightClick, setIsModal } = useInfo();
+
+  const handleCancel = () => {
+    if (setIsModal !== undefined) setIsModal({ ProcessOpen: false });
   };
   const { request, isLoading } = useRequest();
   InforLogin();
 
   const handleOk = async () => {
-    await vcenterAPI
-      .postCreateProcessFile(Context.keyRightClick, {
-        credentials: {
-          interactive_session: false,
-          password: 'zxcasdqwe~123456789',
-          type: 'USERNAME_PASSWORD',
-          user_name: 'home',
-        },
-        spec: {
-          arguments: form.getFieldValue('arguments'),
-          environment_variables: {},
-          path: form.getFieldValue('path'),
-          start_minimized: false,
-          working_directory: form.getFieldValue('working_directory'),
-        },
-      })
-      .then(idProcess => {
-        if (vmLog !== undefined) {
-          vmLog({
-            executeTime: Date.now(),
-            name: Context.nameRightClick,
-            action: `: Run process successfully with id: ${idProcess}`,
-          });
-        }
-      })
-      .catch(err => console.log('error', err));
+    if (keyRightClick !== undefined)
+      await vcenterAPI
+        .postCreateProcessFile(keyRightClick, {
+          credentials: {
+            interactive_session: false,
+            password: 'zxcasdqwe~123456789',
+            type: 'USERNAME_PASSWORD',
+            user_name: 'home',
+          },
+          spec: {
+            arguments: form.getFieldValue('arguments'),
+            environment_variables: {},
+            path: form.getFieldValue('path'),
+            start_minimized: false,
+            working_directory: form.getFieldValue('working_directory'),
+          },
+        })
+        .then(idProcess => {
+          if (vmLog !== undefined) {
+            vmLog({
+              executeTime: Date.now(),
+              name: nameRightClick,
+              action: `: Run process successfully with id: ${idProcess}`,
+            });
+          }
+        })
+        .catch(err => console.log('error', err));
     form.setFieldsValue({ arguments: '', path: '', minimized: 'false', working_directory: '' });
     handleCancel();
   };
@@ -91,7 +94,7 @@ const ModalProcess = () => {
   return (
     <Modal
       title="Process"
-      open={Context.isModal.ProcessOpen}
+      open={isModal?.ProcessOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={isLoading}

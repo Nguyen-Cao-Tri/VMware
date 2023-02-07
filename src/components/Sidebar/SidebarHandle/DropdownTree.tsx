@@ -3,28 +3,40 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useState } from 'react';
 import { Dropdown, Tree, TreeProps } from 'antd';
-import { DataNode, SidebarContext } from '../Sidebar';
+import { SidebarContext } from '../Sidebar';
 import './sidebar.scss';
 import { useInfo } from '../../../hooks/infoProvider/InfoProvider';
 import Item from './Item';
+import { DataNode } from 'hooks/infoProvider/TypeInfo';
 // import { Search } from 'react-router-dom';
 
 const DropdownTree = () => {
-  const { setOnExpand } = useInfo();
   const Context: any = useContext(SidebarContext);
+  const {
+    setOnExpand,
+    loadedKeys,
+    treeData,
+    checkedKeys,
+    keyExpand,
+    setCheckedKey,
+    setNameClick,
+    setKeyClick,
+    setTreeDatas,
+  } = useInfo();
   const onRightClick = (value: any) => {
-    Context.setKeyRightClick(value.node.key);
-    Context.setNameRightClick(value.node.title);
+    if (setKeyClick && setNameClick) {
+      setKeyClick(value.node.key);
+      setNameClick(value.node.title);
+    }
   };
   const onExpand = (value: React.Key[], info: any) => {
     if (setOnExpand != null) setOnExpand(value);
-    Context.setKeyExpanded(value);
   };
   const onCheck = (value: any) => {
-    Context.setCheckedKeys(value);
+    if (setCheckedKey != null) setCheckedKey(value);
   };
   const updateTreeDrop = (info: any) => {
-    Context.setTreeData(info);
+    if (setTreeDatas != null) setTreeDatas(info);
   };
   const onDrop: TreeProps['onDrop'] = info => {
     const dropKey = info?.node?.key;
@@ -95,12 +107,11 @@ const DropdownTree = () => {
             onSelect={onSelect}
             onExpand={onExpand}
             defaultExpandParent={true}
-            treeData={Context.treeData}
+            treeData={treeData}
             loadData={Context.onLoadData}
-            loadedKeys={Context.loadedKeys}
-            checkedKeys={Context.checkedKeys}
-            expandedKeys={Context.keyExpanded}
-            selectedKeys={Context.keySelected}
+            loadedKeys={loadedKeys}
+            checkedKeys={checkedKeys}
+            expandedKeys={keyExpand}
             onRightClick={onRightClick}
             onDrop={info => {
               onDrop(info);

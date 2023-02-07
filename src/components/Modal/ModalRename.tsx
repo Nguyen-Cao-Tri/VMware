@@ -1,39 +1,41 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import { Input, Modal } from 'antd';
-import React, { useContext, useEffect, useState } from 'react';
+import { useInfo } from 'hooks/infoProvider/InfoProvider';
+import { DataNode } from 'hooks/infoProvider/TypeInfo';
+import React, { useEffect, useState } from 'react';
 import { useLog } from '../../hooks/logProvider/LogProvider';
-import { DataNode, SidebarContext } from '../Sidebar/Sidebar';
 
 const ModalRename = () => {
   const { vmLog } = useLog();
-  const Context: any = useContext(SidebarContext);
-  console.log('context', Context);
+  const { isModal, nameRightClick, keyRightClick, treeData, setIsModal, setTreeDatas } = useInfo();
 
   const handleCancel = () => {
-    Context.setIsModal({ RenameOpen: false });
+    if (setIsModal !== undefined) setIsModal({ RenameOpen: false });
   };
   const handleOk = (value: any) => {
-    if (vmLog !== undefined) {
-      vmLog({
-        executeTime: Date.now(),
-        name: Context.nameRightClick,
-        action: `Changed name to ${value}`,
-      });
+    if (setIsModal && setTreeDatas && keyRightClick) {
+      if (vmLog !== undefined) {
+        vmLog({
+          executeTime: Date.now(),
+          name: nameRightClick,
+          action: `Changed name to ${value}`,
+        });
+      }
+      setTreeDatas([...findRename(treeData, keyRightClick, value)]);
+      setIsModal({ RenameOpen: false });
     }
-    Context.setTreeData([...findRename(Context.treeData, Context.keyRightClick, value)]);
-    Context.setIsModal({ RenameOpen: false });
   };
   const [renameInput, setRenameInput] = useState<string>('');
 
   useEffect(() => {
-    setRenameInput(Context.nameRightClick);
-  }, [Context.nameRightClick]);
+    if (nameRightClick !== undefined) setRenameInput(nameRightClick);
+  }, [nameRightClick]);
 
   return (
     <Modal
       title="Rename"
-      open={Context.isModal.RenameOpen}
+      open={isModal?.RenameOpen}
       onOk={() => {
         handleOk(renameInput);
         setRenameInput('');

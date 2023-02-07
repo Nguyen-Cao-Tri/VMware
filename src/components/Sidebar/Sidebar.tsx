@@ -21,56 +21,57 @@ import ModalRename from '../Modal/ModalRename';
 import ModalClone from 'components/Modal/ModalClone';
 import { Input, Spin } from 'antd';
 import { vcenterAPI } from 'api/vcenterAPI';
-import { useAPI } from 'hooks/useAPI/useAPI';
+import { DataNode } from 'hooks/infoProvider/TypeInfo';
 
-export interface DataNode {
-  title: string;
-  key: string;
-  children?: DataNode[];
-  isLeaf?: boolean;
-  username?: string;
-  password?: string;
-}
 export const SidebarContext = createContext({});
 export const Sidebar = () => {
-  const [isModal, setIsModal] = useState({
-    UserLoginOpen: false,
-    CopyfileOpen: false,
-    GetfileOpen: false,
-    ProcessOpen: false,
-    RenameOpen: false,
-    CloneOpen: false,
-  });
-  const [alternativeTreeData, setAlternativeTreeData] = useState<DataNode[]>([]);
-  const [nameRightClick, setNameRightClick] = useState<string>('');
-  const [keyExpanded, setKeyExpanded] = useState<React.Key[]>([]);
-  const [keyDatacenter, setKeyDatacenter] = useState<string>('');
-  const [keyRightClick, setKeyRightClick] = useState<string>('');
-  const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
-  const [keySelected, setKeySelected] = useState<React.Key[]>([]);
-  const [treeData, setTreeData] = useState<DataNode[]>([]);
-  const [checkedKeys, setCheckedKeys] = useState<any>([]);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const {
+    alternativeTreeData,
+    keyDatacenter,
+    inforSelect,
+    checkedKeys,
+    curentTheme,
+    loadedKeys,
+    keySelect,
+    treeData,
+    vm,
+    vmKey,
+    setVmKeys,
+    setOnExpand,
+    setOnSelect,
+    setChildrens,
+    setLoadedKey,
+    setTreeDatas,
+    setDatacenters,
+    setAlternative,
+    setKeySelected,
+    setKeyDatacenters,
+    setArrayTreeData,
+    setVmPowerStates,
+  } = useInfo();
 
   const antIcon = <LoadingOutlined className="loading" style={{ fontSize: 15 }} spin />;
-
-  const { inforSelect, curentTheme, setOnSelect, setVmPowerStates, setChildrens, setArrayTreeData } = useInfo();
   useEffect(() => {
     vcenterAPI.getDatacenters().then((datacenter: any) => {
-      setTreeData(InitTreeData(datacenter));
+      if (setTreeDatas) setTreeDatas(InitTreeData(datacenter));
     });
     const keySelectParam: any = searchParams.get('selected')?.split(',');
     const keyExpandParam: any = searchParams.get('expanded')?.split(',');
-    setKeyExpanded(keyExpandParam);
-    setKeySelected(keySelectParam);
+    if (setOnExpand && setKeySelected) {
+      setOnExpand(keyExpandParam);
+      setKeySelected(keySelectParam);
+    }
   }, []);
   const checkUpdateIcon = (action: string, idVm: string) => {
-    if (action === 'start') {
-      setTreeData([...updateIconStart(treeData, <PowerStart />, idVm)]);
-    }
-    if (action === 'stop') {
-      setTreeData([...updateIconStart(treeData, <LaptopOutlined />, idVm)]);
+    if (setTreeDatas && treeData) {
+      if (action === 'start') {
+        setTreeDatas([...updateIconStart(treeData, <PowerStart />, idVm)]);
+      }
+      if (action === 'stop') {
+        setTreeDatas([...updateIconStart(treeData, <LaptopOutlined />, idVm)]);
+      }
     }
   };
   const updateIconStart = (list: DataNode[], icon: any, idVm: string) => {
@@ -85,22 +86,33 @@ export const Sidebar = () => {
     return list;
   };
   const callApiPowerState = async (idVm: string, action: string) => {
-    setTreeData([...updateIconStart(treeData, <Spin indicator={antIcon} />, idVm)]);
-    await vcenterAPI
-      .postPower(idVm, action)
-      .then(async () => {
-        checkUpdateIcon(action, idVm);
-      })
-      .catch((err: any) => {
-        `${err}`.includes('Failed to fetch') ? setTreeData([...treeData]) : checkUpdateIcon(action, idVm);
+    if (setTreeDatas && treeData) {
+      setTreeDatas([...updateIconStart(treeData, <Spin indicator={antIcon} />, idVm)]);
+      await vcenterAPI
+        .postPower(idVm, action)
+        .then(async () => {
+          vm.forEach((itemVm: any) => {
+            if (itemVm.vmKey === idVm) {
+              itemVm.power_state = action;
+              localStorage.setItem(itemVm.vmKey, action);
+            }
+          });
+          checkUpdateIcon(action, idVm);
+        })
+        .catch(err => {
+          `${err}`.includes('Failed to fetch') ? setTreeDatas([...treeData]) : checkUpdateIcon(action, idVm);
+        });
+
+      await vcenterAPI.getPower(idVm).then(powerState => {
+        const obj = {
+          idVm,
+          powerState,
+        };
+        console.log('obj', obj);
+
+        if (setVmPowerStates) setVmPowerStates(obj);
       });
-    await vcenterAPI.getPower(idVm).then(powerState => {
-      const obj = {
-        idVm,
-        powerState,
-      };
-      if (setVmPowerStates) setVmPowerStates(obj);
-    });
+    }
   };
   const handlePowerState = async (idVm: string, action: string) => {
     const vmCheckKeys = checkedKeys.filter((item: any) => item.includes('vm'));
@@ -138,7 +150,7 @@ export const Sidebar = () => {
       });
       if (setArrayTreeData) setArrayTreeData(formatTreeData(treeData, [], '1'));
       ['datacenter', 'group', 'vm'].forEach((item: any) => navigateSelect(item, value[0]));
-      setKeySelected(value);
+      if (setKeySelected) setKeySelected(value);
       localStorage.setItem('keySelect', JSON.stringify(value));
       const obj = {
         title: info.node.title,
@@ -150,56 +162,64 @@ export const Sidebar = () => {
     }
   };
   const updateTreeOnLoadData = (list: DataNode[], key: string, data: any, param: string) => {
-    setTreeData(() => UpdateTreeData(treeData, key, PushRequestData(data, param)));
-    sessionStorage.setItem('treeData', JSON.stringify(UpdateTreeData(treeData, key, PushRequestData(data, param))));
-    sessionStorage.setItem('sessionLogin', JSON.stringify(UpdateTreeData(treeData, key, PushRequestData(data, param))));
-    localStorage.setItem('localLogin', JSON.stringify(UpdateTreeData(treeData, key, PushRequestData(data, param))));
-    setAlternativeTreeData(() => UpdateTreeData(treeData, key, PushRequestData(data, param)));
+    if (setTreeDatas && setAlternative && treeData) {
+      setTreeDatas(() => UpdateTreeData(treeData, key, PushRequestData(data, param)));
+      sessionStorage.setItem('treeData', JSON.stringify(UpdateTreeData(treeData, key, PushRequestData(data, param))));
+      sessionStorage.setItem(
+        'sessionLogin',
+        JSON.stringify(UpdateTreeData(treeData, key, PushRequestData(data, param))),
+      );
+      localStorage.setItem('localLogin', JSON.stringify(UpdateTreeData(treeData, key, PushRequestData(data, param))));
+      setAlternative(() => UpdateTreeData(treeData, key, PushRequestData(data, param)));
+    }
   };
   const onLoadData = async ({ key }: any) => {
-    if (key.includes('datacenter')) {
-      setKeyDatacenter(key);
-      await vcenterAPI.getFoldersByIdParent(key, '').then(folder => {
-        updateTreeOnLoadData(treeData, key, folder, 'folder');
-        if (key === keySelected) {
-          if (setChildrens) setChildrens(folder);
-        }
-      });
-    }
-    if (key.includes('group')) {
-      await vcenterAPI.getFoldersByIdParent(keyDatacenter, key).then(folder => {
-        if (keySelected !== undefined && key === keySelected[0].toString())
-          if (setOnSelect) {
-            setOnSelect({
-              title: inforSelect.title,
-              key,
-              children: folder,
-            });
+    if (setKeyDatacenters && setVmKeys && setLoadedKey && loadedKeys) {
+      if (key.includes('datacenter')) {
+        setKeyDatacenters(key);
+        await vcenterAPI.getFoldersByIdParent(key, '').then(folder => {
+          updateTreeOnLoadData(treeData, key, folder, 'folder');
+          if (key === keySelect) {
+            if (setChildrens) setChildrens(folder);
           }
-        updateTreeOnLoadData(treeData, key, folder, 'folder');
-      });
-      await vcenterAPI.getVmsByIdParent(key, keyDatacenter).then(vm => {
-        if (vm.length > 0) {
-          if (keySelected !== undefined && key === keySelected[0].toString()) {
+        });
+      }
+      if (key.includes('group')) {
+        await vcenterAPI.getFoldersByIdParent(keyDatacenter, key).then(folder => {
+          if (keySelect !== undefined && key === keySelect[0].toString())
             if (setOnSelect) {
               setOnSelect({
                 title: inforSelect.title,
                 key,
-                children: vm,
+                children: folder,
               });
             }
+          updateTreeOnLoadData(treeData, key, folder, 'folder');
+        });
+        await vcenterAPI.getVmsByIdParent(key, keyDatacenter).then(vm => {
+          if (vm.length > 0) {
+            if (keySelect !== undefined && key === keySelect[0].toString()) {
+              if (setOnSelect) {
+                setOnSelect({
+                  title: inforSelect.title,
+                  key,
+                  children: vm,
+                });
+              }
+            }
+            updateTreeOnLoadData(treeData, key, vm, 'vm');
           }
-          updateTreeOnLoadData(treeData, key, vm, 'vm');
-        }
-      });
+        });
+      }
+      setLoadedKey(loadedKeys.concat([key]));
     }
-    setLoadedKeys(loadedKeys.concat([key]));
   };
   const searchTree = (list: DataNode[], value: string) => {
-    list.map((itemList: any) => {
-      if (itemList.title.toLocaleLowerCase().includes(value)) return setTreeData([itemList]);
-      else if (itemList.children) searchTree(itemList.children, value);
-    });
+    if (setTreeDatas)
+      list.map((itemList: any) => {
+        if (itemList.title.toLocaleLowerCase().includes(value)) return setTreeDatas([itemList]);
+        else if (itemList.children) searchTree(itemList.children, value);
+      });
   };
   const handleOnChange = (value: string) => {
     console.log('alternativeTreeData', alternativeTreeData);
@@ -207,24 +227,9 @@ export const Sidebar = () => {
     searchTree(alternativeTreeData, inputValue);
   };
   const value = {
-    treeData,
-    loadedKeys,
-    keyExpanded,
-    keySelected,
-    checkedKeys,
-    keyRightClick,
-    nameRightClick,
-    isModal,
     onLoadData,
-    setTreeData,
-    setLoadedKeys,
     handleOnSelect,
-    setCheckedKeys,
-    setKeyExpanded,
-    setKeyRightClick,
     handlePowerState,
-    setNameRightClick,
-    setIsModal,
   };
   return (
     <SidebarContext.Provider value={value}>

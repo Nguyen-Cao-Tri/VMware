@@ -1,20 +1,25 @@
 .login {
-  // background: linear-gradient(269.88deg, #e4f4ff 6.75%, #fcf8ed 95.85%);
-  background: linear-gradient(to top left, #99ccff 0%, #fcf8ed 60%);
-  // background: url('../../assets/images/loginvm.jpg') top center/cover;
-  height: 100%;
-  width: 100%;
+  .bg_login{
+    background: top center/cover;
+   filter: brightness(50%);
+   height: 100%;
+   width: 100%;
+   position: absolute;
+  }
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
-
+  position: relative;
   .item_login {
-    background-color: #fafafa;
+    // background-color: #f6f6f6;
+     background: linear-gradient(to top left, #99ccff 0%, #fcf8ed 60%);
     box-sizing: border-box;
-    box-shadow: 14px 14px 20px #c2ddf8;
+    box-shadow: 14px 14px 20px #8d8a8a;
     border-radius: 10px;
     padding: 50px;
+    z-index: 1;
+    height: 350px;
     .logo_login {
       text-align: center;
       margin-bottom: 20px;
@@ -27,7 +32,7 @@
     Form {
       border-radius: 5px;
 
-      width: 400px;
+      width: 350px;
 
       button {
         width: 100%;

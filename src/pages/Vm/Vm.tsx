@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import React, { useEffect, useState } from 'react';
@@ -9,20 +10,20 @@ import { vcenterAPI } from 'api/vcenterAPI';
 import RenderUI from './HandleVm/RenderUI/RenderUI';
 import './vm.scss';
 
-interface IVm {
-  memory_size_MiB: number;
-  vm: string;
-  name: string;
-  power_state: string;
-  cpu_count: number;
-}
+// interface IVm {
+//   memory_size_MiB: number;
+//   vm: string;
+//   name: string;
+//   power_state: string;
+//   cpu_count: number;
+// }
 const Vm = () => {
-  const [inforVm, setInforVm] = useState<IVm>({ memory_size_MiB: 0, vm: '', name: '', power_state: '', cpu_count: 0 });
+  // const [inforVm, setInforVm] = useState<IVm>({ memory_size_MiB: 0, vm: '', name: '', power_state: '', cpu_count: 0 });
   const { inforSelect, keyExpand, arrayFormatTreeData } = useInfo();
   const keySelect = inforSelect.key;
   const navigate = useNavigate();
   useEffect(() => {
-    void vcenterAPI.getVms(keySelect).then(inforVm => setInforVm(inforVm[0]));
+    // void vcenterAPI.getVms(keySelect).then(inforVm => setInforVm(inforVm[0]));
     const idParentStorage: any = localStorage.getItem('idParent');
     if (arrayFormatTreeData?.length === 0) {
       JSON.parse(idParentStorage)?.map((item: any) => {
@@ -53,10 +54,10 @@ const Vm = () => {
   }, [keySelect, keyExpand]);
   return (
     <>
-      <MenuVm prop={inforVm} />
+      <MenuVm />
       <div className="content_item">
         <div className="render_ui">
-          <RenderUI prop={keySelect} />
+          <RenderUI />
         </div>
         <div className="table_content">{keySelect?.includes('vm') ? <TableVm /> : ''}</div>
       </div>
